@@ -1,6 +1,10 @@
 #! /usr/bin/env bash
 
-# bash deploy.sh ../../niudour/static/
+if [ $1 == "" ]; then
+  echo 'usage:'
+  echo 'bash deploy.sh ../niudour/static/'
+  exit 1
+fi
 
 srcDir=$1
 
