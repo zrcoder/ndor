@@ -1,12 +1,12 @@
 #! /usr/bin/env bash
 
-if [ "$1" = "" ]; then
+if [ "$@" = "" ]; then
   echo 'usage:'
   echo 'bash deploy.sh ../niudour/static/*'
   exit 1
 fi
 
-src=$1
+src=$@
 
 rsync -r ${src} .
 
