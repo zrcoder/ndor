@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-if [ $1 == "" ]; then
+if [ "$1" = "" ]; then
   echo 'usage:'
   echo 'bash deploy.sh ../niudour/static/'
   exit 1
