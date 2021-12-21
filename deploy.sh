@@ -2,13 +2,13 @@
 
 if [ "$1" = "" ]; then
   echo 'usage:'
-  echo 'bash deploy.sh ../niudour/static/'
+  echo 'bash deploy.sh ../niudour/static/*'
   exit 1
 fi
 
-srcDir=$1
+src=$1
 
-rsync -r ${srcDir} .
+rsync -r ${src} .
 
 git add -A
 git commit -m "deploy"
