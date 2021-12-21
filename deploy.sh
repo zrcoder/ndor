@@ -10,6 +10,7 @@ src=$@
 
 rsync -r ${src} .
 
+
 git add -A
 git commit -m "deploy"
 
