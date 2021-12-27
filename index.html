@@ -6,6 +6,17 @@
     <title>牛豆儿画图</title>
     <link rel="icon" href="images/ellipse.png">
     <link rel="stylesheet" href="style.css" type="text/css">
+
+    <script src="wasm_exec.js"></script>
+    <script src="js/wasm.js"></script>
+    <!--alert-->
+    <script>document.documentElement.style.setProperty('--animate-duration', '400ms')</script>
+    <script src="js/sweetalert2.js"></script>
+    <script src="js/alert.js"></script>
+    <!--monaco editor-->
+    <script src="./monaco-editor/package/min/vs/loader.js"></script>
+    <script src="js/editor.js"></script>
+
 </head>
 
 <body style="overflow:hidden">
@@ -21,16 +32,6 @@
 
 <button id="teacherButton" class="teacher-button" onclick="teacherAction()">HELP</button>
 <button id="goButton" class="run-button">GO</button>
-
-<script src="wasm_exec.js"></script>
-<script src="js/wasm.js"></script>
-<!--alert-->
-<script>document.documentElement.style.setProperty('--animate-duration', '400ms')</script>
-<script src="js/sweetalert2.js"></script>
-<script src="js/alert.js"></script>
-<!--monaco editor-->
-<script src="./monaco-editor/package/min/vs/loader.js"></script>
-<script src="js/editor.js"></script>
 </body>
 
 </html>
