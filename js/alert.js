@@ -45,7 +45,7 @@ function alertResult(imgSrc, msg) {
                 text: "I'll give you an example soon",
             }).then((reslut) => {
                 const exampleCode = 'context 800 800\ncolor 0 255 0 255\ncircle 400 400 300\nfill'
-                editModel.setValue(exampleCode)
+                setCode(exampleCode)
             })
         } else {
             Swal.fire({
