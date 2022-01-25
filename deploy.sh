@@ -2,11 +2,12 @@
 
 if [ -z "$1" ]; then
   echo 'You should give the sources for this script, like:'
-  echo 'bash deploy.sh ../niudour/static/*'
+  echo './deploy.sh ../../../gitee/rdor/niudour/static/*'
   exit 1
 fi
 
 src=$@
+
 rsync -r ${src} .
 
 git add -A
