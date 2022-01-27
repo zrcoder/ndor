@@ -15,11 +15,11 @@
 }
 .left-box{
     left: 20px;
-    width: 700px;
+    width: 50%;
 }
 .right-box{
-    left: 720px;
-    width: 100%;
+    left: 50%;
+    width: 50%;
     border:1px solid lightgray;
     border-top:none;
     border-bottom:none;
