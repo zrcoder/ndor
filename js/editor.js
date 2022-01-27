@@ -1,7 +1,8 @@
-require.config({ paths: { vs: './monaco-editor/package/min/vs' } })
+require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.31.1/min/vs' } })
 var codeEditor
 require(['vs/editor/editor.main'], function () {
-    codeEditor = monaco.editor.create(document.getElementById('codeArea'), {
+    const codeArea = document.getElementById('codeArea')
+    codeEditor = monaco.editor.create(codeArea, {
         language: 'coffeescript',
         fontSize: 24,
     })

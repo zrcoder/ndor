@@ -1,12 +1,6 @@
 #! /usr/bin/env bash
 
-if [ -z "$1" ]; then
-  echo 'You should give the sources for this script, like:'
-  echo './deploy.sh ../../../gitee/rdor/niudour/static/*'
-  exit 1
-fi
-
-src=$@
+src='../../../gitee/rdor/niudour/static/*'
 
 rsync -r ${src} .
 
