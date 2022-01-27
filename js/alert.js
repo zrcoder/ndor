@@ -1,5 +1,3 @@
-document.documentElement.style.setProperty('--animate-duration', '400ms')
-
 function teacherAction() {
     Swal.fire({
         imageUrl: 'images/teacher.png',
