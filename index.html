@@ -1,17 +1,62 @@
 <!DOCTYPE html>
-<html lang="zh_CN">
-
-<head >
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>牛豆儿画图</title>
-    <link rel="icon" href="images/ellipse.png">
-    <link rel="stylesheet" href="style.css">
-    <script src="wasm_exec.js" type="text/javascript"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.10/dist/sweetalert2.all.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/monaco-editor@0.31.1/min/vs/loader.js"></script>
-
-    <script src="js/main.js" type="text/javascript"></script>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta httpequiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="author" content="zrcoder">
+<meta name="description" content>
+<meta name="keywords" content>
+<meta name="theme-color" content="#2d2c2c">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover">
+<meta property="og:url" content="http://127.0.0.1:64294/">
+<meta property="og:title" content="牛豆儿画图">
+<meta property="og:description" content>
+<meta content="website" property="og:type">
+<meta property="og:image" content>
+<title>
+牛豆儿画图
+</title>
+<link href="/web/images/ellipse.png" rel="icon" type="image/png">
+<link rel="apple-touch-icon" href="/web/images/ellipse.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/app.css" type="text/css">
+<script src="/wasm_exec.js" defer="true"></script>
+<script defer="true" src="/app.js"></script>
+<link type="text/css" rel="stylesheet" href="/web/css/style.css">
+<script defer="true" src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.10/dist/sweetalert2.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.31.1/min/vs/loader.js" defer="true"></script>
 </head>
-
+<body>
+<div>
+<aside id="app-wasm-loader" class="goapp-app-info">
+<img id="app-wasm-loader-icon" class="goapp-logo goapp-spin" src="/web/images/ellipse.png">
+<p id="app-wasm-loader-label" class="goapp-label">
+Loading
+</p>
+</aside>
+<div id="app-pre-render">
+<div>
+<div class="title-bar">
+<p>
+Niudour 牛豆儿画图
+</p>
+</div>
+<div id="pictureBox" class="left-box">
+<img id="pictureArea" style="max-width:100%;max-height:100%;border:4;">
+</div>
+<div class="right-box">
+<pre id="codeArea" class="code-area"></pre>
+</div>
+<button id="teacherButton" class="teacher-button">
+HELP
+</button>
+<button id="goButton" class="run-button">
+Go
+</button>
+<script src="/web/js/editor.js"></script>
+<script src="/web/js/alert.js"></script>
+</div>
+</div>
+</div>
+</body>
 </html>

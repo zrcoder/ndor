@@ -1,0 +1,22 @@
+{
+  "short_name": "niudour",
+  "name": "niudour",
+  "description": "",
+  "icons": [
+    {
+      "src": "/web/images/ellipse.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "scope": "/",
+  "start_url": "/",
+  "background_color": "#2d2c2c",
+  "theme_color": "#2d2c2c",
+  "display": "standalone"
+}
