@@ -1,7 +1,6 @@
-const imgPath = '/web/images/'
-function teacherAction() {
+function teacherAction(img) {
     Swal.fire({
-        imageUrl: imgPath+'teacher.png',
+        imageUrl: img,
         imageHeight: 100,
         title: 'Need help?',
         text: 'You can learn by reading the document.',
@@ -15,7 +14,7 @@ function teacherAction() {
     })
 }
 
-function alertResult(imgSrc, msg) {
+function alertResult(imgSrc, msg, painterImg, teacherImg) {
     const Toast = Swal.mixin({
         toast: true,
         position: 'center',
@@ -25,12 +24,8 @@ function alertResult(imgSrc, msg) {
             Swal.showLoading()
         },
     })
-    let img = imgPath+'paint.png'
-    if (Math.random() < 0.5) {
-        img = imgPath+'code.png'
-    }
     Toast.fire({
-        imageUrl: img,
+        imageUrl: painterImg,
         imageHeight: 150,
     }).then((reslut) => {
         if(imgSrc !== '') {
@@ -39,7 +34,7 @@ function alertResult(imgSrc, msg) {
         }
         if(msg === 'no operations') {
             Swal.fire({
-                imageUrl: imgPath+'teacher.png',
+                imageUrl: teacherImg,
                 imageHeight: 100,
                 showConfirmButton: false,
                 titleText: 'no code to run',
@@ -58,11 +53,11 @@ function alertResult(imgSrc, msg) {
     })
 }
 
-function alertError(msg) {
-    alertResult('', msg)
+function alertError(msg, painterImg, teacherImg) {
+    alertResult('', msg, painterImg, teacherImg)
 }
 
-function toastSuccess(src) {
-    alertResult(src, '')
+function toastSuccess(src, painterImg, teacherImg) {
+    alertResult(src, '', painterImg, teacherImg)
 }
 
