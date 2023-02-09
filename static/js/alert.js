@@ -9,7 +9,7 @@ function teacherAction() {
 
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location.href = 'https://github.com/zrcoder/niudour'
+            window.location.href = 'https://github.com/zrcoder/niudour/wiki'
         }
     })
 }
