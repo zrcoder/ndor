@@ -8,9 +8,9 @@ function teacherAction() {
         showCancelButton: true,
 
     }).then((result) => {
-          if (result.isConfirmed) {
-            window.location.href='https://gitee.com/rdor/niudour/blob/master/README.md'
-          }
+        if (result.isConfirmed) {
+            window.location.href = 'https://github.com/zrcoder/niudour'
+        }
     })
 }
 
@@ -32,11 +32,11 @@ function alertResult(imgSrc, msg) {
         imageUrl: img,
         imageHeight: 150,
     }).then((reslut) => {
-        if(imgSrc !== '') {
+        if (imgSrc !== '') {
             document.getElementById('pictureArea').src = imgSrc
             return
         }
-        if(msg === 'no operations') {
+        if (msg === 'no operations') {
             Swal.fire({
                 imageUrl: 'images/teacher.png',
                 imageHeight: 100,
