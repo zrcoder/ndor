@@ -36,7 +36,7 @@ function alertResult(imgSrc, msg) {
             document.getElementById('pictureArea').src = imgSrc
             return
         }
-        if (msg === 'no operations') {
+        if (msg === 'empty input') {
             Swal.fire({
                 imageUrl: 'images/teacher.png',
                 imageHeight: 100,
