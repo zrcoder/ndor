@@ -1,8 +1,8 @@
-const cacheName = "app-" + "2023-02-14 15:25:42.331678 +0800 CST m=+0.000847389";
+const cacheName = "app-" + "0c59ad6ce19368e0956278e2e0f186c3b39f5efe";
 const resourcesToCache = ["/","/app.css","/app.js","/manifest.webmanifest","/wasm_exec.js","/web/app.wasm","https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.35.0/min/vs/loader.min.js","images/gopher.png","js/alert.js","js/editor.js","js/sweetalert2.js","style.css"];
 
 self.addEventListener("install", (event) => {
-  console.log("installing app worker 2023-02-14 15:25:42.331678 +0800 CST m=+0.000847389");
+  console.log("installing app worker 0c59ad6ce19368e0956278e2e0f186c3b39f5efe");
 
   event.waitUntil(
     caches
@@ -28,7 +28,7 @@ self.addEventListener("activate", (event) => {
       );
     })
   );
-  console.log("app worker 2023-02-14 15:25:42.331678 +0800 CST m=+0.000847389 is activated");
+  console.log("app worker 0c59ad6ce19368e0956278e2e0f186c3b39f5efe is activated");
 });
 
 self.addEventListener("fetch", (event) => {

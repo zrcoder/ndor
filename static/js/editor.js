@@ -2,11 +2,35 @@ require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-edi
 var codeEditor
 require(['vs/editor/editor.main'], function () {
     codeEditor = monaco.editor.create(document.getElementById('codeArea'), {
-        language: 'coffeescript',
+        language: 'c', // go+
         fontSize: 24,
+        wordWrap: 'on',
     })
     codeEditor.focus()
+    codeEditor.onDidChangeModelContent(() => {
+        clearErrorLineMarks()
+    })
 })
+
+let decorations = []
+
+function markErrorLine(number) {
+    decorations = codeEditor.deltaDecorations(
+        [],
+        [
+            {
+                range: new monaco.Range(number, 0, number, 0),
+                options: {
+                    isWholeLine: true,
+                    inlineClassName: "editorLineErr"
+                },
+            },
+        ])
+}
+
+function clearErrorLineMarks() {
+    codeEditor.removeDecorations(decorations)
+}
 
 function getCode() {
     return codeEditor.getValue()

@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	icolor "image/color"
 	"math"
 	"strconv"
@@ -376,7 +375,10 @@ func genInvalidParamError(num int) error {
 }
 
 func genError(num int, msg string) error {
-	return fmt.Errorf("line %d: %s", num+1, msg)
+	return &LineError{
+		Msg:    msg,
+		Number: num,
+	}
 }
 
 const defaultContextSize = 1024

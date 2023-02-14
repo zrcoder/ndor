@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="author" content>
 <meta name="description" content="牛豆儿画图">
-<meta name="keywords" content>
-<meta content="#2d2c2c" name="theme-color">
-<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover" name="viewport">
-<meta property="og:url" content="http://127.0.0.1:49622/">
-<meta property="og:title" content="牛豆儿画图">
+<meta content name="keywords">
+<meta name="theme-color" content="#2d2c2c">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover">
+<meta property="og:url" content="http://127.0.0.1:55917/">
+<meta content="牛豆儿画图" property="og:title">
 <meta property="og:description" content="牛豆儿画图">
 <meta property="og:type" content="website">
 <meta property="og:image" content>
@@ -18,20 +18,25 @@
 <link rel="icon" href="images/gopher.png">
 <link rel="apple-touch-icon" href="images/gopher.png">
 <link rel="manifest" href="/manifest.webmanifest">
-<link type="text/css" rel="stylesheet" href="/app.css">
+<link href="/app.css" type="text/css" rel="stylesheet">
 <script defer="true" src="/wasm_exec.js"></script>
 <script defer="true" src="/app.js"></script>
-<link rel="stylesheet" href="style.css" type="text/css">
-<script defer="true" src="js/sweetalert2.js"></script>
+<link type="text/css" rel="stylesheet" href="style.css">
+<script src="js/sweetalert2.js" defer="true"></script>
 <script defer="true" src="js/alert.js"></script>
 <script defer="true" src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.35.0/min/vs/loader.min.js"></script>
 <script defer="true" src="js/editor.js"></script>
+<style>
+			.editorLineErr {
+				background: red;
+			}
+		</style>
 </head>
 <body>
 <div>
 <aside id="app-wasm-loader" class="goapp-app-info">
-<img class="goapp-logo goapp-spin" src="images/gopher.png" id="app-wasm-loader-icon">
-<p class="goapp-label" id="app-wasm-loader-label">
+<img id="app-wasm-loader-icon" class="goapp-logo goapp-spin" src="images/gopher.png">
+<p id="app-wasm-loader-label" class="goapp-label">
 0%
 </p>
 </aside>
@@ -42,7 +47,7 @@
 Niudour 牛豆儿画图
 </p>
 </div>
-<div id="pictureBox" class="left-box">
+<div class="left-box" id="pictureBox">
 <img id="pictureArea" style="max-width:100%;max-height:100%;border:4;">
 </div>
 <div class="right-box">

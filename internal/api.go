@@ -9,33 +9,39 @@ import (
 	"strings"
 )
 
-func Draw(width, height int, code string) (string, error) {
-	log.Println("[test]")
+func Draw(width, height int, code string) (imgSrc string, errLine int, errInfo string) {
+	log.Printf("origin code to run:\n%s\n", code)
 	if strings.TrimSpace(code) == "" {
-		return "", errEmptyInput
+		return "", -1, errEmptyInput.Error()
 	}
-
 	var err error
+	preLines := strings.Count(preCodes, "\n")
+	code, err = gopExecute(preCodes+code, preLines)
+	if err != nil {
+		if lineErr, ok := err.(*LineError); ok {
+			return "", lineErr.Number, lineErr.Msg
+		}
+		return "", -1, err.Error()
+	}
+	log.Printf("code after gop exec:\n%s\n", code)
 
-	// code, err = gopExecute(regularInput(code))
-	// if err != nil {
-	// 	return "", err
-	// }
-
-	painter := NewPainter(code)
+	painter := NewPainter(code, preLines)
 	img, err := painter.Draw(width, height)
 	if err != nil {
-		return "", err
+		if lineErr, ok := err.(*LineError); ok {
+			return "", lineErr.Number, lineErr.Msg
+		}
+		return "", -1, err.Error()
 	}
+
 	return getImgString(img)
 }
 
-func getImgString(img image.Image) (string, error) {
+func getImgString(img image.Image) (string, int, string) {
 	buf := bytes.NewBuffer(nil)
 	err := png.Encode(buf, img)
 	if err != nil {
-		log.Println(err)
-		return "", err
+		return "", -1, err.Error()
 	}
-	return "data:image/png;base64," + base64.StdEncoding.EncodeToString(buf.Bytes()), nil
+	return "data:image/png;base64," + base64.StdEncoding.EncodeToString(buf.Bytes()), -1, ""
 }

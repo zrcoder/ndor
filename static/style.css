@@ -1,4 +1,4 @@
-.title-bar{
+.title-bar {
     position: fixed;
     left: 0;
     top: 0;
@@ -8,24 +8,29 @@
     color: white;
     padding-left: 24px;
 }
-.left-box,.right-box{
+
+.left-box,
+.right-box {
     position: fixed;
     top: 50px;
     height: 1024px;
 }
-.left-box{
+
+.left-box {
     left: 20px;
     width: 700px;
 }
-.right-box{
+
+.right-box {
     left: 720px;
     width: 100%;
-    border:1px solid lightgray;
-    border-top:none;
-    border-bottom:none;
-    border-right:none;
+    border: 1px solid lightgray;
+    border-top: none;
+    border-bottom: none;
+    border-right: none;
 }
-.code-area{
+
+.code-area {
     position: relative;
     top: 0;
     left: 0;
@@ -35,6 +40,7 @@
     outline: none;
     padding: 5px;
 }
+
 .teacher-button {
     position: fixed;
     left: 24px;
@@ -44,8 +50,9 @@
     padding-top: 65px;
     border: 0;
     background: url("images/teacher.png") no-repeat bottom;
-    background-size:100% 100%;
+    background-size: 100% 100%;
 }
+
 .run-button {
     position: fixed;
     right: 24px;
@@ -55,9 +62,10 @@
     padding-top: 65px;
     border: 0;
     background: url("images/gopher.png") no-repeat bottom;
-    background-size:100%, 100%;
+    background-size: 100%, 100%;
 }
+
 button:hover {
     color: white;
-    background-size:85% 85%;
+    background-size: 85% 85%;
 }

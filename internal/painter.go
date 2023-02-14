@@ -4,11 +4,17 @@ import (
 	"errors"
 	"fmt"
 	"image"
+	"log"
 	"math/rand"
+	"strconv"
 	"strings"
 	"time"
 
 	"gitee.com/rdor/gg"
+)
+
+const (
+	commentPrefix = "//"
 )
 
 var errEmptyInput = errors.New("empty input")
@@ -81,26 +87,40 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-func NewPainter(body string) *Painter {
+func NewPainter(body string, preLines int) *Painter {
 	res := &Painter{}
 	lines := strings.Split(body, "\n")
-	for i, line := range lines {
+	for _, line := range lines {
 		line = strings.TrimSpace(line)
-		if len(line) == 0 || strings.HasPrefix(line, "//") {
+		if len(line) == 0 || strings.HasPrefix(line, commentPrefix) {
 			continue
 		}
+		line, lineNum := parseLineNumber(line, preLines)
+		log.Println("parsed line:", line, "number:", lineNum)
 		arr := strings.Fields(line)
 		oper, ok := operations[arr[0]]
 		if !ok {
-			res.err = genError(i, "uncognized operation")
+			res.err = genError(lineNum, "uncognized operation")
 			return res
 		}
-		res.lines = append(res.lines, lineInfo{Num: i, Oper: oper, Params: arr[1:]})
+		res.lines = append(res.lines, lineInfo{Num: lineNum, Oper: oper, Params: arr[1:]})
 	}
 	if len(res.lines) == 0 {
 		res.err = errEmptyInput
 	}
 	return res
+}
+
+func parseLineNumber(line string, preLines int) (string, int) {
+	i := strings.LastIndex(line, commentPrefix)
+	if i == -1 {
+		return line, -1
+	}
+	res := line[i:]
+	res = strings.TrimPrefix(res, commentPrefix)
+	res = strings.TrimSpace(res)
+	n, _ := strconv.Atoi(res)
+	return line[:i], n - preLines
 }
 
 func (p *Painter) Draw(w, h int) (image.Image, error) {
@@ -113,7 +133,10 @@ func (p *Painter) Draw(w, h int) (image.Image, error) {
 		err = line.Oper(p, line)
 		if err != nil {
 			fmt.Println(line.Num, err)
-			return nil, err
+			return nil, &LineError{
+				Msg:    err.Error(),
+				Number: line.Num,
+			}
 		}
 	}
 	return p.context.Image(), nil
