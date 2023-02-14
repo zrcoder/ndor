@@ -40,16 +40,6 @@ func draw(v js.Value, args []js.Value) interface{} {
 		rootDom.Get("alertError").Invoke(internal.ErrEmptyInput.Error())
 		return nil
 	}
-
-	wait := make(chan requestGopResp)
-	go callGopPlay(text, wait)
-	rsp := <-wait
-	if rsp.err != nil {
-		log.Println(rsp.err)
-		rootDom.Get("alertError").Invoke(rsp.err.Error())
-		return nil
-	}
-	text = rsp.s
 	painter := internal.NewPainter(text)
 	pictureBox := rootDom.Get("pictureBox")
 	w := pictureBox.Get("offsetWidth").Int()
