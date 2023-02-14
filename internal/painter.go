@@ -11,7 +11,7 @@ import (
 	"gitee.com/rdor/gg"
 )
 
-var ErrEmptyInput = errors.New("empty input")
+var errEmptyInput = errors.New("empty input")
 
 type Painter struct {
 	context *gg.Context
@@ -98,7 +98,7 @@ func NewPainter(body string) *Painter {
 		res.lines = append(res.lines, lineInfo{Num: i, Oper: oper, Params: arr[1:]})
 	}
 	if len(res.lines) == 0 {
-		res.err = ErrEmptyInput
+		res.err = errEmptyInput
 	}
 	return res
 }
