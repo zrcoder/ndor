@@ -10,6 +10,14 @@ repo: build
 	cd static && ./app niudour
 	rm static/app
 
+netlify: local
+	cd static && \
+	git init && \
+	git add -A && \
+	git commit -m 'sync' && \
+	git push -f netlify HEAD && \
+	rm -rf .git
+
 run:
 	cd static && go run ../server
 
