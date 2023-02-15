@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"gitee.com/rdor/gg"
+	"github.com/fogleman/gg"
 	"golang.org/x/image/colornames"
 )
 
@@ -48,7 +48,7 @@ func color(p *Painter, line lineInfo) error {
 		r, g, b := floats[0], floats[1], floats[2]
 		var a uint8 = 0xff
 		if n == 4 {
-			a = uint8(floats[3])
+			a = uint8(floats[3] * float64(a))
 		}
 		rgba = icolor.RGBA{R: uint8(r), G: uint8(g), B: uint8(b), A: a}
 	default:

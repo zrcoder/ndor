@@ -7,5 +7,5 @@ import (
 
 func main() {
 	log.Println("serve on http://localhost:9999")
-	log.Fatalln(http.ListenAndServe(":9999", http.FileServer(http.Dir("static"))))
+	log.Fatalln(http.ListenAndServe(":9999", http.FileServer(http.Dir("."))))
 }

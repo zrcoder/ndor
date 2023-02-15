@@ -3,10 +3,17 @@ package main
 import (
 	"fmt"
 	"runtime"
+
+	math "math"
+	rand "math/rand"
+)
+
+var (
+	pi = math.Pi
+	_  rand.Source
 )
 
 const (
-	random   = "random"
 	preserve = "preserve"
 )
 

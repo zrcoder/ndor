@@ -60,38 +60,38 @@ func gopExecute(code string, preLines int) (string, error) {
 }
 
 func parseGopPlayError(ori string, preLines int) *LineError {
-	log.Println("goplay error:", ori)
+	log.Println("begin to parse goplay error:", ori)
 	log.Println("pre lines:", preLines)
-	res := &LineError{Number: -1}
-	arr := strings.SplitN(ori, "\n", 2)
-	msg := arr[0]
-	sep := ": "
-	i := strings.Index(msg, sep)
+	res := &LineError{Number: -1, Msg: ori}
+	sep := ".gop:"
+	i := strings.Index(ori, sep)
 	if i == -1 {
-		res.Msg = msg
+		sep = ".go:"
+		i = strings.Index(ori, sep)
+	}
+	if i == -1 {
+		return res
+	}
+	msg := ori[i+len(sep):]
+	i = strings.Index(msg, "\n")
+	if i == -1 {
+		i = strings.Index(msg, `\n`)
+	}
+	if i != -1 {
+		msg = msg[:i]
+	}
+	res.Msg = msg
+	sep = ": "
+	i = strings.Index(msg, sep)
+	if i == -1 {
 		return res
 	}
 	res.Msg = msg[i+len(sep):]
 	msg = msg[:i]
-	log.Println(res.Msg)
-	log.Println(msg)
-
 	i = strings.LastIndex(msg, ":")
-	if i == -1 {
-		return res
+	if i != -1 {
+		msg = msg[:i]
 	}
-	msg = msg[:i]
-	log.Println(msg)
-	sep = ".gop:"
-	i = strings.Index(msg, sep)
-	if i == -1 {
-		sep = ".go:"
-		i = strings.Index(msg, sep)
-		if i == -1 {
-			return res
-		}
-	}
-	msg = msg[i+len(sep):]
 	n, err := strconv.Atoi(msg)
 	if err != nil {
 		return res

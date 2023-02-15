@@ -1,10 +1,10 @@
-require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.35.0/min/vs' } })
-var codeEditor
+require.config({ paths: { vs: './js/lib/monaco-editor/vs' } })
+
+let codeEditor
 require(['vs/editor/editor.main'], function () {
     codeEditor = monaco.editor.create(document.getElementById('codeArea'), {
         language: 'c', // go+
-        fontSize: 24,
-        wordWrap: 'on',
+        fontSize: 20,
     })
     codeEditor.focus()
     codeEditor.onDidChangeModelContent(() => {
@@ -14,9 +14,12 @@ require(['vs/editor/editor.main'], function () {
 
 let decorations = []
 
+function clearErrorLineMarks() {
+    codeEditor.removeDecorations(decorations)
+}
+
 function markErrorLine(number) {
-    decorations = codeEditor.deltaDecorations(
-        [],
+    decorations = codeEditor.deltaDecorations([],
         [
             {
                 range: new monaco.Range(number, 0, number, 0),
@@ -25,11 +28,8 @@ function markErrorLine(number) {
                     inlineClassName: "editorLineErr"
                 },
             },
-        ])
-}
-
-function clearErrorLineMarks() {
-    codeEditor.removeDecorations(decorations)
+        ]
+    )
 }
 
 function getCode() {

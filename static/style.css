@@ -69,3 +69,7 @@ button:hover {
     color: white;
     background-size: 85% 85%;
 }
+
+.editorLineErr {
+    background: red;
+}

@@ -7,7 +7,7 @@ gen: build
 	rm static/app
 
 run: gen
-	go run ./server
+	cd static && go run ../server
 
 clear: 
 	rm -rf static/web
