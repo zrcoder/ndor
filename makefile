@@ -10,12 +10,18 @@ repo: build
 	cd static && ./app niudour
 	rm static/app
 
+github: repo
+	git add -A && \
+	git commit -m '$(msg)' && \
+	git push
+
 netlify: local
 	cd static && \
 	git init && \
 	git add -A && \
-	git commit -m 'sync' && \
-	git push -f netlify HEAD && \
+	git commit -m '$(msg)' && \
+	git remote add origin https://github.com/zrcoder/niudour && \
+	git push -f origin HEAD:netlify && \
 	rm -rf .git
 
 run:
