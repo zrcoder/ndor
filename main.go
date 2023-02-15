@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/zrcoder/niudour/internal"
 
@@ -12,6 +13,9 @@ func main() {
 	log.SetFlags(log.Lshortfile)
 	app.Route("/", &index{})
 	app.RunWhenOnBrowser()
+	if len(os.Args) > 1 { // for github/gitee
+		handler.Resources = app.CustomProvider("", os.Args[1])
+	}
 	if err := app.GenerateStaticWebsite(".", handler); err != nil {
 		log.Fatal(err)
 	}
@@ -30,7 +34,7 @@ var handler = &app.Handler{
 		"js/lib/sweetalert2.min.js", "js/alert.js",
 		"js/lib/monaco-editor/vs/loader.js", "js/editor.js",
 	},
-	Version: "0.2",
+	Version: "0.31",
 }
 
 const (

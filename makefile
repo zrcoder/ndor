@@ -2,11 +2,15 @@ build:
 	GOARCH=wasm GOOS=js go build -o static/web/app.wasm
 	go build -o static/app
 
-gen: build
+local: build
 	cd static && ./app
 	rm static/app
 
-run: gen
+repo: build
+	cd static && ./app niudour
+	rm static/app
+
+run:
 	cd static && go run ../server
 
 clear: 

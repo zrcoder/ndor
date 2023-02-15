@@ -1,8 +1,8 @@
-const cacheName = "app-" + "0.2";
-const resourcesToCache = ["/","/app.css","/app.js","/manifest.webmanifest","/wasm_exec.js","/web/app.wasm","images/gopher.png","js/alert.js","js/editor.js","js/lib/monaco-editor/vs/loader.js","js/lib/sweetalert2.min.js","style.css"];
+const cacheName = "app-" + "0.31";
+const resourcesToCache = ["/niudour","/niudour/app.css","/niudour/app.js","/niudour/manifest.webmanifest","/niudour/wasm_exec.js","/niudour/web/app.wasm","images/gopher.png","js/alert.js","js/editor.js","js/lib/monaco-editor/vs/loader.js","js/lib/sweetalert2.min.js","style.css"];
 
 self.addEventListener("install", (event) => {
-  console.log("installing app worker 0.2");
+  console.log("installing app worker 0.31");
 
   event.waitUntil(
     caches
@@ -28,7 +28,7 @@ self.addEventListener("activate", (event) => {
       );
     })
   );
-  console.log("app worker 0.2 is activated");
+  console.log("app worker 0.31 is activated");
 });
 
 self.addEventListener("fetch", (event) => {
