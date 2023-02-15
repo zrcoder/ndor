@@ -1,43 +1,37 @@
 require.config({ paths: { vs: './js/lib/monaco-editor/vs' } })
 
-let codeEditor
+let _codeEditor = null
+let _decorations = []
+
 require(['vs/editor/editor.main'], function () {
-    codeEditor = monaco.editor.create(document.getElementById('codeArea'), {
+    _codeEditor = monaco.editor.create(document.getElementById('codeArea'), {
         language: 'c', // go+
         fontSize: 20,
+        wordWrapColumn: 45,
     })
-    codeEditor.focus()
-    codeEditor.onDidChangeModelContent(() => {
-        clearErrorLineMarks()
+    _codeEditor.focus()
+    _codeEditor.onDidChangeModelContent(() => {
+        _codeEditor.removeDecorations(_decorations)
+        _decorations = []
     })
 })
 
-let decorations = []
-
-function clearErrorLineMarks() {
-    codeEditor.removeDecorations(decorations)
+function MarkErrorLine(number) {
+    _decorations = _codeEditor.deltaDecorations([], [{
+        range: new monaco.Range(number, 0, number, 0),
+        options: {
+            isWholeLine: true,
+            inlineClassName: "editorLineErr"
+        }
+    }])
 }
 
-function markErrorLine(number) {
-    decorations = codeEditor.deltaDecorations([],
-        [
-            {
-                range: new monaco.Range(number, 0, number, 0),
-                options: {
-                    isWholeLine: true,
-                    inlineClassName: "editorLineErr"
-                },
-            },
-        ]
-    )
+function SetCode(s) {
+    _codeEditor.setValue(s)
+    _codeEditor.setPosition({ column: 0, lineNumber: 3000 })
+    _codeEditor.focus()
 }
 
-function getCode() {
-    return codeEditor.getValue()
-}
-
-function setCode(s) {
-    codeEditor.setValue(s)
-    codeEditor.setPosition({ column: 1000, lineNumber: 3000 })
-    codeEditor.focus()
+function GetCode() {
+    return _codeEditor.getValue()
 }

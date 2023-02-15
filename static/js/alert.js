@@ -1,76 +1,82 @@
-function alertTeacherHelp() {
-    Swal.fire({
-        imageUrl: 'images/teacher.png',
-        imageHeight: 100,
-        title: 'Need help?',
-        text: 'You can learn by reading the document.',
-        confirmButtonText: 'Read',
-        showCancelButton: true,
-    }).then((result) => {
-        if (result.isConfirmed) {
-            window.location.href = 'https://github.com/zrcoder/niudour/wiki'
-        }
-    })
-}
+class NiudourAlert {
+    constructor() {
+        this.paintToast = null
+    }
 
-let paintToast = null
-
-function getToast() {
-    if (paintToast == null) {
-        paintToast = Swal.mixin({
-            toast: true,
-            position: 'center',
-            showConfirmButton: false,
-            didOpen: () => {
-                Swal.showLoading()
-            },
+    showHelp() {
+        Swal.fire({
+            imageUrl: 'images/teacher.png',
+            imageHeight: 100,
+            title: 'Need help?',
+            text: 'You can learn by reading the document.',
+            confirmButtonText: 'Read',
+            showCancelButton: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'https://github.com/zrcoder/niudour/wiki'
+            }
         })
     }
-    return paintToast
-}
 
-function toastPainting() {
-    let img = 'images/paint.png'
-    if (Math.random() < 0.5) {
-        img = 'images/code.png'
-    }
-    getToast().fire({
-        imageUrl: img,
-        imageHeight: 150,
-    })
-}
-
-function closePaintToast() {
-    if (paintToast != null) {
-        paintToast.close()
-        paintToast = null
-    }
-}
-
-function alertError(number, errInfo) {
-    if (number != -1) {
-        errInfo = number + ': ' + errInfo
-    }
-    Swal.fire({
-        icon: 'warning',
-        text: errInfo,
-        showConfirmButton: false,
-    }).then((result) => {
+    alertError(number, errInfo) {
         if (number != -1) {
-            markErrorLine(number)
+            errInfo = number + ': ' + errInfo
         }
-    })
+        Swal.fire({
+            icon: 'warning',
+            title: errInfo,
+        }).then((result) => {
+            if (number != -1) {
+                MarkErrorLine(number)
+            }
+        })
+    }
+
+    alertEmptyInputWith(exampleCode) {
+        Swal.fire({
+            imageUrl: 'images/teacher.png',
+            imageHeight: 100,
+            showConfirmButton: false,
+            titleText: 'no code to run',
+            text: "I'll give you an example soon",
+            timer: 1999
+        }).then((reslut) => {
+            SetCode(exampleCode)
+        })
+    }
+
+    toastPainting() {
+        if (this.paintToast == null) {
+            this.paintToast = Swal.mixin({
+                toast: true,
+                position: 'center',
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading()
+                },
+            })
+        }
+        let img = 'images/paint.png'
+        if (Math.random() < 0.5) {
+            img = 'images/code.png'
+        }
+        this.paintToast.fire({
+            imageUrl: img,
+            imageHeight: 150,
+        })
+    }
+
+    closePaintToast() {
+        if (this.paintToast != null) {
+            this.paintToast.close()
+            this.paintToast = null
+        }
+    }
 }
 
-function alertEmptyInputWith(exampleCode) {
-    Swal.fire({
-        imageUrl: 'images/teacher.png',
-        imageHeight: 100,
-        showConfirmButton: false,
-        titleText: 'no code to run',
-        text: "I'll give you an example soon",
-        timer: 666
-    }).then((reslut) => {
-        setCode(exampleCode)
-    })
+const niudourAlert = new NiudourAlert()
+
+// for go
+function getNiudourAlert() {
+    return niudourAlert
 }

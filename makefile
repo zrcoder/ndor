@@ -1,4 +1,5 @@
 build:
+	go generate
 	GOARCH=wasm GOOS=js go build -o static/web/app.wasm
 	go build -o static/app
 
@@ -24,8 +25,10 @@ netlify: local
 	git push -f origin HEAD:netlify && \
 	rm -rf .git
 
-run:
-	cd static && go run ../server
+runcur:
+	cd static && go run ../tools/server
+
+run: local runcur
 
 clear: 
 	rm -rf static/web

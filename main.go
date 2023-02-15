@@ -2,12 +2,17 @@ package main
 
 import (
 	"log"
+	"math/rand"
 	"os"
+	"time"
 
 	"github.com/zrcoder/niudour/internal"
+	"github.com/zrcoder/niudour/pkg"
 
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 )
+
+//go:generate igop export -outdir ./internal/exported ./api
 
 func main() {
 	log.SetFlags(log.Lshortfile)
@@ -34,7 +39,7 @@ var handler = &app.Handler{
 		"js/lib/sweetalert2.min.js", "js/alert.js",
 		"js/lib/monaco-editor/vs/loader.js", "js/editor.js",
 	},
-	Version: "0.33",
+	Version: "0.36",
 }
 
 const (
@@ -60,34 +65,37 @@ func (i index) Render() app.UI {
 			app.Img().ID(pictureAreaID).Style("max-width", "100%").Style("max-height", "100%").Style("border", "4"),
 		),
 		app.Div().Class("right-box").Body(app.Pre().ID("codeArea").Class("code-area")),
-		app.Button().Class("teacher-button").Attr("onclick", "alertTeacherHelp()").Text("HELP"),
+		app.Button().Class("teacher-button").Attr("onclick", "niudourAlert.showHelp()").Text("HELP"),
 		app.Button().Class("run-button").OnClick(goButtonAction).Text("GO"),
 	)
 }
 
 func goButtonAction(ctx app.Context, e app.Event) {
-	ctx.JSSrc().Set("disabled", "disabled") // TODO
-	defer ctx.JSSrc().Set("disabled", "")
-
+	// TODO: disable gopher button when running draw proccess
 	root := app.Window()
 	root.Get(pictureAreaID).Set("src", "")
+	alert := root.Get("getNiudourAlert").Invoke()
 
-	root.Get("toastPainting").Invoke()
 	pictureBox := root.Get(pictureBoxID)
 	width := pictureBox.Get("offsetWidth").Int()
 	height := pictureBox.Get("offsetHeight").Int()
-	code := root.Get("getCode").Invoke().String()
-	src, errLine, errInfo := internal.Draw(width, height, code)
-	root.Get("closePaintToast").Invoke()
+	code := root.Get("GetCode").Invoke().String()
 
-	if errInfo != "" {
-		if errInfo == internal.ErrEmptyInput.Error() {
-			root.Get("alertEmptyInputWith").Invoke(exampleCode)
+	alert.Call("toastPainting")
+
+	src, err := pkg.Run(width, height, code)
+	if err != nil {
+		alert.Call("closePaintToast")
+		if err == internal.ErrEmptyInput {
+			alert.Call("alertEmptyInputWith", exampleCode)
 			return
 		}
-		root.Get("alertError").Invoke(errLine, errInfo)
+		alert.Call("alertError", err.Number, err.Msg)
 		return
 	}
 
+	// the draw proccess is very fast, wait 1-2 s to show painting toast~
+	time.Sleep(time.Duration(1000+rand.Intn(1000)) * time.Millisecond)
+	alert.Call("closePaintToast")
 	root.Get(pictureAreaID).Set("src", src)
 }
