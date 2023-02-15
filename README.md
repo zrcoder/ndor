@@ -4,6 +4,8 @@
 
 You can take a look at the [wiki](https://github.com/zrcoder/niudour/wiki) for detail.
 
+![niudor](https://raw.githubusercontent.com/wiki/zrcoder/niudour/images/main.png)
+
 ## develop
 
 If you want to run `niudour` on your local machine：
