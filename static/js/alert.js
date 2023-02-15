@@ -8,7 +8,7 @@ function alertTeacherHelp() {
         showCancelButton: true,
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location.href = 'https://github.com/zrcoder/niudour/wiki/%E7%89%9B%E8%B1%86%E5%84%BF%E7%94%BB%E5%9B%BE'
+            window.location.href = 'https://github.com/zrcoder/niudour/wiki'
         }
     })
 }
