@@ -1,11 +1,11 @@
-module gitee.com/rdor/niudour
+module github.com/zrcoder/niudour
 
-go 1.18
+go 1.20
 
 require (
-	gitee.com/rdor/gg v1.3.0
+	github.com/fogleman/gg v1.3.0
 	github.com/maxence-charriere/go-app/v9 v9.6.7
-	golang.org/x/image v0.0.0-20201208152932-35266b937fa6
+	golang.org/x/image v0.5.0
 )
 
 require (

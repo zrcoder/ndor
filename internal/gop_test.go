@@ -48,6 +48,17 @@ func Test_parseGopPlayError(t *testing.T) {
 				Msg:    `undefined: vv`,
 			},
 		},
+		{
+			name: "",
+			args: args{
+				ori:      `"# playgrounddemo\nprog.gop:150: y1 declared but not used\nexit status 2"`,
+				preLines: 140,
+			},
+			want: &LineError{
+				Number: 10,
+				Msg:    "y1 declared but not used",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

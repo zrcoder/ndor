@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="author" content>
 <meta name="description" content="牛豆儿画图">
-<meta content name="keywords">
+<meta name="keywords" content>
 <meta name="theme-color" content="#2d2c2c">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover">
-<meta property="og:url" content="http://127.0.0.1:55917/">
-<meta content="牛豆儿画图" property="og:title">
+<meta property="og:url" content="http://127.0.0.1:57534/">
+<meta property="og:title" content="牛豆儿画图">
 <meta property="og:description" content="牛豆儿画图">
 <meta property="og:type" content="website">
 <meta property="og:image" content>
@@ -18,19 +18,14 @@
 <link rel="icon" href="images/gopher.png">
 <link rel="apple-touch-icon" href="images/gopher.png">
 <link rel="manifest" href="/manifest.webmanifest">
-<link href="/app.css" type="text/css" rel="stylesheet">
+<link type="text/css" rel="stylesheet" href="/app.css">
 <script defer="true" src="/wasm_exec.js"></script>
 <script defer="true" src="/app.js"></script>
 <link type="text/css" rel="stylesheet" href="style.css">
-<script src="js/sweetalert2.js" defer="true"></script>
+<script defer="true" src="js/lib/sweetalert2.min.js"></script>
 <script defer="true" src="js/alert.js"></script>
-<script defer="true" src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.35.0/min/vs/loader.min.js"></script>
+<script defer="true" src="js/lib/monaco-editor/vs/loader.js"></script>
 <script defer="true" src="js/editor.js"></script>
-<style>
-			.editorLineErr {
-				background: red;
-			}
-		</style>
 </head>
 <body>
 <div>
@@ -47,13 +42,13 @@
 Niudour 牛豆儿画图
 </p>
 </div>
-<div class="left-box" id="pictureBox">
+<div id="pictureBox" class="left-box">
 <img id="pictureArea" style="max-width:100%;max-height:100%;border:4;">
 </div>
 <div class="right-box">
 <pre id="codeArea" class="code-area"></pre>
 </div>
-<button class="teacher-button" onclick="teacherAction()">
+<button onclick="alertTeacherHelp()" class="teacher-button">
 HELP
 </button>
 <button class="run-button">

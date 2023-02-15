@@ -12,7 +12,7 @@ import (
 func Draw(width, height int, code string) (imgSrc string, errLine int, errInfo string) {
 	log.Printf("origin code to run:\n%s\n", code)
 	if strings.TrimSpace(code) == "" {
-		return "", -1, errEmptyInput.Error()
+		return "", -1, ErrEmptyInput.Error()
 	}
 	var err error
 	preLines := strings.Count(preCodes, "\n")

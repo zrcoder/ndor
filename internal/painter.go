@@ -10,14 +10,14 @@ import (
 	"strings"
 	"time"
 
-	"gitee.com/rdor/gg"
+	"github.com/fogleman/gg"
 )
 
 const (
 	commentPrefix = "//"
 )
 
-var errEmptyInput = errors.New("empty input")
+var ErrEmptyInput = errors.New("empty input")
 
 type Painter struct {
 	context *gg.Context
@@ -96,7 +96,6 @@ func NewPainter(body string, preLines int) *Painter {
 			continue
 		}
 		line, lineNum := parseLineNumber(line, preLines)
-		log.Println("parsed line:", line, "number:", lineNum)
 		arr := strings.Fields(line)
 		oper, ok := operations[arr[0]]
 		if !ok {
@@ -106,7 +105,7 @@ func NewPainter(body string, preLines int) *Painter {
 		res.lines = append(res.lines, lineInfo{Num: lineNum, Oper: oper, Params: arr[1:]})
 	}
 	if len(res.lines) == 0 {
-		res.err = errEmptyInput
+		res.err = ErrEmptyInput
 	}
 	return res
 }
