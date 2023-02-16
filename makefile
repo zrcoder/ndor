@@ -25,10 +25,8 @@ netlify: local
 	git push -f origin HEAD:netlify && \
 	rm -rf .git
 
-runcur:
+run:
 	cd static && go run ../tools/server
-
-run: local runcur
 
 clear: 
 	rm -rf static/web
