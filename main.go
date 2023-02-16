@@ -39,7 +39,7 @@ var handler = &app.Handler{
 		"js/lib/sweetalert2.min.js", "js/alert.js",
 		"js/lib/monaco-editor/vs/loader.js", "js/editor.js",
 	},
-	Version: "0.36",
+	Version: "0.37",
 }
 
 const (
