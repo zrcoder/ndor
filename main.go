@@ -14,6 +14,10 @@ import (
 
 //go:generate igop export -outdir ./internal/exported ./api
 
+const (
+	version = "0.39"
+)
+
 func main() {
 	log.SetFlags(log.Lshortfile)
 	app.Route("/", &index{})
@@ -39,7 +43,7 @@ var handler = &app.Handler{
 		"js/lib/sweetalert2.min.js", "js/alert.js",
 		"js/lib/monaco-editor/vs/loader.js", "js/editor.js",
 	},
-	Version: "0.38",
+	Version: version,
 }
 
 const (
@@ -65,9 +69,14 @@ func (i index) Render() app.UI {
 			app.Img().ID(pictureAreaID).Style("max-width", "100%").Style("max-height", "100%").Style("border", "4"),
 		),
 		app.Div().Class("right-box").Body(app.Pre().ID("codeArea").Class("code-area")),
-		app.Button().Class("teacher-button").Attr("onclick", "niudourAlert.showHelp()").Text("HELP"),
+		app.Button().Class("teacher-button").OnClick(teacherButtonAction).Text("HELP"),
 		app.Button().Class("run-button").OnClick(goButtonAction).Text("GO"),
 	)
+}
+
+func teacherButtonAction(ctx app.Context, e app.Event) {
+	alert := app.Window().Get("getNiudourAlert").Invoke()
+	alert.Call("showHelp", version)
 }
 
 func goButtonAction(ctx app.Context, e app.Event) {
