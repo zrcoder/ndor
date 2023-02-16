@@ -10,7 +10,8 @@ import (
 
 	"github.com/goplus/igop"
 	_ "github.com/goplus/igop/gopbuild"
-	_ "github.com/goplus/igop/pkg"
+	_ "github.com/goplus/igop/pkg/math"
+	_ "github.com/goplus/igop/pkg/math/rand"
 )
 
 const (
