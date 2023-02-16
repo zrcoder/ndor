@@ -3,12 +3,13 @@ class NiudourAlert {
         this.paintToast = null
     }
 
-    showHelp() {
+    showHelp(version) {
         Swal.fire({
             imageUrl: 'images/teacher.png',
             imageHeight: 100,
             title: 'Need help?',
-            text: 'You can learn by reading the document.',
+            html: 'You can learn by reading the document.<br>' +
+                'v' + version,
             confirmButtonText: 'Read',
             showCancelButton: true,
         }).then((result) => {
