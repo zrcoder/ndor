@@ -1,0 +1,39 @@
+examples:
+- name: hello world
+  code: |-
+    context 800, 800
+    circle 400, 400, 300
+    color "lightgreen"
+    fill
+- name: hello world Go
+  code: |-
+    func main() {
+    context(800, 800)
+    circle(400, 400, 300)
+    color("lightgreen)
+    fill}
+- name: rainbow
+  code: |-
+    context 1024, 512
+    linew 50
+
+    colors := [
+        "red",
+        "orange",
+        "yellow",
+        "green",
+        "blue",
+        "violet",
+        "indigo",
+    ]
+
+    const x, y = 512, 512
+    const from, to = 0, -180
+    r := 480.0
+
+    for c <- colors {
+        color c
+        arc x, y, r, from, to
+        stroke
+        r -= 50
+    }
