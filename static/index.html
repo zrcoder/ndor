@@ -2,36 +2,36 @@
 <html lang="zh_CN">
 <head>
 <meta charset="UTF-8">
-<meta content name="author">
+<meta name="author" content>
 <meta content="牛豆儿画图" name="description">
 <meta name="keywords" content>
 <meta name="theme-color" content="#2d2c2c">
-<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover" name="viewport">
-<meta property="og:url" content="http://127.0.0.1:62578/">
-<meta property="og:title" content="牛豆儿画图">
-<meta content="牛豆儿画图" property="og:description">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover">
+<meta property="og:url" content="http://127.0.0.1:55279/">
+<meta content="牛豆儿画图" property="og:title">
+<meta property="og:description" content="牛豆儿画图">
 <meta property="og:type" content="website">
 <meta property="og:image" content>
 <title>
 牛豆儿画图
 </title>
-<link href="images/gopher.png" rel="icon">
+<link rel="icon" href="images/gopher.png">
 <link rel="apple-touch-icon" href="images/gopher.png">
 <link rel="manifest" href="/niudour/manifest.webmanifest">
 <link type="text/css" rel="stylesheet" href="/niudour/app.css">
-<script src="/niudour/wasm_exec.js" defer="true"></script>
-<script src="/niudour/app.js" defer="true"></script>
+<script defer="true" src="/niudour/wasm_exec.js"></script>
+<script defer="true" src="/niudour/app.js"></script>
 <link type="text/css" rel="stylesheet" href="style.css">
 <script defer="true" src="js/lib/sweetalert2.min.js"></script>
 <script defer="true" src="js/alert.js"></script>
 <script defer="true" src="js/lib/monaco-editor/vs/loader.js"></script>
-<script defer="true" src="js/editor.js"></script>
+<script src="js/editor.js" defer="true"></script>
 </head>
 <body>
 <div>
 <aside id="app-wasm-loader" class="goapp-app-info">
-<img src="images/gopher.png" id="app-wasm-loader-icon" class="goapp-logo goapp-spin">
-<p id="app-wasm-loader-label" class="goapp-label">
+<img class="goapp-logo goapp-spin" src="images/gopher.png" id="app-wasm-loader-icon">
+<p class="goapp-label" id="app-wasm-loader-label">
 0%
 </p>
 </aside>
@@ -42,8 +42,8 @@
 Niudour 牛豆儿画图
 </p>
 </div>
-<div class="left-box" id="pictureBox">
-<img style="max-width:100%;max-height:100%;border:4;" id="pictureArea">
+<div id="pictureBox" class="left-box">
+<img id="pictureArea" style="max-width:100%;max-height:100%;border:4;">
 </div>
 <div class="right-box">
 <pre id="codeArea" class="code-area"></pre>

@@ -15,7 +15,7 @@ import (
 //go:generate igop export -outdir ./internal/exported ./api
 
 const (
-	version = "0.39"
+	version = "0.41"
 )
 
 func main() {

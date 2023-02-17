@@ -30,6 +30,9 @@ context 800, 800
 color "lightgreen"
 circle 400, 400, 300
 fill
+//---
+context 1000, 1000
+color "notExistColorName"
 `
 	sep = "//---\n"
 )

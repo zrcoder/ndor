@@ -3,33 +3,31 @@ package internal
 import (
 	"errors"
 	icolor "image/color"
-	"runtime"
 	"strconv"
 
 	"golang.org/x/image/colornames"
 )
 
 func ParseColor(args ...any) (icolor.RGBA, *LineError) {
-	_, _, line, _ := runtime.Caller(2)
 	var rgba icolor.RGBA
 	switch len(args) {
 	case 1:
 		s, ok := args[0].(string)
 		if !ok {
-			return rgba, newInvalidParsErr(line)
+			return rgba, newInvalidParsErr(colorFlag, invalidPars)
 		}
 		if c, ok := colornames.Map[s]; ok {
 			rgba = c
 		} else {
 			if c, ok = parseHexColor(s); !ok {
-				return rgba, newInvalidParsErr(line)
+				return rgba, newInvalidParsErr(colorFlag, "invalid color name or hex color format")
 			}
 			rgba = c
 		}
 	case 3, 4:
 		floats, err := toFloats((args))
 		if err != nil {
-			return rgba, newInvalidParsErr(line)
+			return rgba, newInvalidParsErr(colorFlag, invalidPars)
 		}
 		r, g, b := floats[0], floats[1], floats[2]
 		var a uint8 = 0xff
@@ -38,7 +36,7 @@ func ParseColor(args ...any) (icolor.RGBA, *LineError) {
 		}
 		rgba = icolor.RGBA{R: uint8(r), G: uint8(g), B: uint8(b), A: a}
 	default:
-		return rgba, newInvalidParsErr(line)
+		return rgba, newInvalidParsErr(colorFlag, invalidPars)
 	}
 	return rgba, nil
 }
@@ -112,9 +110,9 @@ func parseFloat(param any) (float64, error) {
 	return 0, errors.New(invalidPars)
 }
 
-func newInvalidParsErr(line int) *LineError {
+func newInvalidParsErr(flag, msg string) *LineError {
 	return &LineError{
-		Number: line,
-		Msg:    invalidPars,
+		Flag: flag,
+		Msg:  msg,
 	}
 }

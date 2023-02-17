@@ -25,4 +25,9 @@ If you want to run `niudour` on your local machine：
    make run
    ```
 
+   > delete or comment the line "Version: version" in main.go for every dev build
+   > this is to break the cache mechanism, just for developing
+   >
+   > for product, modify the const "version" variable and then push and make pr
+
 4. Open `http://localhost:9999`, start your painting journey～
