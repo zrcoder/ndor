@@ -6,11 +6,14 @@ import (
 
 type LineError struct {
 	Number int
+	Flag   string
 	Msg    string
 }
 
 const (
 	invalidPars = "invalid parameters"
+
+	colorFlag = "color"
 )
 
 var (
