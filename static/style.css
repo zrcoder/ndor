@@ -9,6 +9,20 @@
     padding-left: 24px;
 }
 
+.example-button {
+    position: fixed;
+    top: 12px;
+    right: 24px;
+}
+
+.example-list {
+    position: fixed;
+    top: 54px;
+    width: 160px;
+    height: 600px;
+    right: 24px;
+}
+
 .left-box,
 .right-box {
     position: fixed;

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"math/rand"
 	"time"
 
@@ -30,32 +29,28 @@ type index struct {
 	showExamples bool
 }
 
-func (idx index) Render() app.UI {
+func (idx *index) Render() app.UI {
 	return app.Div().Style("overflow", "hidden").Body(
 		app.Div().Class("title-bar").Body(
 			app.P().Text("Niudour 牛豆儿画图"),
-			app.Button().OnClick(func(ctx app.Context, e app.Event) {
+			app.Button().Class("example-button").OnClick(func(ctx app.Context, e app.Event) {
 				idx.showExamples = !idx.showExamples
-				log.Println("[test], Hello~~~, show examples?", idx.showExamples)
 			}).Text("Examples"),
 		),
 		app.Div().ID(pictureBoxID).Class("left-box").Body(
 			app.Img().ID(pictureAreaID).Style("max-width", "100%").Style("max-height", "100%").Style("border", "4"),
 		),
 		app.Div().Class("right-box").Body(app.Pre().ID("codeArea").Class("code-area")),
+		app.If(idx.showExamples, app.Ul().Class("example-list").Body(
+			app.Range(config.Default.Examples).Slice(func(i int) app.UI {
+				return app.Li().Text(config.Default.Examples[i].Name).OnClick(func(ctx app.Context, e app.Event) {
+					app.Window().Get("SetCode").Invoke(config.Default.Examples[i].Code)
+					idx.showExamples = false
+				})
+			}),
+		)),
 		app.Button().Class("teacher-button").OnClick(teacherButtonAction).Text("HELP"),
 		app.Button().Class("run-button").OnClick(goButtonAction).Text("GO"),
-		app.If(idx.showExamples, app.Div().Body(
-			app.Ul().Body(
-				app.Range(config.Default.Examples).Slice(func(i int) app.UI {
-					return app.Li().Text(config.Default.Examples[i].Name).OnClick(func(ctx app.Context, e app.Event) {
-						log.Println(config.Default.Examples[i].Code)
-						app.Window().Get("SetCode").Invoke(config.Default.Examples[i].Code)
-						idx.showExamples = false
-					})
-				}),
-			),
-		)),
 	)
 }
 
