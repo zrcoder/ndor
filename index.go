@@ -50,7 +50,7 @@ func (idx *index) Render() app.UI {
 			}),
 		)),
 		app.Button().Class("teacher-button").OnClick(teacherButtonAction).Text("HELP"),
-		app.Button().Class("run-button").OnClick(goButtonAction).Text("GO"),
+		app.Button().ID("run-button").Class("run-button").OnClick(goButtonAction).Text("GO"),
 	)
 }
 

@@ -1,0 +1,22 @@
+{
+  "short_name": "Niudour",
+  "name": "Niudour",
+  "description": "牛豆儿画图",
+  "icons": [
+    {
+      "src": "images/gopher.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "scope": "/niudour/",
+  "start_url": "/niudour/",
+  "background_color": "#2d2c2c",
+  "theme_color": "#2d2c2c",
+  "display": "standalone"
+}
