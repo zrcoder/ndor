@@ -15,6 +15,8 @@ examples:
     }
 - name: rainbow
   code: |-
+    // rainbow
+    
     context 1024, 512
     linew 50
 
@@ -29,8 +31,8 @@ examples:
     ]
 
     const x, y = 512, 512
-    const from, to = 0, -180
-    r := 480.0
+    const from, to = 0, 180
+    r := 400.0
 
     for c <- colors {
         color c
@@ -40,6 +42,8 @@ examples:
     }
 - name: clip
   code: |-
+    //clip
+
     context 1000, 1000
     circle 350, 500, 300
     clip
@@ -50,6 +54,8 @@ examples:
     fill
 - name: fan
   code: |-
+    // fan
+
     context 1000, 1000
     
     translate 500, 500
@@ -64,9 +70,11 @@ examples:
     stroke
 - name: flower
   code: |-
+    // flower
+
     const (
-        x, y = 512, 512
-        dx, dy = 512, 128
+        x, y = 500, 420
+        dx, dy = 400, 80
         delta = 30
         all = 180
     )
@@ -74,7 +82,7 @@ examples:
     n := all/delta
     degree := 0.0
     
-    context 1024, 1024
+    context 1000, 1000
     color 0, 0, 0, 0.2
     
     for i <- :n {
@@ -87,6 +95,8 @@ examples:
     }
 - name: geometry
   code: |-
+    // geometry
+
     context 600, 600
     
     rectangle 50, 50, 500, 500
@@ -118,6 +128,8 @@ examples:
     text 25, 430, "m-1-r"
 - name: lines
   code: |-
+    // lines
+
     const width, height = 1024, 1024
     
     context width, height
@@ -143,6 +155,8 @@ examples:
     }
 - name: crisp
   code: |-
+    // crisp
+
     const (
         width = 1000
         height = 1000
@@ -185,6 +199,8 @@ examples:
     stroke
 - name: line width
   code: |-
+    // line width
+
     context 1000, 1000
     color "white"
     clear
@@ -200,6 +216,8 @@ examples:
     }
 - name: open fill
   code: |-
+    // open fill
+
     context 1000, 1000
     
     for j <- :10 {
@@ -222,6 +240,8 @@ examples:
     stroke preserve
 - name: beziel
   code: |-
+    // beziel
+
     type Point struct {
         x, y float64
     }
@@ -265,7 +285,7 @@ examples:
         stroke
     }
     
-    const s = 1000
+    const s = 1200
     context s, s
     color "white"
     clear
@@ -278,10 +298,12 @@ examples:
     points ps
 - name: spiral
   code: |-
+    // spiral
+
     const s = 1024
     const n = 2048
     
-    context s, n
+    context s, s
     color "black"
     
     for i <- :n {
@@ -297,6 +319,7 @@ examples:
     fill
 - name: star
   code: |-
+    // star
     type point struct {
         x, y float64
     }

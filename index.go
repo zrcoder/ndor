@@ -17,7 +17,7 @@ const (
 )
 
 const exampleCode = `context 800, 800
-color 0, 255, 0
+color "lightgreen"
 circle 400, 400, 300
 fill
 
@@ -38,7 +38,7 @@ func (idx *index) Render() app.UI {
 			}).Text("Examples"),
 		),
 		app.Div().ID(pictureBoxID).Class("left-box").Body(
-			app.Img().ID(pictureAreaID).Style("max-width", "100%").Style("max-height", "100%").Style("border", "4"),
+			app.Img().ID(pictureAreaID).Style("max-width", "100%").Style("max-height", "100%"),
 		),
 		app.Div().Class("right-box").Body(app.Pre().ID("codeArea").Class("code-area")),
 		app.If(idx.showExamples, app.Ul().Class("example-list").Body(
@@ -64,13 +64,12 @@ func goButtonAction(ctx app.Context, e app.Event) {
 	root := app.Window()
 	root.Get(pictureAreaID).Set("src", "")
 	alert := root.Get("getNiudourAlert").Invoke()
+	alert.Call("toastPainting")
 
 	pictureBox := root.Get(pictureBoxID)
 	width := pictureBox.Get("offsetWidth").Int()
 	height := pictureBox.Get("offsetHeight").Int()
 	code := root.Get("GetCode").Invoke().String()
-
-	alert.Call("toastPainting")
 
 	src, err := pkg.Run(width, height, code)
 	if err != nil {

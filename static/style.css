@@ -31,13 +31,13 @@
 }
 
 .left-box {
-    left: 20px;
-    width: 50%;
+    left: 0px;
+    width: 55%;
 }
 
 .right-box {
-    left: 50%;
-    width: 50%;
+    left: 55%;
+    width: 45%;
     border-left: 1px solid lightgray;
 }
 
