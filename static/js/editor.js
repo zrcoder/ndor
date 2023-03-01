@@ -6,10 +6,19 @@ let _decorations = []
 require(['vs/editor/editor.main'], function () {
     _codeEditor = monaco.editor.create(document.getElementById('codeArea'), {
         language: 'c', // go+
-        fontSize: 20,
-        wordWrapColumn: 45,
+        fontSize: 16,
+        wordWrap: 'on',
+        minimap: {
+            enabled: false
+        },
+        scrollbar: {
+            vertical: "hidden",
+            horizontal: "hidden"
+        },
+        automaticLayout: true,
+        overviewRulerLanes: 0,
+        hideCursorInOverviewRuler: true,
     })
-    _codeEditor.focus()
     _codeEditor.onDidChangeModelContent(() => {
         _codeEditor.removeDecorations(_decorations)
         _decorations = []

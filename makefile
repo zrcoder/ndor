@@ -34,3 +34,4 @@ clear:
 	rm static/*.html
 	rm static/manifest*
 	rm static/app.css
+	rm -rf static/.git
