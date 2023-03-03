@@ -18,8 +18,9 @@ examples:
     // rainbow
     
     context 1024, 512
-    linew 50
-
+    color "white"
+    clear
+    
     colors := [
         "red",
         "orange",
@@ -28,16 +29,17 @@ examples:
         "blue",
         "violet",
         "indigo",
+        "white",
     ]
-
+    
     const x, y = 512, 512
-    const from, to = 0, 180
+    const from, to = 0, -180
     r := 400.0
-
+    
     for c <- colors {
         color c
         arc x, y, r, from, to
-        stroke
+        fill
         r -= 50
     }
 - name: clip
@@ -83,7 +85,7 @@ examples:
     degree := 0.0
     
     context 1000, 1000
-    color 0, 0, 0, 0.2
+    color 0, 0, 0, 50
     
     for i <- :n {
         push
@@ -145,7 +147,7 @@ examples:
         r := 255 * rand.float64
         g := 255 * rand.float64
         b := 255 * rand.float64
-        a := rand.float64*0.5 + 0.5
+        a := 255*(rand.float64*0.5 + 0.5)
         w := rand.float64*4 + 1
         color r, g, b, a
         linew w
@@ -185,7 +187,7 @@ examples:
     for y <- minor:height:minor {
         row y
     }
-    color 0, 0, 0, 0.25
+    color 0, 0, 0, 55
     stroke
     
     for x <- major:width:major {
@@ -195,7 +197,7 @@ examples:
         row y
     }
     
-    color 0, 0, 0, 0.5
+    color 0, 0, 0, 120
     stroke
 - name: line width
   code: |-
@@ -350,6 +352,6 @@ examples:
     }
     color 0, 127, 0
     fill preserve
-    color 0, 127, 0, 0.5
+    color 0, 127, 0, 130
     linew 16
     stroke

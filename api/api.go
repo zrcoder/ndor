@@ -64,10 +64,14 @@ func Text(x, y float64, s string) {
 }
 
 func Arc(x, y, r, angle1, angle2 float64) {
+	angle1 = gg.Radians(angle1)
+	angle2 = gg.Radians(angle2)
 	internal.GlobalCtx.DrawArc(x, y, r, angle1, angle2)
 }
 
 func Earc(x, y, rx, ry, angle1, angle2 float64) {
+	angle1 = gg.Radians(angle1)
+	angle2 = gg.Radians(angle2)
 	internal.GlobalCtx.DrawEllipticalArc(x, y, rx, ry, angle1, angle2)
 }
 

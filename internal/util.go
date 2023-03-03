@@ -32,7 +32,7 @@ func ParseColor(args ...any) (icolor.RGBA, *LineError) {
 		r, g, b := floats[0], floats[1], floats[2]
 		var a uint8 = 0xff
 		if len(args) == 4 {
-			a = uint8(floats[3] * float64(a))
+			a = uint8(floats[3])
 		}
 		rgba = icolor.RGBA{R: uint8(r), G: uint8(g), B: uint8(b), A: a}
 	default:
