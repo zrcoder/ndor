@@ -11,22 +11,35 @@ import (
 )
 
 func Run(width, height int, code string) (string, *internal.LineError) {
-	if strings.TrimSpace(code) == "" {
-		return "", internal.ErrEmptyInput
+	if err := gen(width, height, code); err != nil {
+		return "", err
 	}
-
-	internal.Init(width, height)
-	err := gopRun(code)
+	src, err := getImageSrc(code)
 	if err != nil {
 		return "", err
+	}
+	return "data:image/png;base64," + base64.StdEncoding.EncodeToString(src), nil
+}
+
+func Gen(width, height int, code string) ([]byte, *internal.LineError) {
+	if err := gen(width, height, code); err != nil {
+		return nil, err
 	}
 	return getImageSrc(code)
 }
 
-func getImageSrc(oriCode string) (string, *internal.LineError) {
+func gen(width, height int, code string) *internal.LineError {
+	if strings.TrimSpace(code) == "" {
+		return internal.ErrEmptyInput
+	}
+	internal.Init(width, height)
+	return gopRun(code)
+}
+
+func getImageSrc(oriCode string) ([]byte, *internal.LineError) {
 	if internal.GlobalErr != nil {
 		internal.GlobalErr.Number = parseErrorline(oriCode, internal.GlobalErr.Flag)
-		return "", internal.GlobalErr
+		return nil, internal.GlobalErr
 	}
 	return encode(internal.GlobalCtx.Image())
 }
@@ -60,11 +73,11 @@ func lowercaseFirstLetter(s string) string {
 	return strings.ToLower(s[:1]) + s[1:]
 }
 
-func encode(img image.Image) (string, *internal.LineError) {
+func encode(img image.Image) ([]byte, *internal.LineError) {
 	buf := bytes.NewBuffer(nil)
 	err := png.Encode(buf, img)
 	if err != nil {
-		return "", &internal.LineError{Number: -1, Msg: err.Error()}
+		return nil, &internal.LineError{Number: -1, Msg: err.Error()}
 	}
-	return "data:image/png;base64," + base64.StdEncoding.EncodeToString(buf.Bytes()), nil
+	return buf.Bytes(), nil
 }

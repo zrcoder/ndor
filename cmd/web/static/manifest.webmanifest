@@ -14,8 +14,8 @@
       "sizes": "512x512"
     }
   ],
-  "scope": "/",
-  "start_url": "/",
+  "scope": "/niudour/",
+  "start_url": "/niudour/",
   "background_color": "#2d2c2c",
   "theme_color": "#2d2c2c",
   "display": "standalone"

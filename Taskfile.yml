@@ -1,0 +1,48 @@
+version: '3'
+tasks:
+  gen:
+    cmds:
+      - go generate
+  build:
+    dir: cmd/web
+    cmds:
+      - GOARCH=wasm GOOS=js go build -o static/web/app.wasm
+      - go build -o static/app
+      - cd static && ./app {{.SITE_PATH}}
+      - rm static/app
+  run:
+    deps:
+      - task: build
+        # var SITE_PATH is empty here
+    dir: cmd/web
+    cmds:
+      - cd static && go run ../tools/server
+  github:
+    deps:
+      - task: build
+        vars: {SITE_PATH: 'niudour'}
+    cmds:
+      - echo 'build succeed for github'
+      - git add -A && git commit -m '{{.CLI_ARGS}}' && git push
+  netlify:
+    dir: cmd/web/static
+    deps:
+      - task: build
+        # var SITE_PATH is empty here
+    cmds:
+      - echo 'build succeed for netlify'
+      - git init
+      - git add -A
+      - git commit -m '{{.CLI_ARGS}}'
+      - git remote add origin https':'//github.com/zrcoder/niudour
+      - git push -f origin HEAD':'netlify
+      - rm -rf .git
+  clear:
+    dir: cmd/web/static
+    cmds:
+      - rm -rf web
+      - rm -f *.js
+      - rm -f *.html
+      - rm -f manifest*
+      - rm -f app.css
+      - rm -rf .git

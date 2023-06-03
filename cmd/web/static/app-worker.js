@@ -1,5 +1,5 @@
 const cacheName = "app-" + "0.51";
-const resourcesToCache = ["/","/app.css","/app.js","/manifest.webmanifest","/wasm_exec.js","/web/app.wasm","images/gopher.png","js/alert.js","js/editor.js","js/lib/monaco-editor/vs/loader.js","js/lib/sweetalert2.min.js","js/shortcut.js","style.css"];
+const resourcesToCache = ["/niudour","/niudour/app.css","/niudour/app.js","/niudour/manifest.webmanifest","/niudour/wasm_exec.js","/niudour/web/app.wasm","images/gopher.png","js/alert.js","js/editor.js","js/lib/monaco-editor/vs/loader.js","js/lib/sweetalert2.min.js","js/shortcut.js","style.css"];
 
 self.addEventListener("install", (event) => {
   console.log("installing app worker 0.51");
