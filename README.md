@@ -11,8 +11,10 @@
 - cli app
 
     ```shell
-    niudour xxx.gop
+    niudour {source file}
     ```
+
+    > The argument is the code source file, the cli will generate a image as xxx.png
 
 You can take a look at the [wiki](https://github.com/zrcoder/niudour/wiki) for detail.
 
