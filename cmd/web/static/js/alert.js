@@ -1,4 +1,4 @@
-class NiudourAlert {
+class NdorAlert {
     constructor() {
         this.paintToast = null
     }
@@ -14,7 +14,7 @@ class NiudourAlert {
             showCancelButton: true,
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = 'https://github.com/zrcoder/niudour/wiki'
+                window.location.href = 'https://github.com/zrcoder/ndor/wiki'
             }
         })
     }
@@ -75,9 +75,9 @@ class NiudourAlert {
     }
 }
 
-const niudourAlert = new NiudourAlert()
+const ndorAlert = new NdorAlert()
 
 // for go
-function getNiudourAlert() {
-    return niudourAlert
+function getndorAlert() {
+    return ndorAlert
 }

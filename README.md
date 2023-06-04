@@ -1,34 +1,44 @@
-# niudour
+# ndor
 
-`niudour` is an app with wich you can draw by codes, for kids and coders~
+`ndor` is an app with wich you can draw by codes, for kids and coders~
 
-![niudor](https://raw.githubusercontent.com/wiki/zrcoder/niudour/images/main.png)
+![ndor](https://raw.githubusercontent.com/wiki/zrcoder/ndor/images/main.png)
 
-- web app
+You can take a look at the [wiki](https://github.com/zrcoder/ndor/wiki) for detail.
 
-    Vist <https://niudour.netlify.app> or run on your local machine as described bellow.
+## web app
 
-- cli app
+Vist <https://ndor.netlify.app> or run on your local machine as described bellow.
 
-    ```shell
-    niudour {source file}
-    ```
+## cli app
 
-    > The argument is the code source file, the cli will generate a image as xxx.png
+Install with go:
 
-You can take a look at the [wiki](https://github.com/zrcoder/niudour/wiki) for detail.
+```shell
+go install github.com/zrcoder/ndor/cmd/ndor@latest
+```
+
+> TODO: Download from github releases
+
+Run:
+```shell
+ndor {source file}
+```
+
+> The argument is the code source file, the cli will generate a image as xxx.png
+
 
 ## develop
 
-`niudour` is impletioned with go, js and wasm.
+`ndor` is impletioned with go, js and wasm.
 
-If you want to run `niudour` on your local machine：
+If you want to run `ndor` on your local machine：
 
 1. Install `git`, `Go` and [`task`](https://taskfile.dev)
 2. Clone the repo
 
     ```shell
-    git clone https://github.com/zrcoder/niudour
+    git clone https://github.com/zrcoder/ndor
     ```
 
 3. Run
@@ -38,7 +48,7 @@ If you want to run `niudour` on your local machine：
         task run
         ```
         
-        > delete or comment the line "Version: version" in main.go for every dev build
+        > delete or comment the line "Version: version" in cmd/web/main.go for every dev build
         > this is to break the cache mechanism, just for developing
         >
         > for product, modify the const "version" variable and then push and make pr
@@ -48,6 +58,6 @@ If you want to run `niudour` on your local machine：
     - cli app
 
         ```shell
-        go run ./cmd/cli {source file}
+        task cli -- {source file}
         ```
 

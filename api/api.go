@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/zrcoder/niudour/internal"
+	"github.com/zrcoder/ndor/internal"
 
 	"github.com/fogleman/gg"
 )

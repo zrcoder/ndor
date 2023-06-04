@@ -4,9 +4,9 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/zrcoder/niudour/internal"
-	"github.com/zrcoder/niudour/internal/config"
-	"github.com/zrcoder/niudour/pkg"
+	"github.com/zrcoder/ndor/internal"
+	"github.com/zrcoder/ndor/internal/config"
+	"github.com/zrcoder/ndor/pkg"
 
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 )
@@ -32,7 +32,7 @@ type index struct {
 func (idx *index) Render() app.UI {
 	return app.Div().Style("overflow", "hidden").Body(
 		app.Div().Class("title-bar").Body(
-			app.P().Text("Niudour 牛豆儿画图"),
+			app.P().Text("ndor 牛豆儿画图"),
 			app.Button().Class("example-button").OnClick(func(ctx app.Context, e app.Event) {
 				idx.showExamples = !idx.showExamples
 			}).Text("Examples"),
@@ -55,7 +55,7 @@ func (idx *index) Render() app.UI {
 }
 
 func teacherButtonAction(ctx app.Context, e app.Event) {
-	alert := app.Window().Get("getNiudourAlert").Invoke()
+	alert := app.Window().Get("getndorAlert").Invoke()
 	alert.Call("showHelp", version)
 }
 
@@ -63,7 +63,7 @@ func goButtonAction(ctx app.Context, e app.Event) {
 	// TODO: disable gopher button when running draw proccess
 	root := app.Window()
 	root.Get(pictureAreaID).Set("src", "")
-	alert := root.Get("getNiudourAlert").Invoke()
+	alert := root.Get("getndorAlert").Invoke()
 	alert.Call("toastPainting")
 
 	pictureBox := root.Get(pictureBoxID)

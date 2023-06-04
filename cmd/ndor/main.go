@@ -1,15 +1,17 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/zrcoder/niudour/pkg"
+	"github.com/zrcoder/ndor/pkg"
 )
 
 func main() {
+	log.SetFlags(log.LUTC)
 	if len(os.Args) < 2 {
 		log.Fatal("must input the source file")
 	}
@@ -20,7 +22,8 @@ func main() {
 	}
 	src, lerr := pkg.Gen(0, 0, string(data))
 	if lerr != nil {
-		log.Fatal(lerr)
+		msg := fmt.Sprintf("line %d: %s", lerr.Number, lerr.Msg)
+		log.Fatal(msg)
 	}
 
 	outfile := getOutFile(inFile)

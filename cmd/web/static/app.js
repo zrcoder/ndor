@@ -5,7 +5,7 @@ var goappNav = function () {};
 var goappOnUpdate = function () {};
 var goappOnAppInstallChange = function () {};
 
-const goappEnv = {"GOAPP_INTERNAL_URLS":"null","GOAPP_ROOT_PREFIX":"/niudour","GOAPP_STATIC_RESOURCES_URL":"/niudour","GOAPP_VERSION":"0.51"};
+const goappEnv = {"GOAPP_INTERNAL_URLS":"null","GOAPP_ROOT_PREFIX":"/ndor","GOAPP_STATIC_RESOURCES_URL":"/ndor","GOAPP_VERSION":"0.53"};
 const goappLoadingLabel = "{progress}%";
 const goappWasmContentLengthHeader = "";
 
@@ -24,7 +24,7 @@ async function goappInitServiceWorker() {
   if ("serviceWorker" in navigator) {
     try {
       const registration = await navigator.serviceWorker.register(
-        "/niudour/app-worker.js"
+        "/ndor/app-worker.js"
       );
 
       goappServiceWorkerRegistration = registration;
@@ -214,7 +214,7 @@ async function goappInitWebAssembly() {
 
     const go = new Go();
     const wasm = await instantiateStreaming(
-      fetchWithProgress("/niudour/web/app.wasm", showProgress),
+      fetchWithProgress("/ndor/web/app.wasm", showProgress),
       go.importObject
     );
 

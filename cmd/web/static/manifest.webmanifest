@@ -1,6 +1,6 @@
 {
-  "short_name": "Niudour",
-  "name": "Niudour",
+  "short_name": "ndor",
+  "name": "ndor",
   "description": "牛豆儿画图",
   "icons": [
     {
@@ -14,8 +14,8 @@
       "sizes": "512x512"
     }
   ],
-  "scope": "/niudour/",
-  "start_url": "/niudour/",
+  "scope": "/ndor/",
+  "start_url": "/ndor/",
   "background_color": "#2d2c2c",
   "theme_color": "#2d2c2c",
   "display": "standalone"

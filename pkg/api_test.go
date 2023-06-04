@@ -3,7 +3,7 @@ package pkg
 import (
 	"testing"
 
-	"github.com/zrcoder/niudour/internal"
+	"github.com/zrcoder/ndor/internal"
 )
 
 func TestRun(t *testing.T) {

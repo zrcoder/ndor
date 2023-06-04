@@ -7,7 +7,7 @@ import (
 	"image/png"
 	"strings"
 
-	"github.com/zrcoder/niudour/internal"
+	"github.com/zrcoder/ndor/internal"
 )
 
 func Run(width, height int, code string) (string, *internal.LineError) {

@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	version = "0.51"
+	version = "0.53"
 )
 
 func main() {
@@ -24,7 +24,7 @@ func main() {
 }
 
 var handler = &app.Handler{
-	Name:        "Niudour",
+	Name:        "ndor",
 	Description: "牛豆儿画图",
 	Lang:        "zh_CN",
 	Title:       "牛豆儿画图",

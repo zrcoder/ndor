@@ -20,7 +20,7 @@ tasks:
   github:
     deps:
       - task: build
-        vars: {SITE_PATH: 'niudour'}
+        vars: {SITE_PATH: 'ndor'}
     cmds:
       - echo 'build succeed for github'
       - git add -A && git commit -m '{{.CLI_ARGS}}' && git push
@@ -34,7 +34,7 @@ tasks:
       - git init
       - git add -A
       - git commit -m '{{.CLI_ARGS}}'
-      - git remote add origin https':'//github.com/zrcoder/niudour
+      - git remote add origin https':'//github.com/zrcoder/ndor
       - git push -f origin HEAD':'netlify
       - rm -rf .git
   clear:
@@ -46,3 +46,6 @@ tasks:
       - rm -f manifest*
       - rm -f app.css
       - rm -rf .git
+  cli:
+    cmds:
+      - go run ./cmd/ndor {{.CLI_ARGS}}

@@ -1,12 +1,11 @@
 package pkg
 
 import (
-	"log"
 	"strconv"
 	"strings"
 
-	"github.com/zrcoder/niudour/internal"
-	_ "github.com/zrcoder/niudour/internal/exported/github.com/zrcoder/niudour/api"
+	"github.com/zrcoder/ndor/internal"
+	_ "github.com/zrcoder/ndor/internal/exported/github.com/zrcoder/ndor/api"
 
 	"github.com/goplus/igop"
 	_ "github.com/goplus/igop/gopbuild"
@@ -22,7 +21,7 @@ const (
 		math "math"
 		rand "math/rand"
 	
-		. "github.com/zrcoder/niudour/api"
+		. "github.com/zrcoder/ndor/api"
 	)
 	
 	var (
@@ -49,7 +48,6 @@ func gopRun(code string) *internal.LineError {
 	code = preCodes + code
 	_, err := igop.RunFile(gopfileName, code, nil, 0)
 	if err != nil {
-		log.Println(err)
 		return parseGopErr(err)
 	}
 	return nil

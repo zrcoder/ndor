@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zrcoder/niudour/internal"
+	"github.com/zrcoder/ndor/internal"
 )
 
 const (
