@@ -46,6 +46,7 @@ tasks:
       - rm -f manifest*
       - rm -f app.css
       - rm -rf .git
+      - rm -f ../../../examples/*.png
   cli:
     cmds:
       - go run ./cmd/ndor {{.CLI_ARGS}}

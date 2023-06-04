@@ -58,6 +58,6 @@ If you want to run `ndor` on your local machine：
     - cli app
 
         ```shell
-        task cli -- {source file}
+        task cli -- examples/rainbow.gop
         ```
 

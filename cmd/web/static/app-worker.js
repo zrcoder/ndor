@@ -1,8 +1,8 @@
-const cacheName = "app-" + "0.53";
+const cacheName = "app-" + "0.54";
 const resourcesToCache = ["/ndor","/ndor/app.css","/ndor/app.js","/ndor/manifest.webmanifest","/ndor/wasm_exec.js","/ndor/web/app.wasm","images/gopher.png","js/alert.js","js/editor.js","js/lib/monaco-editor/vs/loader.js","js/lib/sweetalert2.min.js","js/shortcut.js","style.css"];
 
 self.addEventListener("install", (event) => {
-  console.log("installing app worker 0.53");
+  console.log("installing app worker 0.54");
 
   event.waitUntil(
     caches
@@ -28,7 +28,7 @@ self.addEventListener("activate", (event) => {
       );
     })
   );
-  console.log("app worker 0.53 is activated");
+  console.log("app worker 0.54 is activated");
 });
 
 self.addEventListener("fetch", (event) => {

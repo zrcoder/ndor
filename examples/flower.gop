@@ -1,0 +1,23 @@
+// flower
+
+const (
+    x, y = 500, 420
+    dx, dy = 400, 80
+    delta = 30
+    all = 180
+)
+
+n := all/delta
+degree := 0.0
+
+context 1000, 1000
+color 0, 0, 0, 50
+
+for i <- :n {
+    push
+    rotate x, y, degree
+    ellipse x, y, dx, dy
+    fill
+    pop
+    degree += 30
+}

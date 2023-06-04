@@ -1,0 +1,8 @@
+// hellow world
+
+context 800, 800
+circle 400, 400, 300
+color "lightgreen"
+fill
+
+// click the gopher on bottom right or press [Ctrl+Enter] to draw!

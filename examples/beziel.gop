@@ -1,0 +1,56 @@
+// beziel
+
+type Point struct {
+    x, y float64
+}
+
+func points(ps []Point) {
+    for p <- ps {
+        circle p.x, p.y, 0.5
+    }
+    color "white"
+    fill preserve
+    color "black"
+    linew 4
+    stroke
+}
+
+func connect(ps []Point) {
+    if len(ps) < 2 {
+        return
+    }
+    from ps[0].x, ps[0].y
+    for _, p := range ps {
+        to p.x, p.y
+    }
+    color "#FF2D00"
+    linew 8
+    stroke
+}
+
+func bezierPoints(ps []Point) {
+    if len(ps) < 3 {
+        return
+    }
+    for len(ps) >= 3 {
+        bezier ps[0].x, ps[0].y, ps[1].x, ps[1].y, ps[2].x, ps[2].y
+        ps = ps[2:]
+    }
+    color "#3E606F"
+    linew 16
+    fill preserve
+    color "black"
+    stroke
+}
+
+const s = 1200
+context s, s
+color "white"
+clear
+translate s/2, s/2
+scale 40, 40
+
+ps := []Point{{-10, 0}, {-5, -10}, {0, 0}, {5, 10}, {10, 0}}
+connect ps
+bezierPoints ps
+points ps

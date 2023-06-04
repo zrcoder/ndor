@@ -5,7 +5,7 @@ var goappNav = function () {};
 var goappOnUpdate = function () {};
 var goappOnAppInstallChange = function () {};
 
-const goappEnv = {"GOAPP_INTERNAL_URLS":"null","GOAPP_ROOT_PREFIX":"/ndor","GOAPP_STATIC_RESOURCES_URL":"/ndor","GOAPP_VERSION":"0.53"};
+const goappEnv = {"GOAPP_INTERNAL_URLS":"null","GOAPP_ROOT_PREFIX":"/ndor","GOAPP_STATIC_RESOURCES_URL":"/ndor","GOAPP_VERSION":"0.54"};
 const goappLoadingLabel = "{progress}%";
 const goappWasmContentLengthHeader = "";
 

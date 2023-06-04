@@ -1,0 +1,35 @@
+// star
+
+type point struct {
+    x, y float64
+}
+
+func genPoints(n int, x, y, r float64) []point {
+    result := make([]point, n)
+    for i, _ <- result {
+        angle := float64(i)*2*math.Pi/float64(n) - math.Pi/2
+        result[i] = point{
+            x: x + r*math.cos(angle),
+            y: y + r*math.sin(angle),
+        }
+    }
+    return result
+}
+
+context 1024, 1024
+n := 5
+points := genPoints(n, 512, 512, 400)
+for i <- :n + 1 {
+    index := (i * 2) % n
+    p := points[index]
+    if i == 0 {
+        from p.x, p.y
+    } else {
+        to p.x, p.y
+    }
+}
+color 0, 127, 0
+fill preserve
+color 0, 127, 0, 130
+linew 16
+stroke

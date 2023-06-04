@@ -1,0 +1,31 @@
+// geometry
+
+context 600, 600
+
+rectangle 50, 50, 500, 500
+stroke
+
+dash 5
+rectangle 50, 50, 120, 60
+rectangle 490, 50, 60, 120
+rectangle 430, 490, 120, 60
+rectangle 50, 430, 60, 120
+stroke
+
+dash // cacel dashes
+from 170, 110
+to 490, 170
+to 430, 490
+to 110, 430
+to 170, 110
+stroke
+
+color "black"
+text 40, 110, "c"
+text 170, 45, "r"
+text 480, 45, "n-1-c"
+text 555, 170, "r"
+text 555, 490, "m-1-c"
+text 420, 565, "n-1-r"
+text 105, 565, "c"
+text 25, 430, "m-1-r"
