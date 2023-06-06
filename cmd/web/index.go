@@ -21,7 +21,7 @@ color "lightgreen"
 circle 400, 400, 300
 fill
 
-// click the gopher on bottom right or press [Ctrl+Enter] to draw!`
+`
 
 type index struct {
 	app.Compo
