@@ -8,35 +8,14 @@ tasks:
     cmds:
       - GOARCH=wasm GOOS=js go build -o static/web/app.wasm
       - go build -o static/app
-      - cd static && ./app {{.SITE_PATH}}
+      - cd static && ./app
       - rm static/app
   run:
     deps:
       - task: build
-        # var SITE_PATH is empty here
     dir: cmd/web
     cmds:
       - cd static && go run ../tools/server
-  github:
-    deps:
-      - task: build
-        vars: {SITE_PATH: 'ndor'}
-    cmds:
-      - echo 'build succeed for github'
-      - git add -A && git commit -m '{{.CLI_ARGS}}' && git push
-  netlify:
-    dir: cmd/web/static
-    deps:
-      - task: build
-        # var SITE_PATH is empty here
-    cmds:
-      - echo 'build succeed for netlify'
-      - git init
-      - git add -A
-      - git commit -m '{{.CLI_ARGS}}'
-      - git remote add origin https':'//github.com/zrcoder/ndor
-      - git push -f origin HEAD':'netlify
-      - rm -rf .git
   clear:
     dir: cmd/web/static
     cmds:

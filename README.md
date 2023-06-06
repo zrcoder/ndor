@@ -21,12 +21,12 @@ go install github.com/zrcoder/ndor/cmd/ndor@latest
 > TODO: Download from github releases
 
 Run:
+
 ```shell
 ndor {source file}
 ```
 
 > The argument is the code source file, the cli will generate a image as xxx.png
-
 
 ## develop
 
@@ -43,11 +43,11 @@ If you want to run `ndor` on your local machine：
 
 3. Run
     - web app:
-        
+
         ```shell
         task run
         ```
-        
+
         > delete or comment the line "Version: version" in cmd/web/main.go for every dev build
         > this is to break the cache mechanism, just for developing
         >
@@ -60,4 +60,3 @@ If you want to run `ndor` on your local machine：
         ```shell
         task cli -- examples/rainbow.gop
         ```
-
