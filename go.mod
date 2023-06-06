@@ -7,7 +7,6 @@ require (
 	github.com/goplus/igop v0.9.9
 	github.com/maxence-charriere/go-app/v9 v9.6.7
 	golang.org/x/image v0.5.0
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )
 
 require (
@@ -26,4 +25,5 @@ require (
 	github.com/visualfc/xtype v0.1.2 // indirect
 	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/tools v0.6.0 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
