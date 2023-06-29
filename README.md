@@ -1,6 +1,6 @@
 # ndor
 
-`ndor` is an app with wich you can draw by codes, for kids and coders~
+`ndor` is an app with which you can draw by codes, for kids and coders~
 
 ![ndor](https://raw.githubusercontent.com/wiki/zrcoder/ndor/images/main.png)
 
