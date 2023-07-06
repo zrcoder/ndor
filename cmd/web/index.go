@@ -40,10 +40,10 @@ func (idx *index) Render() app.UI {
 		app.Div().ID(pictureBoxID).Class("left-box").Body(
 			app.Img().ID(pictureAreaID).Style("max-width", "100%").Style("max-height", "100%"),
 		),
-		app.Div().Class("right-box").Body(app.Pre().ID("codeArea").Class("code-area")),
+		app.Div().Class("right-box").Body(app.Div().ID("codeArea").Class("code-area")),
 		app.If(idx.showExamples, app.Ul().Class("example-list").Body(
 			app.Range(examples.Default).Slice(func(i int) app.UI {
-				return app.Li().Text(examples.Default[i].Name).OnClick(func(ctx app.Context, e app.Event) {
+				return app.Li().Text(examples.Default[i].Name).OnClick(func(_ app.Context, _ app.Event) {
 					app.Window().Get("SetCode").Invoke(examples.Default[i].Code)
 					idx.showExamples = false
 				})

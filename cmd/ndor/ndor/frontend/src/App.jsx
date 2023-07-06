@@ -39,21 +39,36 @@ function App() {
   }
 
   return (
-    <div style={{ 'overflow': "hidden" }} >
-      <div className='title-bar'>
+    <div style={{
+      'overflow': "hidden", "--wails-draggable": "drag"
+    }} >
+      < div className='title-bar' >
         <p>Ndor 牛豆儿画图</p>
       </div>
       <div id="pictureBox" className='left-box'>
         <img id='pictureArea' src={genedImgSrc} style={{ 'max- width': "100%", 'max-height': "100%" }} />
       </ div >
       <div className='right-box'>
-        <pre id='codeArea' className='code-area' >
-          <MonacoEditor
-            height="100%"
-            editorDidMount={handleEditorDidMount}
-            onChange={onEditorChange}
-          />
-        </pre>
+        <MonacoEditor
+          language="javascript"
+          theme="vs-dark"
+          options={{
+            fontSize: 16,
+            wordWrap: true,
+            minimap: {
+              enabled: false
+            },
+            scrollBar: {
+              vertical: 'hidden',
+              horizontal: 'hidden'
+            },
+            automaticLayout: true,
+            overviewrulerLanes: 0,
+            hideCursorInOverviewRuler: true,
+          }}
+          editorDidMount={handleEditorDidMount}
+          onChange={onEditorChange}
+        />
       </div>
       <button className='teacher-button' onClick={help()}>HELP</button>
       <button id="run-button" className='run-button' disabled={!isEditorReady} onClick={go}>GO</button>

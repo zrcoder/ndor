@@ -6,4 +6,5 @@ manifest.webmanifest
 wasm_exec.js
 app.wasm
 ndor.wiki
-
+.DS_Store
+.null-ls*

@@ -16,10 +16,11 @@
 }
 
 .example-list {
+    background: white;
     position: fixed;
     top: 54px;
     width: 160px;
-    height: 600px;
+    height: "100%";
     right: 24px;
 }
 
@@ -32,12 +33,13 @@
 
 .left-box {
     left: 0px;
-    width: 55%;
+    width: 50%;
 }
 
 .right-box {
-    left: 55%;
-    width: 45%;
+    background: black;
+    left: 50%;
+    width: 50%;
     border-left: 1px solid lightgray;
 }
 
