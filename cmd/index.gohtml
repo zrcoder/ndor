@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+  <head>
+    <meta charset="UTF-8">
+    <title>牛豆儿画图</title>
+    <link rel="icon" href="images/gopher.png">
+    <link rel="stylesheet" type="text/css" href="static/style.css">
+  </head>
+  <body>
+    <div class="title-bar">
+      <p>ndor 牛豆儿画图</p>
+      <button class="example-button" onclick="toogleExamples()">Examples</button>
+    </div>
+    <div id="pictureBox" class="left-box">
+      <img id="pictureArea" style="max-width:100%;max-height:100%;">
+    </div>
+    <div class="right-box">
+      <div id="codeArea" class="code-area"></div>
+    </div>
+    <ul id="examples" class="example-list" style="display: none;">
+      {{ range . }}
+      <li code="{{ .Code }}" onclick="selectExample(this)">{{ .Name }}</li>
+      {{ end }}
+    </ul>
+    <button class="teacher-button" onclick="help()">HELP</button>
+    <button id="run-button" class="run-button" onclick="draw()">GO</button>
+
+    <script src="static/js/lib/sweetalert2.min.js"></script>
+    <script src="static/js/alert.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.27.0/min/vs/loader.js"></script>
+    <script src="static/js/editor.js"></script>
+    <script>
+      const version = "0.1";
+
+      function selectExample(exampleItem) {
+        setCode(exampleItem.getAttribute("code"));
+        document.getElementById("examples").style.display = "none";
+      }
+
+      function help() {
+        getndorAlert().showHelp(version)
+      }
+
+      function toogleExamples() {
+        const examples = document.getElementById("examples");
+        if (examples.style.display === "none") {
+          examples.style.display = "block";
+        } else {
+          examples.style.display = "none";
+        }
+      }
+
+      function draw() {
+        const pic = document.getElementById("pictureArea");
+        pic.src = "";
+        const alert = getndorAlert()
+        alert.toastPainting()
+        const picBox = document.getElementById("pictureBox")
+        const code = getCode()
+        const req = new XMLHttpRequest();
+        req.overrideMimeType("application/json");
+        req.onload = function() {
+          setTimeout(function() {
+            alert.closePaintToast()
+            if (req.readyState == 4 && req.status == 200) {
+              const resp = JSON.parse(req.responseText);
+              if (resp.Error == null) {
+                pic.src = resp.Data;
+              } else {
+                alert.alertError(resp.Error.Number, resp.Error.Msg);
+              }
+            }
+          }, 700)
+        };
+        req.open("post", "/image", true);
+        const body = {
+          "width": picBox.offsetWidth,
+          "height": picBox.offsetHeight,
+          "code": code
+        };
+        req.send(JSON.stringify(body));
+      }
+    </script>
+  </body>
+</html>

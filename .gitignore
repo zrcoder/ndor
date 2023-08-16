@@ -1,7 +1,6 @@
 app-worker.js
 app.css
 app.js
-index.html
 manifest.webmanifest
 wasm_exec.js
 app.wasm
