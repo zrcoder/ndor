@@ -27,7 +27,7 @@ func main() {
 	}
 
 	outfile := getOutFile(inFile)
-	err = os.WriteFile(outfile, src, 0640)
+	err = os.WriteFile(outfile, src, 0o640)
 	if err != nil {
 		log.Fatal(err)
 	}

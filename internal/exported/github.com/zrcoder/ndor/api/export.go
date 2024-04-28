@@ -3,12 +3,12 @@
 package api
 
 import (
-	q "github.com/zrcoder/ndor/api"
-
 	"go/constant"
 	"reflect"
 
 	"github.com/goplus/igop"
+
+	q "github.com/zrcoder/ndor/api"
 )
 
 func init() {
