@@ -8,7 +8,7 @@ import (
 	"github.com/zrcoder/ndor/internal"
 	"github.com/zrcoder/ndor/pkg"
 
-	"github.com/maxence-charriere/go-app/v9/pkg/app"
+	"github.com/maxence-charriere/go-app/v10/pkg/app"
 )
 
 const (
@@ -32,7 +32,7 @@ type index struct {
 func (idx *index) Render() app.UI {
 	return app.Div().Style("overflow", "hidden").Body(
 		app.Div().Class("title-bar").Body(
-			app.P().Text("ndor 牛豆儿画图"),
+			app.P().Text("ndor 画图"),
 			app.Button().Class("example-button").OnClick(func(ctx app.Context, e app.Event) {
 				idx.showExamples = !idx.showExamples
 			}).Text("Examples"),
@@ -41,14 +41,16 @@ func (idx *index) Render() app.UI {
 			app.Img().ID(pictureAreaID).Style("max-width", "100%").Style("max-height", "100%"),
 		),
 		app.Div().Class("right-box").Body(app.Div().ID("codeArea").Class("code-area")),
-		app.If(idx.showExamples, app.Ul().Class("example-list").Body(
-			app.Range(examples.Default).Slice(func(i int) app.UI {
-				return app.Li().Text(examples.Default[i].Name).OnClick(func(_ app.Context, _ app.Event) {
-					app.Window().Get("SetCode").Invoke(examples.Default[i].Code)
-					idx.showExamples = false
-				})
-			}),
-		)),
+		app.If(idx.showExamples, func() app.UI {
+			return app.Ul().Class("example-list").Body(
+				app.Range(examples.Default).Slice(func(i int) app.UI {
+					return app.Li().Text(examples.Default[i].Name).OnClick(func(_ app.Context, _ app.Event) {
+						app.Window().Get("SetCode").Invoke(examples.Default[i].Code)
+						idx.showExamples = false
+					})
+				}),
+			)
+		}),
 		app.Button().Class("teacher-button").OnClick(teacherButtonAction).Text("HELP"),
 		app.Button().ID("run-button").Class("run-button").OnClick(goButtonAction).Text("GO"),
 	)

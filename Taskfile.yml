@@ -20,6 +20,7 @@ tasks:
       - rm -f manifest*
       - rm -f app.css
       - rm -rf .git
+      - rm -f app
       - rm -f ../../../examples/*.png
   cli:
     cmds:
