@@ -1,12 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/yuin/goldmark"
+	nmd "github.com/zrcoder/ndor/goldmark"
 	"github.com/zrcoder/ndor/pkg"
 )
 
@@ -20,21 +23,44 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	src, lerr := pkg.Gen(0, 0, string(data))
-	if lerr != nil {
-		msg := fmt.Sprintf("line %d: %s", lerr.Number, lerr.Msg)
-		log.Fatal(msg)
+	outFile := ""
+	if strings.HasSuffix(inFile, ".md") {
+		outFile = getOutfile(inFile, ".html")
+		data, err = md2html(data)
+	} else {
+		outFile = getOutfile(inFile, ".png")
+		data, err = genPng(data)
 	}
-
-	outfile := getOutFile(inFile)
-	err = os.WriteFile(outfile, src, 0o640)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(outfile, "generated!")
+	err = os.WriteFile(outFile, data, 0o640)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
-func getOutFile(inFile string) string {
-	out := strings.TrimSuffix(inFile, filepath.Ext(inFile))
-	return out + ".png"
+func md2html(data []byte) ([]byte, error) {
+	md := goldmark.New(
+		goldmark.WithExtensions(&nmd.Extender{}),
+	)
+
+	buf := bytes.NewBuffer(nil)
+	err := md.Convert(data, buf)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+func genPng(data []byte) ([]byte, error) {
+	src, lerr := pkg.Gen(0, 0, string(data))
+	if lerr != nil {
+		return nil, fmt.Errorf("line %d: %s", lerr.Number, lerr.Msg)
+	}
+	return src, nil
+}
+
+func getOutfile(inFile, ext string) string {
+	return strings.TrimSuffix(inFile, filepath.Ext(inFile)) + ext
 }
