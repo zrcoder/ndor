@@ -15,9 +15,11 @@
 }
 
 .example-list {
+  position: fixed;
   background: sliver;
   width: 160px;
   height: "100%";
+  padding-top: 10px;
   padding-left: 24px;
 }
 
