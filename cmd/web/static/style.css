@@ -1,88 +1,85 @@
-.title-bar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 50px;
-    background: black;
-    color: white;
-    padding-left: 24px;
+:root {
+  --nav-height: 50px;
+  --main-height: calc(100vh - var(--nav-height));
 }
 
-.example-button {
-    position: fixed;
-    top: 12px;
-    right: 24px;
+.title-bar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: var(--nav-height);
+  background: black;
+  color: white;
+  padding-left: 24px;
 }
 
 .example-list {
-    background: white;
-    position: fixed;
-    top: 54px;
-    width: 160px;
-    height: "100%";
-    right: 24px;
+  background: sliver;
+  width: 160px;
+  height: "100%";
+  padding-left: 24px;
+}
+
+.main {
+  position: fixed;
+  left: 0;
+  top: var(--nav-height);
+  width: 100%;
+  height: var(--main-height);
+  display: flex;
 }
 
 .left-box,
 .right-box {
-    position: fixed;
-    top: 50px;
-    height: 1024px;
+  padding: 0px;
+  align-items: stretch;
+  display: flex;
 }
 
 .left-box {
-    left: 0px;
-    width: 50%;
+  width: 55%;
+  border-right: 1px solid lightgray;
 }
 
 .right-box {
-    background: black;
-    left: 50%;
-    width: 50%;
-    border-left: 1px solid lightgray;
-}
-
-.code-area {
-    position: relative;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
-    outline: none;
-    padding: 5px;
+  flex: 1;
+  border: none;
+  outline: none;
+  padding-top: 5px;
+  align-items: stretch;
+  width: 100%;
 }
 
 .teacher-button {
-    position: fixed;
-    left: 24px;
-    bottom: 0px;
-    width: 100px;
-    height: 110px;
-    padding-top: 65px;
-    border: 0;
-    background: url("images/teacher.png") no-repeat bottom;
-    background-size: 100% 100%;
+  position: fixed;
+  left: 24px;
+  bottom: 0px;
+  width: 100px;
+  height: 110px;
+  padding-top: 65px;
+  border: 0;
+  background: url("images/teacher.png") no-repeat bottom;
+  background-size: 100% 100%;
 }
 
 .run-button {
-    position: fixed;
-    right: 24px;
-    bottom: 0px;
-    width: 100px;
-    height: 110px;
-    padding-top: 65px;
-    border: 0;
-    background: url("images/gopher.png") no-repeat bottom;
-    background-size: 100%, 100%;
+  position: fixed;
+  right: 24px;
+  bottom: 0px;
+  width: 100px;
+  height: 110px;
+  padding-top: 65px;
+  border: 0;
+  background: url("images/gopher.png") no-repeat bottom;
+  background-size: 100%, 100%;
 }
 
 button:hover {
-    color: white;
-    background-size: 85% 85%;
+  color: white;
+  background-size: 80% 70%;
 }
 
 .editorLineErr {
-    background: red;
+  background: red;
 }

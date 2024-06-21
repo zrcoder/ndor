@@ -8,3 +8,4 @@ app.wasm
 ndor.wiki
 .DS_Store
 .null-ls*
+app

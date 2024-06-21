@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	version = "0.60"
+	version = "0.70"
 )
 
 func main() {
@@ -25,9 +25,9 @@ func main() {
 
 var handler = &app.Handler{
 	Name:        "ndor",
-	Description: "牛豆儿画图",
+	Description: "Ndor Draw",
 	Lang:        "zh_CN",
-	Title:       "画图",
+	Title:       "Ndor",
 	Icon: app.Icon{
 		Default: "images/gopher.png",
 	},
