@@ -26,7 +26,7 @@ Run:
 ndor {source file}
 ```
 
-> The argument is the code source file, the cli will generate a image as xxx.png
+> The argument is the code source file(xxx.gop or xxx.md), the cli will generate a image as xxx.png or a html as xxx.html.
 
 ## develop
 
