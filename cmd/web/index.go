@@ -38,7 +38,7 @@ func (idx *index) Render() app.UI {
 		),
 		app.Div().Class("main").Body(
 			app.Div().ID(pictureBoxID).Class("left-box").Body(
-				app.Img().ID(pictureAreaID).Style("max-width", "100%").Style("max-height", "100%"),
+				app.Img().ID(pictureAreaID).Style("max-width", "100%").Style("max-height", "100%").Style("object-fit", "contain"),
 				app.If(idx.showExamples, func() app.UI {
 					return app.Ul().Class("example-list").Body(
 						app.Range(examples.Default).Slice(func(i int) app.UI {
