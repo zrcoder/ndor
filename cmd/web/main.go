@@ -24,12 +24,12 @@ func main() {
 }
 
 var handler = &app.Handler{
-	Name:        "ndor",
-	Description: "Ndor Draw",
-	Lang:        "zh_CN",
 	Title:       "Ndor",
+	Description: "Draw",
+	Lang:        "zh_CN",
 	Icon: app.Icon{
-		Default: "images/gopher.png",
+		Default: "images/hi.png",
+		SVG:     "images/hi.png", // not svg now, just to prevent the go-app's default one.
 	},
 	Styles: []string{"style.css"},
 	Scripts: []string{
