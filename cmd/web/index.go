@@ -31,7 +31,7 @@ type index struct {
 func (idx *index) Render() app.UI {
 	return app.Div().Style("overflow", "hidden").Body(
 		app.Div().Class("title-bar").Body(
-			app.Img().Src("images/good_morning.png").Width(54),
+			app.Img().Src("images/good_morning.png").Width(43),
 			app.Button().Hidden(true).ID("example-button").OnClick(func(app.Context, app.Event) {
 				idx.showExamples = true
 			}),
@@ -52,8 +52,8 @@ func (idx *index) Render() app.UI {
 			),
 			app.Div().Class("right-box").ID("codeArea"),
 		),
-		app.Button().Class("teacher-button").OnClick(teacherButtonAction).Text("HELP"),
-		app.Button().ID("run-button").Class("run-button").OnClick(goButtonAction).Text("GO"),
+		app.Button().Class("pic-button teacher-button").OnClick(teacherButtonAction).Text("HELP"),
+		app.Button().ID("run-button").Class("pic-button  run-button").OnClick(goButtonAction).Text("GO"),
 	)
 }
 

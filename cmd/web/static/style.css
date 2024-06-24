@@ -1,5 +1,5 @@
 :root {
-    --nav-height: 50px;
+    --nav-height: 40px;
     --main-height: calc(100vh - var(--nav-height));
 }
 
@@ -40,7 +40,6 @@
 
 .left-box {
     width: 55%;
-    border-right: 1px solid lightgray;
 }
 
 .right-box {
@@ -51,28 +50,27 @@
     width: 100%;
 }
 
-.teacher-button {
+.pic-button {
     position: fixed;
-    left: 24px;
     bottom: 0px;
-    width: 100px;
-    height: 110px;
-    padding-top: 65px;
+    width: 64px;
+    height: 72px;
+    padding-top: 55px;
     border: 0;
-    background: url("images/teacher.png") no-repeat bottom;
     background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: bottom;
+    background-color: transparent;
+}
+
+.teacher-button {
+    left: 24px;
+    background-image: url("images/teacher.png");
 }
 
 .run-button {
-    position: fixed;
     right: 24px;
-    bottom: 0px;
-    width: 100px;
-    height: 110px;
-    padding-top: 65px;
-    border: 0;
-    background: url("images/gopher.png") no-repeat bottom;
-    background-size: 100%, 100%;
+    background-image: url("images/gopher.png");
 }
 
 button:hover {
