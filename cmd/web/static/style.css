@@ -1,87 +1,85 @@
 :root {
-  --nav-height: 50px;
-  --main-height: calc(100vh - var(--nav-height));
+    --nav-height: 50px;
+    --main-height: calc(100vh - var(--nav-height));
 }
 
 .title-bar {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: var(--nav-height);
-  background: black;
-  color: white;
-  padding-left: 24px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: var(--nav-height);
+    background: rgb(30, 30, 30);
+    color: white;
+    padding-left: 24px;
 }
 
 .example-list {
-  position: fixed;
-  background: sliver;
-  width: 160px;
-  height: "100%";
-  padding-top: 10px;
-  padding-left: 24px;
+    position: fixed;
+    background: sliver;
+    width: 160px;
+    height: "100%";
+    padding-top: 10px;
+    padding-left: 24px;
 }
 
 .main {
-  position: fixed;
-  left: 0;
-  top: var(--nav-height);
-  width: 100%;
-  height: var(--main-height);
-  display: flex;
+    position: fixed;
+    left: 0;
+    top: var(--nav-height);
+    width: 100%;
+    height: var(--main-height);
+    display: flex;
 }
 
 .left-box,
 .right-box {
-  padding: 0px;
-  align-items: stretch;
-  display: flex;
+    align-items: stretch;
+    display: flex;
 }
 
 .left-box {
-  width: 55%;
-  border-right: 1px solid lightgray;
+    width: 55%;
+    border-right: 1px solid lightgray;
 }
 
 .right-box {
-  flex: 1;
-  border: none;
-  outline: none;
-  padding-top: 5px;
-  align-items: stretch;
-  width: 100%;
+    flex: 1;
+    border: none;
+    outline: none;
+    align-items: stretch;
+    width: 100%;
 }
 
 .teacher-button {
-  position: fixed;
-  left: 24px;
-  bottom: 0px;
-  width: 100px;
-  height: 110px;
-  padding-top: 65px;
-  border: 0;
-  background: url("images/teacher.png") no-repeat bottom;
-  background-size: 100% 100%;
+    position: fixed;
+    left: 24px;
+    bottom: 0px;
+    width: 100px;
+    height: 110px;
+    padding-top: 65px;
+    border: 0;
+    background: url("images/teacher.png") no-repeat bottom;
+    background-size: 100% 100%;
 }
 
 .run-button {
-  position: fixed;
-  right: 24px;
-  bottom: 0px;
-  width: 100px;
-  height: 110px;
-  padding-top: 65px;
-  border: 0;
-  background: url("images/gopher.png") no-repeat bottom;
-  background-size: 100%, 100%;
+    position: fixed;
+    right: 24px;
+    bottom: 0px;
+    width: 100px;
+    height: 110px;
+    padding-top: 65px;
+    border: 0;
+    background: url("images/gopher.png") no-repeat bottom;
+    background-size: 100%, 100%;
 }
 
 button:hover {
-  color: white;
-  background-size: 80% 70%;
+    color: white;
+    background-size: 80% 70%;
 }
 
 .editorLineErr {
-  background: red;
+    background: red;
 }

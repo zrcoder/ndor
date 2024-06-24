@@ -6,9 +6,10 @@ let _decorations = [];
 require(["vs/editor/editor.main"], function () {
   _codeEditor = monaco.editor.create(document.getElementById("codeArea"), {
     language: "c", // go+
-    // theme: 'vs',
+    theme: "vs-dark",
     fontSize: 16,
     wordWrap: "on",
+    value: "\n",
     minimap: {
       enabled: false,
     },
@@ -20,6 +21,8 @@ require(["vs/editor/editor.main"], function () {
     overviewRulerLanes: 0,
     hideCursorInOverviewRuler: true,
   });
+  _codeEditor.focus();
+  _codeEditor.setPosition({ column: 0, lineNumber: 3000 });
   _codeEditor.onDidChangeModelContent(() => {
     _codeEditor.removeDecorations(_decorations);
     _decorations = [];
@@ -37,7 +40,7 @@ function MarkErrorLine(number) {
           inlineClassName: "editorLineErr",
         },
       },
-    ]
+    ],
   );
 }
 
