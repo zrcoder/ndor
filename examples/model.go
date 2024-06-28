@@ -33,7 +33,7 @@ func init() {
 		"open-fill.gop",
 		"rainbow.gop",
 		"spiral.gop",
-		"start.gop",
+		"star.gop",
 	}
 	Default = make([]Example, 0, len(files))
 
