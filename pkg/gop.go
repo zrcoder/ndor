@@ -20,17 +20,17 @@ const (
 	import (
 		math "math"
 		rand "math/rand"
-	
+
 		. "github.com/zrcoder/ndor/api"
 	)
-	
+
 	var (
 		_ = math.Pi
 		_ rand.Source
 	)
-	
+
 	const preserve = Preserve
-	
+
 	var (
 		color  = Color
 		dash   = Dash
@@ -47,10 +47,7 @@ const (
 func gopRun(code string) *internal.LineError {
 	code = preCodes + code
 	_, err := igop.RunFile(gopfileName, code, nil, 0)
-	if err != nil {
-		return parseGopErr(err)
-	}
-	return nil
+	return parseGopErr(err)
 }
 
 // err like : ./main.gop:1:1: undefined: vv
