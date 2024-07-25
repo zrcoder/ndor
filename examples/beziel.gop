@@ -20,7 +20,7 @@ func connect(ps []Point) {
         return
     }
     from ps[0].x, ps[0].y
-    for _, p := range ps {
+    for _, p := range ps[1:] {
         to p.x, p.y
     }
     color "#FF2D00"

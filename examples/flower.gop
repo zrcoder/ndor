@@ -19,5 +19,5 @@ for i <- :n {
     ellipse x, y, dx, dy
     fill
     pop
-    degree += 30
+    degree += delta
 }
