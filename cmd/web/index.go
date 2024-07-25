@@ -58,7 +58,7 @@ func (idx *index) Render() app.UI {
 }
 
 func teacherButtonAction(ctx app.Context, e app.Event) {
-	app.Window().Get("getndorAlert").Invoke().Call("showHelp")
+	app.Window().Get("getndorAlert").Invoke().Call("showHelp", version)
 }
 
 func goButtonAction(ctx app.Context, e app.Event) {

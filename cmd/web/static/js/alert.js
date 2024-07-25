@@ -3,11 +3,11 @@ class NdorAlert {
     this.paintToast = null;
   }
 
-  showHelp() {
+  showHelp(version) {
     Swal.fire({
       imageUrl: "images/teacher.png",
       imageHeight: 100,
-      title: "Need help?",
+      title: "Ndor v" + version,
       showCancelButton: true,
       confirmButtonText: "Document",
       cancelButtonText: "Examples",
