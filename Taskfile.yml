@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 tasks:
   gen:
     cmds:
@@ -6,8 +6,8 @@ tasks:
   run:
     dir: cmd/web
     cmds:
-      - GOARCH=wasm GOOS=js go build -o static/web/app.wasm
-      - go build -o static/app
+      - GOARCH=wasm GOOS=js go build -ldflags=-checklinkname=0 -o static/web/app.wasm
+      - go build -ldflags=-checklinkname=0 -o static/app
       - cd static && ./app
       - rm static/app
       - cd static && go run ../tools/server
