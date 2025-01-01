@@ -31,7 +31,7 @@ type index struct {
 func (idx *index) Render() app.UI {
 	return app.Div().Style("overflow", "hidden").Body(
 		app.Div().Class("title-bar").Body(
-			app.Img().Src("images/good_morning.png").Width(43),
+			app.Img().Src("/static/images/good_morning.png").Width(43),
 			app.Button().Hidden(true).ID("example-button").OnClick(func(app.Context, app.Event) {
 				idx.showExamples = true
 			}),

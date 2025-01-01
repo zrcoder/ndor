@@ -1,4 +1,4 @@
-require.config({ paths: { vs: "./js/lib/monaco-editor/vs" } });
+require.config({ paths: { vs: "/static/js/lib/monaco-editor/vs" } });
 
 let _codeEditor = null;
 let _decorations = [];
@@ -40,7 +40,7 @@ function MarkErrorLine(number) {
           inlineClassName: "editorLineErr",
         },
       },
-    ],
+    ]
   );
 }
 

@@ -5,7 +5,7 @@ class NdorAlert {
 
   showHelp(version) {
     Swal.fire({
-      imageUrl: "images/teacher.png",
+      imageUrl: "/static/images/teacher.png",
       imageHeight: 100,
       title: "Ndor v" + version,
       showCancelButton: true,
@@ -37,7 +37,7 @@ class NdorAlert {
 
   alertEmptyInputWith(exampleCode) {
     Swal.fire({
-      imageUrl: "images/teacher.png",
+      imageUrl: "/static/images/teacher.png",
       imageHeight: 100,
       showConfirmButton: false,
       titleText: "no code to run",
@@ -59,9 +59,9 @@ class NdorAlert {
         },
       });
     }
-    let img = "images/paint.png";
+    let img = "/static/images/paint.png";
     if (Math.random() < 0.5) {
-      img = "images/code.png";
+      img = "/static/images/code.png";
     }
     this.paintToast.fire({
       imageUrl: img,
