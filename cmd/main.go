@@ -4,35 +4,23 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/maxence-charriere/go-app/v10/pkg/app"
-)
+	"github.com/zrcoder/ndor/cmd/static"
 
-const (
-	version = "0.9.0"
+	"github.com/zrcoder/amisgo"
+	"github.com/zrcoder/amisgo/conf"
 )
 
 func main() {
 	log.SetFlags(log.Lshortfile)
-	app.Route("/", func() app.Composer { return &index{} })
-	app.RunWhenOnBrowser()
-	http.Handle("/", handler)
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	log.Println("Server started at http://localhost:9999")
-	log.Fatal(http.ListenAndServe(":9999", nil))
-}
+	app := amisgo.New(
+		conf.WithTitle("Ndor"),
+		conf.WithLang("zh_CN"),
+		conf.WithTheme(conf.ThemeDark),
+		conf.WithIcon("/static/images/hi.png"),
+	).
+		StaticFS("/static", http.FS(static.FS)).
+		Mount("/", index)
 
-var handler = &app.Handler{
-	Title:       "Ndor",
-	Description: "Draw",
-	Lang:        "zh_CN",
-	Icon: app.Icon{
-		Default: "/static/images/hi.png",
-		SVG:     "/static/images/hi.png", // not svg now, just to prevent the go-app's default one.
-	},
-	Styles: []string{"/static/style.css"},
-	Scripts: []string{
-		"/static/js/lib/sweetalert2.min.js", "/static/js/alert.js",
-		"/static/js/lib/monaco-editor/vs/loader.js", "/static/js/editor.js",
-	},
-	Version: version,
+	log.Println("Server started at http://localhost:9999")
+	log.Fatal(app.Run(":9999"))
 }

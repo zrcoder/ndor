@@ -1,6 +1,10 @@
 // geometry
 
 context 600, 600
+color "white"
+clear
+
+color "black"
 
 rectangle 50, 50, 500, 500
 stroke
@@ -20,7 +24,6 @@ to 110, 430
 to 170, 110
 stroke
 
-color "black"
 text 40, 110, "c"
 text 170, 45, "r"
 text 480, 45, "n-1-c"

@@ -11,6 +11,10 @@ n := all/delta
 degree := 0.0
 
 context 1000, 1000
+
+color "white"
+clear
+
 color 0, 0, 0, 50
 
 for i <- :n {

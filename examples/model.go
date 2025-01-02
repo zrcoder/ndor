@@ -8,14 +8,15 @@ import (
 )
 
 type Example struct {
-	Name string
-	Code string
+	Name string `json:"label"`
+	Code string `json:"value"`
 }
 
 var (
 	//go:embed *.gop
-	fs      embed.FS
-	Default []Example
+	fs          embed.FS
+	Default     []any
+	DefaultCode string
 )
 
 func init() {
@@ -35,9 +36,9 @@ func init() {
 		"spiral.gop",
 		"star.gop",
 	}
-	Default = make([]Example, 0, len(files))
+	Default = make([]any, 0, len(files))
 
-	for _, n := range files {
+	for idx, n := range files {
 		data, err := fs.ReadFile(n)
 		if err != nil {
 			log.Fatal(err)
@@ -50,5 +51,8 @@ func init() {
 			name = strings.TrimLeft(name, "/ ")
 		}
 		Default = append(Default, Example{name, code})
+		if idx == 0 {
+			DefaultCode = code
+		}
 	}
 }

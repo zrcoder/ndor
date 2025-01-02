@@ -22,6 +22,10 @@ func col(x int) {
 context width, height
 linew 1
 
+
+color "white"
+clear
+
 for x <- minor:width:minor {
     col x
 }

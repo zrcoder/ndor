@@ -4,6 +4,10 @@ const s = 1024
 const n = 2048
 
 context s, s
+
+color "white"
+clear
+
 color "black"
 
 for i <- :n {

@@ -5,14 +5,13 @@ go 1.22
 require (
 	github.com/fogleman/gg v1.3.0
 	github.com/goplus/igop v0.27.1
-	github.com/maxence-charriere/go-app/v10 v10.0.8
 	github.com/yuin/goldmark v1.7.6
+	github.com/zrcoder/amisgo v0.0.0-20250102082833-d59e3c4b2732
 	golang.org/x/image v0.21.0
 )
 
 require (
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
 	github.com/goplus/gogen v1.15.2 // indirect
 	github.com/goplus/gop v1.2.6 // indirect

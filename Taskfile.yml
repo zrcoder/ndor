@@ -6,7 +6,6 @@ tasks:
   run:
     dir: cmd
     cmds:
-      - GOARCH=wasm GOOS=js go build -ldflags=-checklinkname=0 -o web/app.wasm
       - go build -ldflags=-checklinkname=0 -o app
       - ./app
   clear:

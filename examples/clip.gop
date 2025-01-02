@@ -1,6 +1,8 @@
 // clip
 
 context 1000, 1000
+color "white"
+clear
 circle 350, 500, 300
 clip
 circle 650, 500, 300

@@ -1,19 +1,12 @@
 package main
 
 import (
-	"math/rand"
-	"time"
+	"errors"
 
 	"github.com/zrcoder/ndor/examples"
-	"github.com/zrcoder/ndor/internal"
 	"github.com/zrcoder/ndor/pkg"
 
-	"github.com/maxence-charriere/go-app/v10/pkg/app"
-)
-
-const (
-	pictureAreaID = "pictureArea"
-	pictureBoxID  = "pictureBox"
+	"github.com/zrcoder/amisgo/comp"
 )
 
 const exampleCode = `context 800, 800
@@ -22,70 +15,43 @@ circle 400, 400, 300
 fill
 
 `
+const version = "0.9.2"
 
-type index struct {
-	app.Compo
-	showExamples bool
-}
-
-func (idx *index) Render() app.UI {
-	return app.Div().Style("overflow", "hidden").Body(
-		app.Div().Class("title-bar").Body(
-			app.Img().Src("/static/images/good_morning.png").Width(43),
-			app.Button().Hidden(true).ID("example-button").OnClick(func(app.Context, app.Event) {
-				idx.showExamples = true
-			}),
-		),
-		app.Div().Class("main").Body(
-			app.Div().ID(pictureBoxID).Class("left-box").Body(
-				app.Img().ID(pictureAreaID).Style("max-width", "100%").Style("max-height", "100%").Style("object-fit", "contain"),
-				app.If(idx.showExamples, func() app.UI {
-					return app.Ul().Class("example-list").Body(
-						app.Range(examples.Default).Slice(func(i int) app.UI {
-							return app.Li().Text(examples.Default[i].Name).OnClick(func(_ app.Context, _ app.Event) {
-								app.Window().Get("SetCode").Invoke(examples.Default[i].Code)
-								idx.showExamples = false
-							})
-						}),
-					)
+var index = comp.Page().Title(
+	comp.Image().Width("30px").Height("40px").InnerClassName("border-none").Src("/static/images/good_morning.png"),
+).Toolbar(
+	comp.Group().Mode("normal").Body(
+		comp.Select().Mode("inline").Name("examples").Label("Examples").Options(examples.Default...).Value(examples.DefaultCode),
+		comp.Button().ActionType("url").Label("Documentation v"+version).Url("https://gitee.com/rdor/ndor/wikis"),
+	),
+).Body(
+	comp.Form().WrapWithPanel(false).Body(
+		comp.Group().ClassName("items-center").Body(
+			comp.Image().InnerClassName("border-none ").Name("picture").ThumbMode("contain").ImageMode("original"),
+			comp.Wrapper().ClassName("items-center w-full").Body(
+				comp.Editor().Name("code").Language("c").Value("${examples}").Size("xxl").Options(comp.Schema{"fontSize": "15"}),
+				comp.Button().ClassName("text-black hover:text-white").Style(comp.Schema{
+					"background-image":    `url("/static/images/gopher.png")`,
+					"width":               "80px",
+					"height":              "88px",
+					"padding-top":         "55px",
+					"border":              0,
+					"background-size":     "100% 100%",
+					"background-repeat":   "no-repeat",
+					"background-position": "bottom",
+					"background-color":    "transparent",
+					"transition":          "background-size 0.3s ease",
+				}).Label("Go").ActionType("submit").Primary(true).Transform("code", "picture", "Done", func(input any) (any, error) {
+					code := input.(string)
+					width := 800
+					height := 800
+					src, err := pkg.Run(width, height, code)
+					if err != nil {
+						return nil, errors.New(err.Msg)
+					}
+					return src, nil
 				}),
 			),
-			app.Div().Class("right-box").ID("codeArea"),
 		),
-		app.Button().Class("pic-button teacher-button").OnClick(teacherButtonAction).Text("HELP"),
-		app.Button().ID("run-button").Class("pic-button  run-button").OnClick(goButtonAction).Text("GO"),
-	)
-}
-
-func teacherButtonAction(ctx app.Context, e app.Event) {
-	app.Window().Get("getndorAlert").Invoke().Call("showHelp", version)
-}
-
-func goButtonAction(ctx app.Context, e app.Event) {
-	// TODO: disable gopher button when running draw proccess
-	root := app.Window()
-	root.Get(pictureAreaID).Set("src", "")
-	alert := root.Get("getndorAlert").Invoke()
-	alert.Call("toastPainting")
-
-	pictureBox := root.Get(pictureBoxID)
-	width := pictureBox.Get("offsetWidth").Int()
-	height := pictureBox.Get("offsetHeight").Int()
-	code := root.Get("GetCode").Invoke().String()
-
-	src, err := pkg.Run(width, height, code)
-	if err != nil {
-		alert.Call("closePaintToast")
-		if err == internal.ErrEmptyInput {
-			alert.Call("alertEmptyInputWith", exampleCode)
-			return
-		}
-		alert.Call("alertError", err.Number, err.Msg)
-		return
-	}
-
-	// the draw proccess is very fast, wait a while to show the painting toast~
-	time.Sleep(time.Duration(600+rand.Intn(800)) * time.Millisecond)
-	alert.Call("closePaintToast")
-	root.Get(pictureAreaID).Set("src", src)
-}
+	).Actions(),
+)
