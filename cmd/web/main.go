@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	version = "1.0.1"
+	version = "1.0.2"
 )
 
 func main() {
@@ -31,10 +31,18 @@ var handler = &app.Handler{
 		Default: "images/hi.png",
 		SVG:     "images/hi.png", // not svg now, just to prevent the go-app's default one.
 	},
-	Styles: []string{"style.css"},
+	Styles: []string{
+		"https://cdn.jsdelivr.net/npm/codemirror@5.65.15/lib/codemirror.min.css",
+		"https://cdn.jsdelivr.net/npm/codemirror@5.65.15/theme/monokai.min.css",
+		"https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css",
+		"style.css",
+	},
 	Scripts: []string{
-		"js/lib/sweetalert2.min.js", "js/alert.js",
-		"js/lib/monaco-editor/vs/loader.js", "js/editor.js",
+		"https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.js",
+		"js/alert.js",
+		"https://cdn.jsdelivr.net/npm/codemirror@5.65.15/lib/codemirror.min.js",
+		"https://cdn.jsdelivr.net/npm/codemirror@5.65.15/mode/clike/clike.min.js",
+		"js/editor.js",
 	},
 	Version: version,
 }
