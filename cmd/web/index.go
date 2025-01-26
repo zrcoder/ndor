@@ -20,7 +20,6 @@ const exampleCode = `context 800, 800
 color "lightgreen"
 circle 400, 400, 300
 fill
-
 `
 
 type index struct {

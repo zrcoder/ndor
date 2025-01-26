@@ -24,14 +24,14 @@ window.addEventListener("load", function () {
 function initEditor() {
   try {
     _codeEditor = CodeMirror(document.getElementById("codeArea"), {
-      mode: "text/x-csrc", 
-      theme: "monokai", 
+      mode: "text/x-csrc",
+      theme: "monokai",
       lineNumbers: true,
       lineWrapping: true,
-      scrollbarStyle: "null", 
-      autofocus: true, 
-      lineHeight: 24, 
-      fontSize: 16, 
+      scrollbarStyle: "null",
+      autofocus: true,
+      lineHeight: 24,
+      fontSize: 16,
     });
 
     _codeEditor.setCursor({ line: 3000, ch: 0 });
