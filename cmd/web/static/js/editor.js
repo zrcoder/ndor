@@ -32,6 +32,7 @@ function initEditor() {
       autofocus: true,
       lineHeight: 24,
       fontSize: 16,
+      smartIndent: false,
     });
 
     _codeEditor.setCursor({ line: 3000, ch: 0 });
