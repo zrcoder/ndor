@@ -11,6 +11,8 @@ window.addEventListener("load", function () {
   container.style.height = "100%";
   container.style.width = "100%";
 
+  console.log("codeArea dimensions:", container.offsetWidth, container.offsetHeight);
+
   if (typeof CodeMirror === "undefined") {
     console.error(
       "CodeMirror is not loaded. Make sure CDN links are included.",
@@ -18,6 +20,7 @@ window.addEventListener("load", function () {
     return;
   }
 
+  console.log("CodeMirror loaded");
   initEditor();
 });
 
@@ -42,6 +45,8 @@ function initEditor() {
         _codeEditor.refresh();
       }
     });
+
+    console.log("CodeMirror Editor initialized");
   } catch (e) {
     console.error("Failed to initialize CodeMirror Editor:", e);
   }
