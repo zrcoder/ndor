@@ -1,21 +1,21 @@
 module github.com/zrcoder/ndor
 
-go 1.22
+go 1.24
 
 require (
 	github.com/fogleman/gg v1.3.0
 	github.com/goplus/igop v0.33.0
-	github.com/maxence-charriere/go-app/v10 v10.0.8
-	github.com/yuin/goldmark v1.7.6
-	golang.org/x/image v0.21.0
+	github.com/maxence-charriere/go-app/v10 v10.1.3
+	github.com/yuin/goldmark v1.7.8
+	golang.org/x/image v0.25.0
 )
 
 require (
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
-	github.com/goplus/gogen v1.16.7 // indirect
-	github.com/goplus/gop v1.3.6 // indirect
+	github.com/goplus/gogen v1.16.6 // indirect
+	github.com/goplus/gop v1.2.0-pre.1.0.20250310113631-49fb8aab7aa7 // indirect
 	github.com/goplus/mod v0.13.17 // indirect
 	github.com/goplus/reflectx v1.3.2 // indirect
 	github.com/qiniu/x v1.13.12 // indirect
