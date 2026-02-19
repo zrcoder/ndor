@@ -1,8 +1,6 @@
 module github.com/zrcoder/ndor
 
-go 1.23.0
-
-toolchain go1.23.7
+go 1.26
 
 require (
 	github.com/fogleman/gg v1.3.0
