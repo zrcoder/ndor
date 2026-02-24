@@ -16,9 +16,9 @@
 
 .example-list {
     position: fixed;
-    background: silver; /* 修正颜色值 */
+    background: silver;
     width: 160px;
-    height: 100%; /* 修正高度值 */
+    height: 100%;
     padding-top: 10px;
     padding-left: 24px;
 }
@@ -91,11 +91,11 @@ button:hover {
 }
 
 .CodeMirror {
-    font-size: 16px; /* 设置字体大小 */
-    line-height: 24px; /* 设置行高 */
-    height: 100%; /* 确保 CodeMirror 填满容器 */
+    font-size: 16px;
+    line-height: 24px;
+    height: 100%;
 }
 
 .CodeMirror-linenumber {
-    padding-right: 20px; /* 增加行号右侧的间距 */
+    padding-right: 20px;
 }

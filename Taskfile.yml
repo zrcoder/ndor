@@ -3,13 +3,17 @@ tasks:
   gen:
     cmds:
       - go generate
-  run:
+  build:
     dir: cmd/web
     cmds:
       - GOARCH=wasm GOOS=js go build -o static/web/app.wasm
       - go build  -o static/app
       - cd static && ./app && rm ./app
-      - cd static && go run ../tools/server
+  run:
+    deps: [build]
+    dir: cmd/web/static
+    cmds:
+      - go run ../tools/server
   clear:
     dir: cmd/web/static
     cmds:
@@ -18,9 +22,6 @@ tasks:
       - rm -f *.html
       - rm -f manifest*
       - rm -f app.css
-      - rm -rf .git
-      - rm -f app
-      - rm -f ../../../examples/*.png
   cli:
     cmds:
       - go run ./cmd/ndor {{.CLI_ARGS}}
