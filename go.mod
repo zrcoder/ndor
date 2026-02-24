@@ -5,9 +5,9 @@ go 1.26
 require (
 	github.com/fogleman/gg v1.3.0
 	github.com/goplus/ixgo v1.0.1
-	github.com/maxence-charriere/go-app/v10 v10.1.3
-	github.com/yuin/goldmark v1.7.8
-	golang.org/x/image v0.30.0
+	github.com/maxence-charriere/go-app/v10 v10.1.11
+	github.com/yuin/goldmark v1.7.16
+	golang.org/x/image v0.36.0
 )
 
 require (

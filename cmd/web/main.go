@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	version = "1.0.8"
+	version = "1.0.9"
 )
 
 func main() {
@@ -44,5 +44,5 @@ var handler = &app.Handler{
 		"https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/clike/clike.min.js",
 		"js/editor.js",
 	},
-	// Version: version,
+	Version: version,
 }
