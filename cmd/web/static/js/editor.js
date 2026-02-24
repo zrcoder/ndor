@@ -1,32 +1,31 @@
 let _codeEditor = null;
-let _errorMarker = null;
 
-window.addEventListener("load", function () {
+function tryInitCodeMirror() {
   const container = document.getElementById("codeArea");
   if (!container) {
-    console.error("Editor container not found");
-    return;
+    return false;
+  }
+
+  if (typeof CodeMirror === "undefined") {
+    return false;
+  }
+
+  if (_codeEditor) {
+    const wrapper = _codeEditor.getWrapperElement();
+    if (wrapper && container.contains(wrapper)) {
+      return true;
+    }
+    console.log("DOM replaced, reinitializing CodeMirror...");
+    _codeEditor = null;
   }
 
   container.style.height = "100%";
   container.style.width = "100%";
 
-  console.log("codeArea dimensions:", container.offsetWidth, container.offsetHeight);
+  console.log("Initializing CodeMirror");
 
-  if (typeof CodeMirror === "undefined") {
-    console.error(
-      "CodeMirror is not loaded. Make sure CDN links are included.",
-    );
-    return;
-  }
-
-  console.log("CodeMirror loaded");
-  initEditor();
-});
-
-function initEditor() {
   try {
-    _codeEditor = CodeMirror(document.getElementById("codeArea"), {
+    _codeEditor = CodeMirror(container, {
       mode: "text/x-csrc",
       theme: "monokai",
       lineNumbers: true,
@@ -47,10 +46,48 @@ function initEditor() {
     });
 
     console.log("CodeMirror Editor initialized");
+    return true;
   } catch (e) {
     console.error("Failed to initialize CodeMirror Editor:", e);
+    return false;
   }
 }
+
+function startWatching() {
+  // Wait for CodeMirror to be available
+  function waitForCodeMirror() {
+    if (typeof CodeMirror === "undefined") {
+      setTimeout(waitForCodeMirror, 100);
+      return;
+    }
+    initWatcher();
+  }
+
+  function initWatcher() {
+    const observer = new MutationObserver(function () {
+      tryInitCodeMirror();
+    });
+
+    // Watch the entire body for any changes
+    observer.observe(document.body, { childList: true, subtree: true });
+    console.log("Started watching body for changes");
+
+    // Also try immediately in case everything is already ready
+    tryInitCodeMirror();
+  }
+
+  waitForCodeMirror();
+}
+
+window.addEventListener("load", function () {
+  startWatching();
+});
+
+document.addEventListener("visibilitychange", function () {
+  if (document.visibilityState === "visible") {
+    tryInitCodeMirror();
+  }
+});
 
 window.MarkErrorLine = function (number) {
   if (!_codeEditor) return;
