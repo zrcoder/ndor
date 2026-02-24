@@ -37,11 +37,11 @@ color "notExistColorName"
 	sep = "//---\n"
 )
 
-func Test_gopRun(t *testing.T) {
+func Test_xgoRun(t *testing.T) {
 	codes := strings.Split(tests, sep)
 	for i, code := range codes {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			err := gopRun(code)
+			err := xgoRun(code)
 			if err != nil {
 				t.Error("code:\n", code)
 				t.Error(err)
@@ -50,28 +50,28 @@ func Test_gopRun(t *testing.T) {
 	}
 }
 
-func Test_parseGopErr(t *testing.T) {
+func Test_parseXGoErr(t *testing.T) {
 	tests := []struct {
 		name string
 		err  error
 		want *internal.LineError
 	}{
 		{
-			name: "./main.gop:100:1: undefined: cc",
-			err:  errors.New("./main.gop:100:1: undefined: cc"),
+			name: "./main.xgo:100:1: undefined: cc",
+			err:  errors.New("./main.xgo:100:1: undefined: cc"),
 			want: &internal.LineError{Number: 100 - strings.Count(preCodes, "\n"), Msg: "undefined: cc"},
 		},
 		{
 			name: "multiple errors",
-			err: errors.New(`main.gop:126:2: undefined: abc
-			main.gop:127:1: undefined: vv123`),
+			err: errors.New(`main.xgo:126:2: undefined: abc
+			main.xgo:127:1: undefined: vv123`),
 			want: &internal.LineError{Number: 126 - strings.Count(preCodes, "\n"), Msg: "undefined: abc"},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := parseGopErr(tt.err); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("\nparseGopErr() = %v, \nwant %v", got, tt.want)
+			if got := parseXGoErr(tt.err); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("\nparseXGoErr() = %v, \nwant %v", got, tt.want)
 			}
 		})
 	}

@@ -33,7 +33,7 @@ func gen(width, height int, code string) *internal.LineError {
 		return internal.ErrEmptyInput
 	}
 	internal.Init(width, height)
-	return gopRun(code)
+	return xgoRun(code)
 }
 
 func getImageSrc(oriCode string) ([]byte, *internal.LineError) {

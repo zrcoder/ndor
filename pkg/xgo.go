@@ -7,14 +7,14 @@ import (
 	"github.com/zrcoder/ndor/internal"
 	_ "github.com/zrcoder/ndor/internal/exported/github.com/zrcoder/ndor/api"
 
-	"github.com/goplus/igop"
-	_ "github.com/goplus/igop/gopbuild"
-	_ "github.com/goplus/igop/pkg/math"
-	_ "github.com/goplus/igop/pkg/math/rand"
+	"github.com/goplus/ixgo"
+	_ "github.com/goplus/ixgo/pkg/math"
+	_ "github.com/goplus/ixgo/pkg/math/rand"
+	_ "github.com/goplus/ixgo/xgobuild"
 )
 
 const (
-	gopfileName = "main.gop"
+	xgofileName = "main.xgo"
 
 	preCodes = `
 	import (
@@ -44,24 +44,24 @@ const (
 	`
 )
 
-func gopRun(code string) *internal.LineError {
+func xgoRun(code string) *internal.LineError {
 	code = preCodes + code
-	_, err := igop.RunFile(gopfileName, code, nil, 0)
-	return parseGopErr(err)
+	_, err := ixgo.RunFile(xgofileName, code, nil, 0)
+	return parseXGoErr(err)
 }
 
-// err like : ./main.gop:1:1: undefined: vv
-func parseGopErr(err error) *internal.LineError {
+// err like : ./main.xgo:1:1: undefined: vv
+func parseXGoErr(err error) *internal.LineError {
 	if err == nil {
 		return nil
 	}
 	msg := err.Error()
-	i := strings.Index(msg, gopfileName)
+	i := strings.Index(msg, xgofileName)
 	if i == -1 {
 		return &internal.LineError{Number: -1, Msg: msg}
 	}
 	errUnexpected := &internal.LineError{Number: -1, Msg: "unexpected internal error"}
-	msg = msg[i+len(gopfileName):]
+	msg = msg[i+len(xgofileName):]
 	if len(msg) == 0 || msg[0] != ':' {
 		return errUnexpected
 	}

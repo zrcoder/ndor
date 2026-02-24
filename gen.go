@@ -1,3 +1,3 @@
 package ndor
 
-//go:generate igop export -outdir ./internal/exported ./api
+//go:generate go tool qexp -outdir ./internal/exported ./api

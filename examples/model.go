@@ -13,27 +13,27 @@ type Example struct {
 }
 
 var (
-	//go:embed *.gop
+	//go:embed *.xgo
 	fs      embed.FS
 	Default []Example
 )
 
 func init() {
 	files := []string{
-		"hello-world.gop",
-		"hello-word-go.gop",
-		"beziel.gop",
-		"clip.gop",
-		"crisp.gop",
-		"fan.gop",
-		"flower.gop",
-		"geometry.gop",
-		"line-width.gop",
-		"lines.gop",
-		"open-fill.gop",
-		"rainbow.gop",
-		"spiral.gop",
-		"star.gop",
+		"hello-world.xgo",
+		"hello-word-go.xgo",
+		"beziel.xgo",
+		"clip.xgo",
+		"crisp.xgo",
+		"fan.xgo",
+		"flower.xgo",
+		"geometry.xgo",
+		"line-width.xgo",
+		"lines.xgo",
+		"open-fill.xgo",
+		"rainbow.xgo",
+		"spiral.xgo",
+		"star.xgo",
 	}
 	Default = make([]Example, 0, len(files))
 
