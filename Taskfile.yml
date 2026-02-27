@@ -19,6 +19,7 @@ tasks:
     cmds:
       - rm -rf ndor/examples/*.html
       - rm -rf web/examples/*.png
+      - rm -rf ../pkg/goldmark/testdata/*.html
       - rm -rf web/static/web
       - rm -f web/static/*.js
       - rm -f web/static/*.html
