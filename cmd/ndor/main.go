@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/yuin/goldmark"
-	nmd "github.com/zrcoder/ndor/goldmark"
 	"github.com/zrcoder/ndor/pkg"
+	nmd "github.com/zrcoder/ndor/pkg/goldmark"
 )
 
 func main() {
