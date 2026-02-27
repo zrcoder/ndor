@@ -9,19 +9,21 @@ tasks:
       - GOARCH=wasm GOOS=js go build -o static/web/app.wasm
       - go build  -o static/app
       - cd static && ./app && rm ./app
-  run:
+  web:
     deps: [build]
     dir: cmd/web/static
     cmds:
       - go run ../tools/server
   clear:
-    dir: cmd/web/static
+    dir: cmd
     cmds:
-      - rm -rf web
-      - rm -f *.js
-      - rm -f *.html
-      - rm -f manifest*
-      - rm -f app.css
+      - rm -rf ndor/examples/*.html
+      - rm -rf web/examples/*.png
+      - rm -rf web/static/web
+      - rm -f web/static/*.js
+      - rm -f web/static/*.html
+      - rm -f web/static/manifest*
+      - rm -f web/static/app.css
   cli:
     cmds:
       - go run ./cmd/ndor {{.CLI_ARGS}}

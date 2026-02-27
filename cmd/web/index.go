@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/zrcoder/ndor/examples"
+	"github.com/zrcoder/ndor/cmd/web/examples"
 	"github.com/zrcoder/ndor/internal"
 	"github.com/zrcoder/ndor/pkg"
 

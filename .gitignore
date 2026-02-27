@@ -9,3 +9,5 @@ ndor.wiki
 .DS_Store
 .null-ls*
 app
+cmd/ndor/examples/*.html
+cmd/web/examples/*.png

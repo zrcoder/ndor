@@ -26,7 +26,7 @@ Run:
 ndor {source file}
 ```
 
-> The argument is the code source file(xxx.gop or xxx.md), the cli will generate a image as xxx.png or a html as xxx.html.
+> The argument is the code source file(xxx.xgo or xxx.md), the cli will generate a image as xxx.png or a html as xxx.html.
 
 ## develop
 
@@ -45,7 +45,7 @@ If you want to run `ndor` on your local machine：
     - web app:
 
         ```shell
-        task run
+        task web
         ```
 
         > delete or comment the line "Version: version" in cmd/web/main.go for every dev build
@@ -58,5 +58,6 @@ If you want to run `ndor` on your local machine：
     - cli app
 
         ```shell
-        task cli -- examples/rainbow.gop
+        task cli -- cmd/web/examples/rainbow.xgo
+        task cli -- cmd/ndor/examples/hello.md
         ```
