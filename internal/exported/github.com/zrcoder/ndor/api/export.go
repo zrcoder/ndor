@@ -50,7 +50,7 @@ func init() {
 		},
 		TypedConsts: map[string]ixgo.TypedConst{},
 		UntypedConsts: map[string]ixgo.UntypedConst{
-			"Preserve": {"untyped string", constant.MakeString(string(q.Preserve))},
+			"Preserve": {Typ: "untyped string", Value: constant.MakeString(string(q.Preserve))},
 		},
 	})
 }

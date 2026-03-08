@@ -45,10 +45,11 @@ func getImageSrc(oriCode string) ([]byte, *internal.LineError) {
 }
 
 func parseErrorline(oriCode, flag string) int {
-	arr := strings.Split(oriCode, "\n")
-	for j, line := range arr {
+	j := 0
+	for line := range strings.SplitSeq(oriCode, "\n") {
 		line = strings.TrimSpace(line)
 		if line == "" {
+			j++
 			continue
 		}
 		i := strings.Index(line, " ")
@@ -62,6 +63,7 @@ func parseErrorline(oriCode, flag string) int {
 		if line == flag {
 			return j + 1
 		}
+		j++
 	}
 	return -1
 }
@@ -74,7 +76,7 @@ func lowercaseFirstLetter(s string) string {
 }
 
 func encode(img image.Image) ([]byte, *internal.LineError) {
-	buf := bytes.NewBuffer(nil)
+	buf := new(bytes.Buffer)
 	err := png.Encode(buf, img)
 	if err != nil {
 		return nil, &internal.LineError{Number: -1, Msg: err.Error()}

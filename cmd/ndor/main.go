@@ -45,7 +45,7 @@ func md2html(data []byte) ([]byte, error) {
 		goldmark.WithExtensions(&nmd.Extender{}),
 	)
 
-	buf := bytes.NewBuffer(nil)
+	buf := new(bytes.Buffer)
 	err := md.Convert(data, buf)
 	if err != nil {
 		return nil, err

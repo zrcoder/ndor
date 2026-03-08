@@ -56,36 +56,33 @@ func parseXGoErr(err error) *internal.LineError {
 		return nil
 	}
 	msg := err.Error()
-	i := strings.Index(msg, xgofileName)
-	if i == -1 {
+	_, after, found := strings.Cut(msg, xgofileName)
+	if !found {
 		return &internal.LineError{Number: -1, Msg: msg}
 	}
 	errUnexpected := &internal.LineError{Number: -1, Msg: "unexpected internal error"}
-	msg = msg[i+len(xgofileName):]
-	if len(msg) == 0 || msg[0] != ':' {
+	if len(after) == 0 || after[0] != ':' {
 		return errUnexpected
 	}
-	msg = msg[1:]
-	i = strings.Index(msg, ":")
-	if i == -1 {
+	after = after[1:]
+	before, after, found := strings.Cut(after, ":")
+	if !found {
 		return errUnexpected
 	}
-	n, err := strconv.Atoi(msg[:i])
+	n, err := strconv.Atoi(before)
 	if err != nil {
 		return &internal.LineError{Number: -1, Msg: err.Error()}
 	}
-	msg = msg[i+1:]
-	i = strings.Index(msg, ":")
-	if i == -1 {
+	_, after, found = strings.Cut(after, ":")
+	if !found {
 		return errUnexpected
 	}
-	msg = strings.TrimSpace(msg[i+1:])
-	i = strings.Index(msg, "\n")
-	if i != -1 {
-		msg = msg[:i]
+	after = strings.TrimSpace(after)
+	if i := strings.Index(after, "\n"); i != -1 {
+		after = after[:i]
 	}
 	return &internal.LineError{
 		Number: n - strings.Count(preCodes, "\n"),
-		Msg:    msg,
+		Msg:    after,
 	}
 }
