@@ -17,7 +17,7 @@ func Test(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	out := &bytes.Buffer{}
+	out := new(bytes.Buffer)
 	err = md.Convert(data, out)
 	if err != nil {
 		t.Error(err)

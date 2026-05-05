@@ -22,9 +22,9 @@ func (r *HTMLRenderer) Render(w util.BufWriter, src []byte, node ast.Node, enter
 		return ast.WalkContinue, nil
 	}
 
-	b := bytes.Buffer{}
+	var b bytes.Buffer
 	lines := n.Lines()
-	for i := 0; i < lines.Len(); i++ {
+	for i := range lines.Len() {
 		line := lines.At(i)
 		b.Write(line.Value(src))
 	}

@@ -46,8 +46,7 @@ func md2html(data []byte) ([]byte, error) {
 	)
 
 	buf := new(bytes.Buffer)
-	err := md.Convert(data, buf)
-	if err != nil {
+	if err := md.Convert(data, buf); err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
