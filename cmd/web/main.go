@@ -4,11 +4,11 @@ import (
 	"log"
 	"os"
 
-	"github.com/maxence-charriere/go-app/v10/pkg/app"
+	"github.com/maxence-charriere/go-app/v11/pkg/app"
 )
 
 const (
-	version = "1.0.12"
+	version = "1.0.13"
 )
 
 func main() {

@@ -1,13 +1,13 @@
 module github.com/zrcoder/ndor
 
-go 1.26
+go 1.26.0
 
 require (
 	github.com/fogleman/gg v1.3.0
 	github.com/goplus/ixgo v1.0.8
-	github.com/maxence-charriere/go-app/v10 v10.1.11
+	github.com/maxence-charriere/go-app/v11 v11.0.1
 	github.com/yuin/goldmark v1.8.2
-	golang.org/x/image v0.39.0
+	golang.org/x/image v0.40.0
 )
 
 require (
@@ -21,8 +21,8 @@ require (
 	github.com/timandy/routine v1.1.6 // indirect
 	github.com/visualfc/funcval v0.1.4 // indirect
 	github.com/visualfc/xtype v0.3.0 // indirect
-	golang.org/x/mod v0.35.0 // indirect
-	golang.org/x/tools v0.44.0 // indirect
+	golang.org/x/mod v0.36.0 // indirect
+	golang.org/x/tools v0.45.0 // indirect
 )
 
 tool github.com/goplus/ixgo/cmd/qexp
