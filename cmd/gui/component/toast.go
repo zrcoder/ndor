@@ -8,16 +8,17 @@ import (
 )
 
 // Toast displays a centered toast message, auto-dismisses after delay seconds
-func Toast(c *ui.Context, message string, delay int) {
-	showToast(c, "", message, delay)
+// onDismiss is called when the toast should disappear (after delay seconds)
+func Toast(c *ui.Context, message string, delay int, onDismiss func()) {
+	showToast(c, "", message, delay, onDismiss)
 }
 
 // ToastWithTitle displays a toast with a title
-func ToastWithTitle(c *ui.Context, title, message string, delay int) {
-	showToast(c, title, message, delay)
+func ToastWithTitle(c *ui.Context, title, message string, delay int, onDismiss func()) {
+	showToast(c, title, message, delay, onDismiss)
 }
 
-func showToast(c *ui.Context, title, message string, delay int) {
+func showToast(c *ui.Context, title, message string, delay int, onDismiss func()) {
 	if delay <= 0 {
 		delay = ToastDelay
 	}
@@ -37,26 +38,29 @@ func showToast(c *ui.Context, title, message string, delay int) {
 		ui.Spacer(c)
 	})
 
-	// Auto dismiss
-	go func() {
-		time.Sleep(time.Duration(delay) * time.Second)
-		c.Invalidate()
-	}()
+	// Auto dismiss - call the callback to clear error state
+	if onDismiss != nil {
+		go func() {
+			time.Sleep(time.Duration(delay) * time.Second)
+			onDismiss()
+			c.Invalidate()
+		}()
+	}
 }
 
 // ToastError displays an error toast
-func ToastError(c *ui.Context, errMsg string, delay int) {
+func ToastError(c *ui.Context, errMsg string, delay int, onDismiss func()) {
 	if delay <= 0 {
 		delay = ToastDelay
 	}
-	Toast(c, errMsg, delay)
+	Toast(c, errMsg, delay, onDismiss)
 }
 
 // ToastErrorAtLine displays an error toast with line number
-func ToastErrorAtLine(c *ui.Context, line int, errMsg string, delay int) {
+func ToastErrorAtLine(c *ui.Context, line int, errMsg string, delay int, onDismiss func()) {
 	if delay <= 0 {
 		delay = ToastDelay
 	}
 	msg := fmt.Sprintf("Error at line %d: %s", line, errMsg)
-	Toast(c, msg, delay)
+	Toast(c, msg, delay, onDismiss)
 }

@@ -8,12 +8,14 @@ import (
 	"github.com/egoist/mygo/ui/editor"
 	"github.com/zrcoder/ndor/cmd/gui/component"
 	"github.com/zrcoder/ndor/pkg"
+	"github.com/zrcoder/ndor/pkg/examples"
 )
 
 type Ndor struct {
 	code          string
 	resultImg     *ui.Bitmap
 	showHelp      bool
+	showExamples  bool
 	errorMsg      string
 	errorLine     int
 	editor        *editor.State
@@ -48,22 +50,34 @@ circle 400, 400, 300
 fill
 `
 	n.editor = &editor.State{Buffer: editor.NewBuffer(n.code)}
+	n.editor.Buffer.SetLanguage(editor.LanguageNamed("c"))
 	return n
 }
 
 func (n *Ndor) View(c *ui.Context) {
 	if n.errorMsg != "" {
-		component.ToastErrorAtLine(c, n.errorLine, n.errorMsg, 3)
+		component.ToastErrorAtLine(c, n.errorLine, n.errorMsg, 3, func() {
+			n.errorMsg = ""
+			n.errorLine = 0
+		})
 	}
 
 	if n.showHelp {
-		component.ShowDialogWithImage(c, &n.showHelp, n.helpBtnImg, "Ndor Help", []string{"Document", "Examples"}, func(btnIndex int) {
+		component.ShowDialogWithImage(c, &n.showHelp, n.helpDialogImg, []string{"Examples", "Document"}, func(btnIndex int) {
 			if btnIndex == 0 {
-				// TODO: open document
+				n.showExamples = true
 			} else {
-				// TODO: show examples
+				// TODO: open document
 			}
+		}, func() {
+			// Click outside triggers Examples button behavior
+			n.showExamples = true
 		})
+	}
+
+	// Examples list overlay
+	if n.showExamples {
+		n.showExamplesList(c)
 	}
 
 	// Main layout
@@ -133,6 +147,44 @@ func (n *Ndor) runCode(c *ui.Context) {
 		n.resultImg = bitmap
 	}
 	c.Invalidate()
+}
+
+func (n *Ndor) showExamplesList(c *ui.Context) {
+	// Click anywhere to close
+	ui.Row(c).Top(0).Bottom(0).Left(0).Right(0).Background(ui.Color{}).Absolute().OnClick(func() {
+		n.showExamples = false
+		c.Invalidate()
+	})
+
+	// Examples list - narrow floating panel at top-left
+	ui.Column(c).Top(10).Left(10).Width(180).Background(ui.RGB(255, 255, 255)).Radius(8).BorderWidth(1).BorderColor(ui.RGB(200, 200, 200)).Absolute().Children(func() {
+		// Header
+		ui.Row(c).Fill().Height(36).BorderWidth(0, 0, 1, 0).BorderColor(ui.RGB(220, 220, 220)).Children(func() {
+			ui.Text(c, "Examples").FontSize(14).FontWeight(700).Padding(8)
+			ui.Spacer(c)
+			ui.ButtonBase(c).Width(24).Height(24).Background(ui.Color{}).OnClick(func() {
+				n.showExamples = false
+				c.Invalidate()
+			}).Children(func() {
+				ui.Text(c, "x").FontSize(14).TextColor(ui.RGB(100, 100, 100))
+			})
+		})
+
+		// Example list
+		ui.Column(c).Fill().Children(func() {
+			for _, ex := range examples.Default {
+				ui.Row(c).Width(170).Height(28).BorderWidth(0, 0, 1, 0).BorderColor(ui.RGB(235, 235, 235)).OnClick(func() {
+					n.code = ex.Code
+					n.editor = &editor.State{Buffer: editor.NewBuffer(n.code)}
+					n.editor.Buffer.SetLanguage(editor.LanguageNamed("c"))
+					n.showExamples = false
+					c.Invalidate()
+				}).Children(func() {
+					ui.Text(c, ex.Name).FontSize(13).Padding(0, 8, 0, 8)
+				})
+			}
+		})
+	})
 }
 
 func getPictureSize(c *ui.Context) (int, int) {
