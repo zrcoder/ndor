@@ -3,6 +3,8 @@ package main
 import (
 	"embed"
 	_ "embed"
+	"os"
+	"time"
 
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
@@ -16,6 +18,7 @@ import (
 type Ndor struct {
 	code          string
 	resultImg     *ui.Bitmap
+	resultPNGData []byte
 	showHelp      bool
 	showHelpDoc   bool
 	helpDocTab    int
@@ -27,6 +30,10 @@ type Ndor struct {
 	helpBtnImg    *ui.Bitmap
 	helpDialogImg *ui.Bitmap
 	runBtnImg     *ui.Bitmap
+	copyCodeDone  time.Time
+	copyIcon      *ui.SVG
+	checkIcon     *ui.SVG
+	saveIcon      *ui.SVG
 }
 
 //go:embed resources/teacher.png
@@ -41,6 +48,15 @@ var gopherLabeledImgData []byte
 //go:embed resources/wiki
 var wikiFS embed.FS
 
+//go:embed resources/icons/copy.svg
+var copyIconData []byte
+
+//go:embed resources/icons/check.svg
+var checkIconData []byte
+
+//go:embed resources/icons/save.svg
+var saveIconData []byte
+
 func New() *Ndor {
 	n := new(Ndor)
 	if bmp, err := ui.DecodeBitmap(teacherLabeledImgData); err == nil {
@@ -52,6 +68,9 @@ func New() *Ndor {
 	if bmp, err := ui.DecodeBitmap(teacherImgData); err == nil {
 		n.helpDialogImg = bmp
 	}
+	n.copyIcon = ui.MustParseSVG(copyIconData)
+	n.checkIcon = ui.MustParseSVG(checkIconData)
+	n.saveIcon = ui.MustParseSVG(saveIconData)
 	n.code = `context 800, 800
 color "lightgreen"
 circle 400, 400, 300
@@ -63,6 +82,15 @@ fill
 }
 
 func (n *Ndor) View(c *ui.Context) {
+	// Handle keyboard shortcuts
+	if c.Shortcut(ui.Ctrl, ui.KeyH) {
+		n.showHelp = true
+		c.Invalidate()
+	}
+	if c.Shortcut(ui.Ctrl, ui.KeyR) {
+		n.runCode(c)
+	}
+
 	if n.errorMsg != "" {
 		component.ToastErrorAtLine(c, n.errorLine, n.errorMsg, 3, func() {
 			n.errorMsg = ""
@@ -117,6 +145,12 @@ func (n *Ndor) View(c *ui.Context) {
 func (n *Ndor) pictureArea(c *ui.Context) {
 	ui.Column(c).WidthPercent(55).Fill().Children(func() {
 		if n.resultImg != nil {
+			ui.Row(c).Fill().Height(40).Children(func() {
+				ui.Spacer(c)
+				component.IconButton(c, n.saveIcon, nil, false, func() {
+					n.saveImage(c)
+				})
+			})
 			ui.Row(c).Fill().Children(func() {
 				ui.Spacer(c)
 				ui.Image(c, n.resultImg).MaxWidthPercent(100).MaxHeightPercent(100)
@@ -126,8 +160,36 @@ func (n *Ndor) pictureArea(c *ui.Context) {
 	})
 }
 
+func (n *Ndor) saveImage(c *ui.Context) {
+	if n.resultPNGData == nil {
+		return
+	}
+	data := n.resultPNGData
+	go func() {
+		path, err := mygo.Dialog.Save(mygo.SaveDialogOptions{
+			Title:       "Save Image",
+			DefaultPath: "ndor.png",
+			Filters:     []mygo.FileFilter{{Name: "PNG Image", Extensions: []string{"png"}}},
+		})
+		if err != nil || path == "" {
+			return
+		}
+		os.WriteFile(path, data, 0o644)
+	}()
+}
+
 func (n *Ndor) codeArea(c *ui.Context) {
 	ui.Column(c).Fill().BorderWidth(0, 0, 0, 0.5).BorderColor(component.DividerColor).Children(func() {
+		ui.Row(c).Fill().Height(36).Children(func() {
+			ui.Spacer(c)
+			// Copy button
+			copied := !n.copyCodeDone.IsZero() && c.Now().Sub(n.copyCodeDone) < 2*time.Second
+			component.IconButton(c, n.copyIcon, n.checkIcon, copied, func() {
+				c.Services().WriteClipboard(n.editor.Buffer.String())
+				n.copyCodeDone = c.Now()
+				c.Invalidate()
+			})
+		})
 		editor.View(c, n.editor).Fill()
 	})
 }
@@ -143,12 +205,14 @@ func (n *Ndor) runCode(c *ui.Context) {
 		n.errorMsg = lineErr.Msg
 		n.errorLine = lineErr.Number
 		n.resultImg = nil
+		n.resultPNGData = nil
 		c.Invalidate()
 		return
 	}
 
 	n.errorMsg = ""
 	n.errorLine = 0
+	n.resultPNGData = pngData
 
 	bitmap, err := ui.DecodeBitmap(pngData)
 	if err != nil {

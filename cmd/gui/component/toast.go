@@ -2,7 +2,6 @@ package component
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/egoist/mygo/ui"
 )
@@ -19,16 +18,17 @@ func ToastWithTitle(c *ui.Context, title, message string, delay int, onDismiss f
 }
 
 func showToast(c *ui.Context, title, message string, delay int, onDismiss func()) {
-	if delay <= 0 {
-		delay = ToastDelay
-	}
-
 	fullMessage := message
 	if title != "" {
 		fullMessage = title + ": " + message
 	}
 
-	ui.Row(c).Top(0).Bottom(0).Fill().Absolute().Children(func() {
+	ui.Row(c).Top(0).Bottom(0).Fill().Absolute().OnClick(func() {
+		if onDismiss != nil {
+			onDismiss()
+		}
+		c.Invalidate()
+	}).Children(func() {
 		ui.Spacer(c)
 		ui.Column(c).Width(ToastWidth).Height(ToastHeight).Radius(ToastRadius).Background(ErrorBgColor).Children(func() {
 			ui.Row(c).Fill().Height(ToastHeight).AlignItems(ui.Center).Justify(ui.Center).Children(func() {
@@ -37,15 +37,6 @@ func showToast(c *ui.Context, title, message string, delay int, onDismiss func()
 		})
 		ui.Spacer(c)
 	})
-
-	// Auto dismiss - call the callback to clear error state
-	if onDismiss != nil {
-		go func() {
-			time.Sleep(time.Duration(delay) * time.Second)
-			onDismiss()
-			c.Invalidate()
-		}()
-	}
 }
 
 // ToastError displays an error toast
