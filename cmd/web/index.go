@@ -40,7 +40,7 @@ func (idx *index) Render() app.UI {
 				app.Img().ID(pictureAreaID).Style("max-width", "100%").Style("max-height", "100%").Style("object-fit", "contain"),
 				app.If(idx.showExamples, func() app.UI {
 					return app.Ul().Class("example-list").Body(
-						app.Range(examples.Default).Slice(func(i int) app.UI {
+						app.Range(examples.DefaultNames).Slice(func(i int) app.UI {
 							return app.Li().Text(examples.DefaultNames[i]).OnClick(func(_ app.Context, _ app.Event) {
 								app.Window().Get("SetCode").Invoke(examples.Default[examples.DefaultNames[i]])
 								idx.showExamples = false
