@@ -2,14 +2,17 @@ package main
 
 import "embed"
 
-// //go:embed resources/code.png
-// var codeImgData []byte
-
-// //go:embed resources/paint.png
-// var paintImgData []byte
+//go:embed resources/paint.png
+var paintImgData []byte
 
 //go:embed resources/teacher.png
 var teacherImgData []byte
+
+// //go:embed resources/gopher.png
+// var gopherImgData []byte
+
+// //go:embed resources/code.png
+// var codeImgData []byte
 
 //go:embed resources/teacher_labeled.png
 var teacherLabeledImgData []byte

@@ -34,6 +34,12 @@ type Ndor struct {
 	closeIcon     *ui.SVG
 	sunIcon       *ui.SVG
 	moonIcon      *ui.SVG
+	paintImg      *ui.Bitmap
+	// runSeq increments when a run starts; resultSeq follows it when the
+	// picture of that run is ready (or it failed). The run is in flight
+	// while they differ.
+	runSeq    uint64
+	resultSeq uint64
 }
 
 func New() *Ndor {
@@ -53,6 +59,9 @@ func New() *Ndor {
 	n.closeIcon = ui.MustParseSVG(closeIconData)
 	n.sunIcon = ui.MustParseSVG(sunIconData)
 	n.moonIcon = ui.MustParseSVG(moonIconData)
+	if bmp, err := ui.DecodeBitmap(paintImgData); err == nil {
+		n.paintImg = bmp
+	}
 	code := `context 800, 800
 color "lightgreen"
 circle 400, 400, 300
@@ -107,39 +116,69 @@ func (n *Ndor) View(c *ui.Context) {
 	}
 
 	// Main layout
-	ui.Row(c).Fill().Children(func() {
+	ui.Row(c).Key("main").Fill().Children(func() {
 		n.pictureArea(c)
 		n.codeArea(c)
 	})
 
 	// Floating buttons
-	ui.Column(c).Width(64).Height(72).Bottom(0).Left(4).Absolute().Children(func() {
+	ui.Column(c).Key("help-float").Width(64).Height(72).Bottom(0).Left(4).Absolute().Children(func() {
 		comp.ImageButtonSimple(c, n.helpBtnImg, func() {
 			n.showHelp = true
 		})
 	})
 
-	ui.Column(c).Width(64).Height(72).Bottom(0).Right(0).Absolute().Children(func() {
+	ui.Column(c).Key("run-float").Width(64).Height(72).Bottom(0).Right(0).Absolute().Children(func() {
 		comp.ImageButtonSimple(c, n.runBtnImg, func() {
 			n.runCode(c)
 		})
 	})
 }
 
+// paintDuration is how long the painting animation runs before the picture
+// of the run replaces it.
+const paintDuration = 900 * time.Millisecond
+
 func (n *Ndor) pictureArea(c *ui.Context) {
 	ui.Column(c).WidthPercent(55).Fill().Children(func() {
-		if n.resultImg != nil {
-			ui.Row(c).Fill().Height(40).Children(func() {
-				ui.Spacer(c)
-				comp.IconButton(c, comp.IconButtonOption{
-					Icon: n.saveIcon,
-					OnClick: func() {
-						n.saveImage(c)
-					},
-				})
+		// The painting animation: a timeline keyed on the run, so a new run
+		// plays it again. It shows while the run is in flight and while the
+		// timeline has not come to rest, so the picture updates only once
+		// both the animation and the generation are done.
+		overlay := ui.Column(c).Key("painting")
+		tl := overlay.Timeline("painting", ui.TimelineOptions{Run: n.runSeq})
+		inFlight := n.resultSeq != n.runSeq
+		painting := n.runSeq > 0 && (inFlight || !tl.Settled())
+		if painting {
+			if inFlight {
+				// Keep frames coming until the result arrives; the timeline
+				// only asks for frames while it moves.
+				c.AnimationFrame()
+			}
+			progress := tl.Tween(ui.Tween{From: 0, To: 1, Duration: paintDuration, Ease: ui.Linear})
+			overlay.Fill().Center().Gap(16).Children(func() {
+				if n.paintImg != nil {
+					ui.Image(c, n.paintImg).MaxHeightPercent(40)
+				}
+
+				ui.Progress(c, float64(progress)).Width(200)
 			})
-			ui.Image(c, n.resultImg).MaxWidthPercent(100).MaxHeightPercent(100)
+			return
 		}
+
+		if n.resultImg == nil {
+			return
+		}
+		ui.Row(c).Fill().Height(40).Children(func() {
+			ui.Spacer(c)
+			comp.IconButton(c, comp.IconButtonOption{
+				Icon: n.saveIcon,
+				OnClick: func() {
+					n.saveImage(c)
+				},
+			})
+		})
+		ui.Image(c, n.resultImg).MaxWidthPercent(100).MaxHeightPercent(100)
 	})
 }
 
@@ -199,34 +238,42 @@ func (n *Ndor) codeArea(c *ui.Context) {
 }
 
 func (n *Ndor) runCode(c *ui.Context) {
+	if n.resultSeq != n.runSeq {
+		return // a run is already in flight
+	}
+
 	width, height := getPictureSize(c)
 	if width <= 0 || height <= 0 {
 		width, height = 800, 800
 	}
+	code := n.editor.Buffer.String()
 
-	pngData, lineErr := pkg.Gen(width, height, n.editor.Buffer.String())
+	// Bump the sequence: the view starts the painting animation for this
+	// run, and the goroutine reports back under the same number.
+	n.runSeq++
+	seq := n.runSeq
+	c.Invalidate()
+
+	pngData, lineErr := pkg.Gen(width, height, code)
 	if lineErr != nil {
 		n.errorMsg = lineErr.Msg
 		n.errorLine = lineErr.Number
 		n.resultImg = nil
 		n.resultPNGData = nil
-		c.Invalidate()
-		return
-	}
-
-	n.errorMsg = ""
-	n.errorLine = 0
-	n.resultPNGData = pngData
-
-	bitmap, err := ui.DecodeBitmap(pngData)
-	if err != nil {
-		n.errorMsg = "Failed to decode image: " + err.Error()
-		n.errorLine = 0
-		n.resultImg = nil
 	} else {
-		n.resultImg = bitmap
+		n.errorMsg = ""
+		n.errorLine = 0
+		n.resultPNGData = pngData
+		bitmap, err := ui.DecodeBitmap(pngData)
+		if err != nil {
+			n.errorMsg = "Failed to decode image: " + err.Error()
+			n.errorLine = 0
+			n.resultImg = nil
+		} else {
+			n.resultImg = bitmap
+		}
 	}
-	c.Invalidate()
+	n.resultSeq = seq
 }
 
 func (n *Ndor) showExamplesList(c *ui.Context) {
