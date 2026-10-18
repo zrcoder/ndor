@@ -27,9 +27,9 @@ func OverlayPanel(c *ui.Context, cfg OverlayPanelConfig, closeIcon *ui.SVG, item
 	})
 
 	// Panel
-	ui.Column(c).Top(10).Left(10).Width(cfg.Width).Background(ui.RGB(255, 255, 255)).Radius(8).BorderWidth(1).BorderColor(ui.RGB(200, 200, 200)).Absolute().Children(func() {
+	ui.Column(c).Top(10).Left(10).Width(cfg.Width).Background(c.Theme().Surface).Radius(8).BorderWidth(1).BorderColor(c.Theme().Border).Absolute().Children(func() {
 		// Header
-		ui.Row(c).Fill().Height(36).BorderWidth(0, 0, 1, 0).BorderColor(ui.RGB(220, 220, 220)).Children(func() {
+		ui.Row(c).Fill().Height(36).BorderWidth(0, 0, 1, 0).BorderColor(c.Theme().Border).Children(func() {
 			ui.Text(c, cfg.Title).FontSize(14).FontWeight(700).Padding(8)
 			ui.Spacer(c)
 			// Close button
@@ -46,7 +46,7 @@ func OverlayPanel(c *ui.Context, cfg OverlayPanelConfig, closeIcon *ui.SVG, item
 		ui.Column(c).Fill().Children(func() {
 			for _, item := range items {
 				itemCopy := item
-				ui.Row(c).Width(cfg.Width-10).Height(28).BorderWidth(0, 0, 1, 0).BorderColor(ui.RGB(235, 235, 235)).OnClick(func() {
+				ui.Row(c).Width(cfg.Width-10).Height(28).BorderWidth(0, 0, 1, 0).BorderColor(c.Theme().Border).OnClick(func() {
 					itemFn(itemCopy)
 					if cfg.OnClose != nil {
 						cfg.OnClose()

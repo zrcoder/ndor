@@ -35,6 +35,8 @@ type Ndor struct {
 	checkIcon     *ui.SVG
 	saveIcon      *ui.SVG
 	closeIcon     *ui.SVG
+	sunIcon       *ui.SVG
+	moonIcon      *ui.SVG
 }
 
 //go:embed resources/teacher.png
@@ -61,6 +63,12 @@ var saveIconData []byte
 //go:embed resources/icons/close.svg
 var closeIconData []byte
 
+//go:embed resources/icons/sun.svg
+var sunIconData []byte
+
+//go:embed resources/icons/moon.svg
+var moonIconData []byte
+
 func New() *Ndor {
 	n := new(Ndor)
 	if bmp, err := ui.DecodeBitmap(teacherLabeledImgData); err == nil {
@@ -76,6 +84,8 @@ func New() *Ndor {
 	n.checkIcon = ui.MustParseSVG(checkIconData)
 	n.saveIcon = ui.MustParseSVG(saveIconData)
 	n.closeIcon = ui.MustParseSVG(closeIconData)
+	n.sunIcon = ui.MustParseSVG(sunIconData)
+	n.moonIcon = ui.MustParseSVG(moonIconData)
 	n.code = `context 800, 800
 color "lightgreen"
 circle 400, 400, 300
@@ -190,6 +200,20 @@ func (n *Ndor) codeArea(c *ui.Context) {
 				n.copyCodeDone = c.Now()
 				c.Invalidate()
 			})
+			// Theme toggle button
+			themeIcon := n.moonIcon
+			isDarkMode := mygo.Theme.IsDark()
+			if isDarkMode {
+				themeIcon = n.sunIcon
+			}
+			component.IconButton(c, themeIcon, nil, false, func() {
+				if isDarkMode {
+					mygo.Theme.SetSource(mygo.ThemeLight)
+				} else {
+					mygo.Theme.SetSource(mygo.ThemeDark)
+				}
+				c.Invalidate()
+			})
 		})
 		editor.View(c, n.editor).Fill()
 	})
@@ -254,7 +278,7 @@ func (n *Ndor) showHelpDocument(c *ui.Context) {
 	content := loadDoc(n.isEnglish, n.helpDocTab)
 
 	if ui.Modal(c, &n.showHelpDoc, func() {
-		ui.Column(c).Width(800).Height(600).Radius(12).Background(ui.RGB(255, 255, 255)).Children(func() {
+		ui.Column(c).Width(800).Height(600).Radius(12).Background(c.Theme().Surface).Children(func() {
 			// Tabs with language toggle and close button
 			ui.Row(c).Fill().Height(40).Children(func() {
 				ui.Tabs(c, &n.helpDocTab, "Home", "API", "Tutorials")
@@ -272,7 +296,7 @@ func (n *Ndor) showHelpDocument(c *ui.Context) {
 					}
 				})
 				if btn.Hovered() {
-					btn.Background(ui.RGB(240, 240, 240))
+					btn.Background(c.Theme().SurfaceHover)
 				}
 				// Close button
 				component.IconButton(c, n.closeIcon, nil, false, func() {

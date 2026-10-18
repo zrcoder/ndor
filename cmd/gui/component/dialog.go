@@ -15,7 +15,7 @@ func ShowDialogWithImage(c *ui.Context, open *bool, img *ui.Bitmap, buttons []st
 	// Check if modal was dismissed (clicked outside or Escape)
 	if ui.Modal(c, open, func() {
 		// Dialog content
-		ui.Column(c).Width(250).Radius(12).Background(ui.RGB(255, 255, 255)).Children(func() {
+		ui.Column(c).Width(250).Radius(12).Background(c.Theme().Surface).Children(func() {
 			// Image
 			if img != nil {
 				ui.Row(c).Fill().Children(func() {
@@ -31,11 +31,11 @@ func ShowDialogWithImage(c *ui.Context, open *bool, img *ui.Bitmap, buttons []st
 					ui.Spacer(c)
 					for i, btnText := range buttons {
 						idx := i
-						bgColor := ui.RGB(240, 240, 240)
-						textColor := ui.RGB(60, 60, 60)
+						bgColor := c.Theme().SurfaceHover
+						textColor := c.Theme().Text
 						if i == len(buttons)-1 {
-							bgColor = ui.RGB(0, 122, 255)
-							textColor = ui.RGB(255, 255, 255)
+							bgColor = c.Theme().Accent
+							textColor = c.Theme().AccentText
 						}
 						ui.ButtonBase(c).Width(100).Height(36).Radius(6).Background(bgColor).OnClick(func() {
 							*open = false
