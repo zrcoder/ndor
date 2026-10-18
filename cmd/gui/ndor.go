@@ -223,7 +223,6 @@ func (n *Ndor) runCode(c *ui.Context) {
 		n.errorMsg = "Failed to decode image: " + err.Error()
 		n.errorLine = 0
 		n.resultImg = nil
-		c.Invalidate()
 	} else {
 		n.resultImg = bitmap
 	}
