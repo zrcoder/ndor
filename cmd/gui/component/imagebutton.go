@@ -21,7 +21,11 @@ func NewImageButton(c *ui.Context, cfg ImageButtonConfig) {
 	}
 	btn.Children(func() {
 		if cfg.Img != nil {
-			ui.Image(c, cfg.Img).Width(cfg.Width - 21).Height(cfg.Height - 12)
+			w, h := cfg.Width-21, cfg.Height-12
+			if btn.Hovered() {
+				w *= 0.88
+			}
+			ui.Image(c, cfg.Img).Width(w).Height(h)
 		}
 	})
 }
