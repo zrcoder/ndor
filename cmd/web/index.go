@@ -4,9 +4,9 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/zrcoder/ndor/pkg/examples"
 	"github.com/zrcoder/ndor/internal"
 	"github.com/zrcoder/ndor/pkg"
+	"github.com/zrcoder/ndor/pkg/examples"
 
 	"github.com/maxence-charriere/go-app/v11/pkg/app"
 )
@@ -41,8 +41,8 @@ func (idx *index) Render() app.UI {
 				app.If(idx.showExamples, func() app.UI {
 					return app.Ul().Class("example-list").Body(
 						app.Range(examples.Default).Slice(func(i int) app.UI {
-							return app.Li().Text(examples.Default[i].Name).OnClick(func(_ app.Context, _ app.Event) {
-								app.Window().Get("SetCode").Invoke(examples.Default[i].Code)
+							return app.Li().Text(examples.DefaultNames[i]).OnClick(func(_ app.Context, _ app.Event) {
+								app.Window().Get("SetCode").Invoke(examples.Default[examples.DefaultNames[i]])
 								idx.showExamples = false
 							})
 						}),

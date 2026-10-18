@@ -1,4 +1,4 @@
-package component
+package comp
 
 import (
 	"testing"
@@ -11,13 +11,15 @@ var testCloseIcon = ui.MustParseSVG([]byte(`<svg xmlns="http://www.w3.org/2000/s
 func TestOverlayPanel(t *testing.T) {
 	selected := ""
 	tt := ui.NewTester(func(c *ui.Context) {
-		cfg := OverlayPanelConfig{
-			Title: "Test Panel",
-			Width: 180,
+		cfg := OverlayPanelOption{
+			Title:     "Test Panel",
+			Width:     180,
+			CloseIcon: testCheckIcon,
+			ItemFn: func(item string) {
+				selected = item
+			},
 		}
-		OverlayPanel(c, cfg, testCloseIcon, []string{"Item 1", "Item 2"}, func(item string) {
-			selected = item
-		})
+		OverlayPanel(c, cfg, []string{"Item 1", "Item 2"})
 	}, 400, 300)
 
 	// Verify panel title is shown
@@ -42,13 +44,15 @@ func TestOverlayPanel(t *testing.T) {
 func TestOverlayPanelCloseOnClickOutside(t *testing.T) {
 	closed := false
 	tt := ui.NewTester(func(c *ui.Context) {
-		cfg := OverlayPanelConfig{
+		opt := OverlayPanelOption{
 			Title:          "Test",
 			Width:          180,
 			OnClose:        func() { closed = true },
 			OnClickOutside: func() { closed = true },
+			CloseIcon:      testCloseIcon,
+			ItemFn:         func(item string) {},
 		}
-		OverlayPanel(c, cfg, testCloseIcon, []string{"Item"}, func(item string) {})
+		OverlayPanel(c, opt, []string{"Item"})
 	}, 400, 300)
 
 	// Click outside the panel (at top-left corner where there's no panel)

@@ -1,4 +1,4 @@
-package component
+package comp
 
 import "github.com/egoist/mygo/ui"
 

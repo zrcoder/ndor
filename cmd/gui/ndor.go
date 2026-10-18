@@ -1,8 +1,6 @@
 package main
 
 import (
-	"embed"
-	_ "embed"
 	"os"
 	"time"
 
@@ -10,13 +8,12 @@ import (
 	"github.com/egoist/mygo/ui"
 	"github.com/egoist/mygo/ui/editor"
 	"github.com/egoist/mygo/ui/markdown"
-	"github.com/zrcoder/ndor/cmd/gui/component"
+	"github.com/zrcoder/ndor/cmd/gui/comp"
 	"github.com/zrcoder/ndor/pkg"
 	"github.com/zrcoder/ndor/pkg/examples"
 )
 
 type Ndor struct {
-	code          string
 	resultImg     *ui.Bitmap
 	resultPNGData []byte
 	showHelp      bool
@@ -39,36 +36,6 @@ type Ndor struct {
 	moonIcon      *ui.SVG
 }
 
-//go:embed resources/teacher.png
-var teacherImgData []byte
-
-//go:embed resources/teacher_labeled.png
-var teacherLabeledImgData []byte
-
-//go:embed resources/gopher_labeled.png
-var gopherLabeledImgData []byte
-
-//go:embed resources/wiki
-var wikiFS embed.FS
-
-//go:embed resources/icons/copy.svg
-var copyIconData []byte
-
-//go:embed resources/icons/check.svg
-var checkIconData []byte
-
-//go:embed resources/icons/save.svg
-var saveIconData []byte
-
-//go:embed resources/icons/close.svg
-var closeIconData []byte
-
-//go:embed resources/icons/sun.svg
-var sunIconData []byte
-
-//go:embed resources/icons/moon.svg
-var moonIconData []byte
-
 func New() *Ndor {
 	n := new(Ndor)
 	if bmp, err := ui.DecodeBitmap(teacherLabeledImgData); err == nil {
@@ -86,12 +53,12 @@ func New() *Ndor {
 	n.closeIcon = ui.MustParseSVG(closeIconData)
 	n.sunIcon = ui.MustParseSVG(sunIconData)
 	n.moonIcon = ui.MustParseSVG(moonIconData)
-	n.code = `context 800, 800
+	code := `context 800, 800
 color "lightgreen"
 circle 400, 400, 300
 fill
 `
-	n.editor = &editor.State{Buffer: editor.NewBuffer(n.code)}
+	n.editor = &editor.State{Buffer: editor.NewBuffer(code)}
 	n.editor.Buffer.SetLanguage(editor.LanguageNamed("c"))
 	return n
 }
@@ -107,23 +74,26 @@ func (n *Ndor) View(c *ui.Context) {
 	}
 
 	if n.errorMsg != "" {
-		component.ToastErrorAtLine(c, n.errorLine, n.errorMsg, 3, func() {
+		comp.ToastErrorAtLine(c, n.errorLine, n.errorMsg, func() {
 			n.errorMsg = ""
 			n.errorLine = 0
 		})
 	}
 
 	if n.showHelp {
-		component.ShowDialogWithImage(c, &n.showHelp, n.helpDialogImg, []string{"Examples", "Document"}, func(btnIndex int) {
-			if btnIndex == 0 {
-				n.showExamples = true
-			} else {
-				n.showHelpDoc = true
-			}
-		}, func() {
-			// Click outside triggers Examples button behavior
-			n.showExamples = true
-		})
+		opt := comp.DialogOption{
+			Open:    &n.showHelp,
+			Img:     n.helpDialogImg,
+			Buttons: []string{"Examples", "Document"},
+			OnClick: func(btnIndex int) {
+				if btnIndex == 0 {
+					n.showExamples = true
+				} else {
+					n.showHelpDoc = true
+				}
+			},
+		}
+		comp.ShowDialogWithImage(c, opt)
 	}
 
 	// Help document dialog
@@ -144,14 +114,13 @@ func (n *Ndor) View(c *ui.Context) {
 
 	// Floating buttons
 	ui.Column(c).Width(64).Height(72).Bottom(0).Left(4).Absolute().Children(func() {
-		component.ImageButtonSimple(c, n.helpBtnImg, func() {
+		comp.ImageButtonSimple(c, n.helpBtnImg, func() {
 			n.showHelp = true
 		})
 	})
 
 	ui.Column(c).Width(64).Height(72).Bottom(0).Right(0).Absolute().Children(func() {
-		component.ImageButtonSimple(c, n.runBtnImg, func() {
-			n.code = n.editor.Buffer.String()
+		comp.ImageButtonSimple(c, n.runBtnImg, func() {
 			n.runCode(c)
 		})
 	})
@@ -162,8 +131,11 @@ func (n *Ndor) pictureArea(c *ui.Context) {
 		if n.resultImg != nil {
 			ui.Row(c).Fill().Height(40).Children(func() {
 				ui.Spacer(c)
-				component.IconButton(c, n.saveIcon, nil, false, func() {
-					n.saveImage(c)
+				comp.IconButton(c, comp.IconButtonOption{
+					Icon: n.saveIcon,
+					OnClick: func() {
+						n.saveImage(c)
+					},
 				})
 			})
 			ui.Image(c, n.resultImg).MaxWidthPercent(100).MaxHeightPercent(100)
@@ -190,29 +162,36 @@ func (n *Ndor) saveImage(c *ui.Context) {
 }
 
 func (n *Ndor) codeArea(c *ui.Context) {
-	ui.Column(c).Fill().BorderWidth(0, 0, 0, 0.5).BorderColor(component.DividerColor).Children(func() {
+	ui.Column(c).Fill().BorderWidth(0, 0, 0, 0.5).BorderColor(comp.DividerColor).Children(func() {
 		ui.Row(c).Fill().Height(36).Children(func() {
 			ui.Spacer(c)
 			// Copy button
 			copied := !n.copyCodeDone.IsZero() && c.Now().Sub(n.copyCodeDone) < 2*time.Second
-			component.IconButton(c, n.copyIcon, n.checkIcon, copied, func() {
-				c.Services().WriteClipboard(n.editor.Buffer.String())
-				n.copyCodeDone = c.Now()
-				c.Invalidate()
+			comp.IconButton(c, comp.IconButtonOption{
+				Icon:       n.copyIcon,
+				SecondIcon: n.checkIcon,
+				ShowSecond: copied,
+				OnClick: func() {
+					c.Services().WriteClipboard(n.editor.Buffer.String())
+					n.copyCodeDone = c.Now()
+					c.Invalidate()
+				},
 			})
 			// Theme toggle button
 			themeIcon := n.moonIcon
-			isDarkMode := mygo.Theme.IsDark()
-			if isDarkMode {
+			if c.Theme().Dark {
 				themeIcon = n.sunIcon
 			}
-			component.IconButton(c, themeIcon, nil, false, func() {
-				if isDarkMode {
-					mygo.Theme.SetSource(mygo.ThemeLight)
-				} else {
-					mygo.Theme.SetSource(mygo.ThemeDark)
-				}
-				c.Invalidate()
+			comp.IconButton(c, comp.IconButtonOption{
+				Icon: themeIcon,
+				OnClick: func() {
+					if mygo.Theme.IsDark() {
+						mygo.Theme.SetSource(mygo.ThemeLight)
+					} else {
+						mygo.Theme.SetSource(mygo.ThemeDark)
+					}
+					c.Invalidate()
+				},
 			})
 		})
 		editor.View(c, n.editor).Fill()
@@ -225,7 +204,7 @@ func (n *Ndor) runCode(c *ui.Context) {
 		width, height = 800, 800
 	}
 
-	pngData, lineErr := pkg.Gen(width, height, n.code)
+	pngData, lineErr := pkg.Gen(width, height, n.editor.Buffer.String())
 	if lineErr != nil {
 		n.errorMsg = lineErr.Msg
 		n.errorLine = lineErr.Number
@@ -252,26 +231,19 @@ func (n *Ndor) runCode(c *ui.Context) {
 }
 
 func (n *Ndor) showExamplesList(c *ui.Context) {
-	names := make([]string, len(examples.Default))
-	for i, ex := range examples.Default {
-		names[i] = ex.Name
-	}
-
-	cfg := component.OverlayPanelConfig{
+	opt := comp.OverlayPanelOption{
 		Title:   "Examples",
 		Width:   180,
 		OnClose: func() { n.showExamples = false },
-	}
-	component.OverlayPanel(c, cfg, n.closeIcon, names, func(item string) {
-		for _, ex := range examples.Default {
-			if ex.Name == item {
-				n.code = ex.Code
-				n.editor = &editor.State{Buffer: editor.NewBuffer(n.code)}
-				n.editor.Buffer.SetLanguage(editor.LanguageNamed("c"))
-				break
+		ItemFn: func(item string) {
+			code, ok := examples.Default[item]
+			if ok {
+				n.editor.Buffer.Set(code)
 			}
-		}
-	})
+		},
+		CloseIcon: n.closeIcon,
+	}
+	comp.OverlayPanel(c, opt, examples.DefaultNames)
 }
 
 func (n *Ndor) showHelpDocument(c *ui.Context) {
@@ -299,9 +271,12 @@ func (n *Ndor) showHelpDocument(c *ui.Context) {
 					btn.Background(c.Theme().SurfaceHover)
 				}
 				// Close button
-				component.IconButton(c, n.closeIcon, nil, false, func() {
-					n.showHelpDoc = false
-					c.Invalidate()
+				comp.IconButton(c, comp.IconButtonOption{
+					Icon: n.closeIcon,
+					OnClick: func() {
+						n.showHelpDoc = false
+						c.Invalidate()
+					},
 				})
 			})
 			// Markdown content - scrollable

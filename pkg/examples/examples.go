@@ -3,55 +3,47 @@ package examples
 import (
 	"embed"
 	"log"
-	"path/filepath"
 	"strings"
 )
 
-// Example represents an example with name and code
-type Example struct {
-	Name string
-	Code string
-}
+// Examples represents an example with names and codes
+type Examples map[string]string
 
 var (
 	//go:embed *.xgo
 	fs embed.FS
 
 	// Default is the list of all available examples
-	Default []Example
+	Default Examples
+
+	DefaultNames = []string{
+		"hello world",
+		"hello word go",
+		"beziel",
+		"clip",
+		"crisp",
+		"fan",
+		"flower",
+		"geometry",
+		"line width",
+		"lines",
+		"open fill",
+		"rainbow",
+		"spiral",
+		"star",
+	}
 )
 
 func init() {
-	files := []string{
-		"hello-world.xgo",
-		"hello-word-go.xgo",
-		"beziel.xgo",
-		"clip.xgo",
-		"crisp.xgo",
-		"fan.xgo",
-		"flower.xgo",
-		"geometry.xgo",
-		"line-width.xgo",
-		"lines.xgo",
-		"open-fill.xgo",
-		"rainbow.xgo",
-		"spiral.xgo",
-		"star.xgo",
-	}
-	Default = make([]Example, 0, len(files))
+	Default = make(Examples, len(DefaultNames))
 
-	for _, n := range files {
-		data, err := fs.ReadFile(n)
+	for _, n := range DefaultNames {
+		path := strings.ReplaceAll(n, " ", "-") + ".xgo"
+		data, err := fs.ReadFile(path)
 		if err != nil {
 			log.Fatal(err)
 		}
-		name := strings.TrimSuffix(n, filepath.Ext(n))
 		code := string(data)
-		i := strings.Index(code, "\n")
-		if i > 0 {
-			name = code[:i]
-			name = strings.TrimLeft(name, "/ ")
-		}
-		Default = append(Default, Example{name, code})
+		Default[n] = code
 	}
 }

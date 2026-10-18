@@ -1,4 +1,4 @@
-package component
+package comp
 
 import (
 	"testing"
@@ -9,10 +9,15 @@ import (
 func TestShowDialogWithImage(t *testing.T) {
 	open := true
 	clickedBtn := -1
-	tt := ui.NewTester(func(c *ui.Context) {
-		ShowDialogWithImage(c, &open, nil, []string{"Left", "Right"}, func(btnIndex int) {
+	opt := DialogOption{
+		Open:    &open,
+		Buttons: []string{"Left", "Right"},
+		OnClick: func(btnIndex int) {
 			clickedBtn = btnIndex
-		}, nil)
+		},
+	}
+	tt := ui.NewTester(func(c *ui.Context) {
+		ShowDialogWithImage(c, opt)
 	}, 400, 300)
 
 	// Verify buttons are shown
@@ -32,11 +37,16 @@ func TestShowDialogWithImage(t *testing.T) {
 func TestShowDialogWithImageDismissed(t *testing.T) {
 	open := true
 	outsideClicked := false
-	_ = ui.NewTester(func(c *ui.Context) {
-		ShowDialogWithImage(c, &open, nil, []string{"Button"}, func(btnIndex int) {
-		}, func() {
+
+	opt := DialogOption{
+		Open:    &open,
+		Buttons: []string{"Button"},
+		OnClick: func(btnIndex int) {
 			outsideClicked = true
-		})
+		},
+	}
+	_ = ui.NewTester(func(c *ui.Context) {
+		ShowDialogWithImage(c, opt)
 	}, 400, 300)
 
 	// Initial state: outsideClicked should be false since we haven't clicked outside yet

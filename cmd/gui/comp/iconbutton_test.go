@@ -1,4 +1,4 @@
-package component
+package comp
 
 import (
 	"testing"
@@ -13,8 +13,11 @@ var testCheckIcon = ui.MustParseSVG([]byte(`<svg xmlns="http://www.w3.org/2000/s
 func TestIconButton(t *testing.T) {
 	clicks := 0
 	tt := ui.NewTester(func(c *ui.Context) {
-		IconButton(c, testCopyIcon, nil, false, func() {
-			clicks++
+		IconButton(c, IconButtonOption{
+			Icon: testCopyIcon,
+			OnClick: func() {
+				clicks++
+			},
 		})
 	}, 100, 50)
 
@@ -28,8 +31,13 @@ func TestIconButton(t *testing.T) {
 func TestIconButtonWithCheck(t *testing.T) {
 	clicks := 0
 	tt := ui.NewTester(func(c *ui.Context) {
-		IconButton(c, testCopyIcon, testCheckIcon, true, func() {
-			clicks++
+		IconButton(c, IconButtonOption{
+			Icon:       testCopyIcon,
+			SecondIcon: testCheckIcon,
+			ShowSecond: true,
+			OnClick: func() {
+				clicks++
+			},
 		})
 	}, 100, 50)
 
