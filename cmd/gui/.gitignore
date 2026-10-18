@@ -1,0 +1,4 @@
+/build/
+/.mygo/
+/.agents/
+mygo_windows_*.syso

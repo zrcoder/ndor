@@ -13,7 +13,7 @@ tasks:
     deps: [build]
     dir: cmd/web/static
     cmds:
-      - go run ../tools/server
+      - go run ../_tools/server
   clear:
     dir: cmd
     cmds:
@@ -28,3 +28,6 @@ tasks:
   cli:
     cmds:
       - go run ./cmd/ndor {{.CLI_ARGS}}
+  gui:
+    cmds:
+      - go run ./cmd/gui
