@@ -3,6 +3,9 @@ tasks:
   gen:
     cmds:
       - go generate
+  test:
+    cmds:
+      - go test ./...
   build:
     dir: cmd/web
     cmds:
