@@ -1,11 +1,13 @@
 package main
 
 import (
+	"embed"
 	_ "embed"
 
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 	"github.com/egoist/mygo/ui/editor"
+	"github.com/egoist/mygo/ui/markdown"
 	"github.com/zrcoder/ndor/cmd/gui/component"
 	"github.com/zrcoder/ndor/pkg"
 	"github.com/zrcoder/ndor/pkg/examples"
@@ -15,7 +17,10 @@ type Ndor struct {
 	code          string
 	resultImg     *ui.Bitmap
 	showHelp      bool
+	showHelpDoc   bool
+	helpDocTab    int
 	showExamples  bool
+	isEnglish     bool
 	errorMsg      string
 	errorLine     int
 	editor        *editor.State
@@ -32,6 +37,9 @@ var teacherLabeledImgData []byte
 
 //go:embed resources/gopher_labeled.png
 var gopherLabeledImgData []byte
+
+//go:embed resources/wiki
+var wikiFS embed.FS
 
 func New() *Ndor {
 	n := new(Ndor)
@@ -67,12 +75,17 @@ func (n *Ndor) View(c *ui.Context) {
 			if btnIndex == 0 {
 				n.showExamples = true
 			} else {
-				// TODO: open document
+				n.showHelpDoc = true
 			}
 		}, func() {
 			// Click outside triggers Examples button behavior
 			n.showExamples = true
 		})
+	}
+
+	// Help document dialog
+	if n.showHelpDoc {
+		n.showHelpDocument(c)
 	}
 
 	// Examples list overlay
@@ -187,6 +200,40 @@ func (n *Ndor) showExamplesList(c *ui.Context) {
 	})
 }
 
+func (n *Ndor) showHelpDocument(c *ui.Context) {
+	content := loadDoc(n.isEnglish, n.helpDocTab)
+
+	if ui.Modal(c, &n.showHelpDoc, func() {
+		ui.Column(c).Width(800).Height(600).Radius(12).Background(ui.RGB(255, 255, 255)).Children(func() {
+			// Tabs with language toggle
+			ui.Row(c).Fill().Height(40).Children(func() {
+				ui.Tabs(c, &n.helpDocTab, "Home", "API", "Tutorials")
+				ui.Spacer(c)
+				ui.ButtonBase(c).Width(60).Height(28).Radius(4).
+					Background(ui.RGB(240, 240, 240)).
+					OnClick(func() {
+						n.isEnglish = !n.isEnglish
+						c.Invalidate()
+					}).Children(func() {
+					if n.isEnglish {
+						ui.Text(c, "🌐 EN").FontSize(12)
+					} else {
+						ui.Text(c, "🌐 中文").FontSize(12)
+					}
+				})
+			})
+			// Markdown content - scrollable
+			ui.Scroll(c).Fill().Children(func() {
+				ui.Column(c).Width(760).Padding(10, 0, 0, 0).Children(func() {
+					markdown.View(c, content, nil)
+				})
+			})
+		})
+	}).Dismissed() {
+		n.showHelpDoc = false
+	}
+}
+
 func getPictureSize(c *ui.Context) (int, int) {
 	win := mygo.FocusedWindow()
 	if win != nil {
@@ -194,4 +241,26 @@ func getPictureSize(c *ui.Context) (int, int) {
 		return bounds.Width * 55 / 100, bounds.Height - 40 - 72
 	}
 	return 800, 600
+}
+
+func loadDoc(isEnglish bool, tab int) string {
+	var base string
+	if isEnglish {
+		base = "resources/wiki/en/"
+	} else {
+		base = "resources/wiki/"
+	}
+
+	var name string
+	switch tab {
+	case 0:
+		name = "Home.md"
+	case 1:
+		name = "Api.md"
+	case 2:
+		name = "Tutorials.md"
+	}
+
+	data, _ := wikiFS.ReadFile(base + name)
+	return string(data)
 }
