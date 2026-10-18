@@ -34,6 +34,7 @@ type Ndor struct {
 	copyIcon      *ui.SVG
 	checkIcon     *ui.SVG
 	saveIcon      *ui.SVG
+	closeIcon     *ui.SVG
 }
 
 //go:embed resources/teacher.png
@@ -57,6 +58,9 @@ var checkIconData []byte
 //go:embed resources/icons/save.svg
 var saveIconData []byte
 
+//go:embed resources/icons/close.svg
+var closeIconData []byte
+
 func New() *Ndor {
 	n := new(Ndor)
 	if bmp, err := ui.DecodeBitmap(teacherLabeledImgData); err == nil {
@@ -71,6 +75,7 @@ func New() *Ndor {
 	n.copyIcon = ui.MustParseSVG(copyIconData)
 	n.checkIcon = ui.MustParseSVG(checkIconData)
 	n.saveIcon = ui.MustParseSVG(saveIconData)
+	n.closeIcon = ui.MustParseSVG(closeIconData)
 	n.code = `context 800, 800
 color "lightgreen"
 circle 400, 400, 300
@@ -151,11 +156,7 @@ func (n *Ndor) pictureArea(c *ui.Context) {
 					n.saveImage(c)
 				})
 			})
-			ui.Row(c).Fill().Children(func() {
-				ui.Spacer(c)
-				ui.Image(c, n.resultImg).MaxWidthPercent(100).MaxHeightPercent(100)
-				ui.Spacer(c)
-			})
+			ui.Image(c, n.resultImg).MaxWidthPercent(100).MaxHeightPercent(100)
 		}
 	})
 }
@@ -227,40 +228,25 @@ func (n *Ndor) runCode(c *ui.Context) {
 }
 
 func (n *Ndor) showExamplesList(c *ui.Context) {
-	// Click anywhere to close
-	ui.Row(c).Top(0).Bottom(0).Left(0).Right(0).Background(ui.Color{}).Absolute().OnClick(func() {
-		n.showExamples = false
-		c.Invalidate()
-	})
+	names := make([]string, len(examples.Default))
+	for i, ex := range examples.Default {
+		names[i] = ex.Name
+	}
 
-	// Examples list - narrow floating panel at top-left
-	ui.Column(c).Top(10).Left(10).Width(180).Background(ui.RGB(255, 255, 255)).Radius(8).BorderWidth(1).BorderColor(ui.RGB(200, 200, 200)).Absolute().Children(func() {
-		// Header
-		ui.Row(c).Fill().Height(36).BorderWidth(0, 0, 1, 0).BorderColor(ui.RGB(220, 220, 220)).Children(func() {
-			ui.Text(c, "Examples").FontSize(14).FontWeight(700).Padding(8)
-			ui.Spacer(c)
-			ui.ButtonBase(c).Width(24).Height(24).Background(ui.Color{}).OnClick(func() {
-				n.showExamples = false
-				c.Invalidate()
-			}).Children(func() {
-				ui.Text(c, "x").FontSize(14).TextColor(ui.RGB(100, 100, 100))
-			})
-		})
-
-		// Example list
-		ui.Column(c).Fill().Children(func() {
-			for _, ex := range examples.Default {
-				ui.Row(c).Width(170).Height(28).BorderWidth(0, 0, 1, 0).BorderColor(ui.RGB(235, 235, 235)).OnClick(func() {
-					n.code = ex.Code
-					n.editor = &editor.State{Buffer: editor.NewBuffer(n.code)}
-					n.editor.Buffer.SetLanguage(editor.LanguageNamed("c"))
-					n.showExamples = false
-					c.Invalidate()
-				}).Children(func() {
-					ui.Text(c, ex.Name).FontSize(13).Padding(0, 8, 0, 8)
-				})
+	cfg := component.OverlayPanelConfig{
+		Title:   "Examples",
+		Width:   180,
+		OnClose: func() { n.showExamples = false },
+	}
+	component.OverlayPanel(c, cfg, n.closeIcon, names, func(item string) {
+		for _, ex := range examples.Default {
+			if ex.Name == item {
+				n.code = ex.Code
+				n.editor = &editor.State{Buffer: editor.NewBuffer(n.code)}
+				n.editor.Buffer.SetLanguage(editor.LanguageNamed("c"))
+				break
 			}
-		})
+		}
 	})
 }
 
@@ -269,12 +255,12 @@ func (n *Ndor) showHelpDocument(c *ui.Context) {
 
 	if ui.Modal(c, &n.showHelpDoc, func() {
 		ui.Column(c).Width(800).Height(600).Radius(12).Background(ui.RGB(255, 255, 255)).Children(func() {
-			// Tabs with language toggle
+			// Tabs with language toggle and close button
 			ui.Row(c).Fill().Height(40).Children(func() {
 				ui.Tabs(c, &n.helpDocTab, "Home", "API", "Tutorials")
 				ui.Spacer(c)
-				ui.ButtonBase(c).Width(60).Height(28).Radius(4).
-					Background(ui.RGB(240, 240, 240)).
+				// Language toggle button
+				btn := ui.ButtonBase(c).Width(60).Height(28).Radius(4).
 					OnClick(func() {
 						n.isEnglish = !n.isEnglish
 						c.Invalidate()
@@ -284,6 +270,14 @@ func (n *Ndor) showHelpDocument(c *ui.Context) {
 					} else {
 						ui.Text(c, "🌐 中文").FontSize(12)
 					}
+				})
+				if btn.Hovered() {
+					btn.Background(ui.RGB(240, 240, 240))
+				}
+				// Close button
+				component.IconButton(c, n.closeIcon, nil, false, func() {
+					n.showHelpDoc = false
+					c.Invalidate()
 				})
 			})
 			// Markdown content - scrollable
