@@ -1,0 +1,14 @@
+// fan
+
+context 1000, 1000
+
+translate 500, 500
+scale 40, 40
+from -10, 0
+bezier -8, -8, 8, 8, 10, 0
+color "orange"
+linew 8
+fill preserve
+dash 1, 10
+color "lightblue"
+stroke

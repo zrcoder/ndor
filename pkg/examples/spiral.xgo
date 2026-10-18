@@ -1,0 +1,19 @@
+// spiral
+
+const s = 1024
+const n = 2048
+
+context s, s
+color "black"
+
+for i <- :n {
+    t := float64(i) / n
+    d := t*s*0.4 + 10
+    a := math.Pi*2*t*20
+    x := s/2 + math.cos(a)*d
+    y := s/2 + math.sin(a)*d
+    r := t*8
+    circle x, y, r
+}
+
+fill

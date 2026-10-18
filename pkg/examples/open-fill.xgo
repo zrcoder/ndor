@@ -1,0 +1,22 @@
+// open fill
+
+context 1000, 1000
+
+for j <- :10 {
+    for i <- :10 {
+        x := float64(i)*100+50
+        y := float64(j)*100+50
+        from := 360*rand.float64
+        to := from + 180*rand.float64 + 180
+        arc x, y, 40, from, to
+    }
+}
+
+color "orange"
+fill preserve
+color "green"
+linew 8
+stroke preserve
+color "red"
+linew 4
+stroke preserve

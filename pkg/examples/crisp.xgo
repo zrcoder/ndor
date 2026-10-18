@@ -1,0 +1,42 @@
+// crisp
+
+const (
+    width = 1000
+    height = 1000
+    minor = 10
+    major = 100
+)
+
+func row(y int) {
+    f := float64(y)
+    from 0, f
+    to width, f
+}
+
+func col(x int) {
+    f := float64(x)
+    from f, 0
+    to f, height
+}
+
+context width, height
+linew 1
+
+for x <- minor:width:minor {
+    col x
+}
+for y <- minor:height:minor {
+    row y
+}
+color 0, 0, 0, 55
+stroke
+
+for x <- major:width:major {
+    col x
+}
+for y <- major:width:major {
+    row y
+}
+
+color 0, 0, 0, 120
+stroke

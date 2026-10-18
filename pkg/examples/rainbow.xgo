@@ -1,0 +1,27 @@
+// rainbow
+
+context 1024, 512
+color "white"
+clear
+
+colors := [
+    "red",
+    "orange",
+    "yellow",
+    "green",
+    "blue",
+    "violet",
+    "indigo",
+    "white",
+]
+
+const x, y = 512, 512
+const from, to = 0, -180
+r := 400.0
+
+for c <- colors {
+    color c
+    arc x, y, r, from, to
+    fill
+    r -= 50
+}
