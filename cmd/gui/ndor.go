@@ -7,7 +7,6 @@ import (
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 	"github.com/egoist/mygo/ui/editor"
-	"github.com/egoist/mygo/ui/markdown"
 	"github.com/zrcoder/ndor/cmd/gui/comp"
 	"github.com/zrcoder/ndor/pkg"
 	"github.com/zrcoder/ndor/pkg/examples"
@@ -16,30 +15,21 @@ import (
 type Ndor struct {
 	resultImg     *ui.Bitmap
 	resultPNGData []byte
-	showHelp      bool
-	showHelpDoc   bool
-	helpDocTab    int
-	showExamples  bool
-	isEnglish     bool
 	errorMsg      string
 	errorLine     int
 	editor        *editor.State
 	helpBtnImg    *ui.Bitmap
-	helpDialogImg *ui.Bitmap
 	runBtnImg     *ui.Bitmap
 	copyCodeDone  time.Time
 	copyIcon      *ui.SVG
 	checkIcon     *ui.SVG
 	saveIcon      *ui.SVG
-	closeIcon     *ui.SVG
 	sunIcon       *ui.SVG
 	moonIcon      *ui.SVG
 	paintImg      *ui.Bitmap
-	// runSeq increments when a run starts; resultSeq follows it when the
-	// picture of that run is ready (or it failed). The run is in flight
-	// while they differ.
-	runSeq    uint64
-	resultSeq uint64
+	codeImg       *ui.Bitmap
+	// help owns the help dialog, documentation viewer and examples overlay.
+	help *comp.Help
 }
 
 func New() *Ndor {
@@ -50,17 +40,16 @@ func New() *Ndor {
 	if bmp, err := ui.DecodeBitmap(gopherLabeledImgData); err == nil {
 		n.runBtnImg = bmp
 	}
-	if bmp, err := ui.DecodeBitmap(teacherImgData); err == nil {
-		n.helpDialogImg = bmp
-	}
 	n.copyIcon = ui.MustParseSVG(copyIconData)
 	n.checkIcon = ui.MustParseSVG(checkIconData)
 	n.saveIcon = ui.MustParseSVG(saveIconData)
-	n.closeIcon = ui.MustParseSVG(closeIconData)
 	n.sunIcon = ui.MustParseSVG(sunIconData)
 	n.moonIcon = ui.MustParseSVG(moonIconData)
 	if bmp, err := ui.DecodeBitmap(paintImgData); err == nil {
 		n.paintImg = bmp
+	}
+	if bmp, err := ui.DecodeBitmap(codeImgData); err == nil {
+		n.codeImg = bmp
 	}
 	code := `context 800, 800
 color "lightgreen"
@@ -69,18 +58,37 @@ fill
 `
 	n.editor = &editor.State{Buffer: editor.NewBuffer(code)}
 	n.editor.Buffer.SetLanguage(editor.LanguageNamed("c"))
+
+	var dialogImg *ui.Bitmap
+	if bmp, err := ui.DecodeBitmap(teacherImgData); err == nil {
+		dialogImg = bmp
+	}
+	n.help = comp.NewHelp(comp.HelpConfig{
+		DialogImg:    dialogImg,
+		CloseIcon:    ui.MustParseSVG(closeIconData),
+		ExampleNames: examples.DefaultNames,
+		Examples:     examples.Default,
+		OnPickExample: func(code string) {
+			n.editor.Buffer.Set(code)
+		},
+		LoadDoc: loadDoc,
+	})
 	return n
 }
 
 func (n *Ndor) View(c *ui.Context) {
-	// Handle keyboard shortcuts
+	// Handle keyboard shortcuts before building the toast viewport, so a run
+	// started here shows the painting in this same frame.
 	if c.Shortcut(ui.Ctrl, ui.KeyH) {
-		n.showHelp = true
+		n.help.Open()
 		c.Invalidate()
 	}
 	if c.Shortcut(ui.Ctrl, ui.KeyR) {
 		n.runCode(c)
 	}
+
+	// The painting toast keeps the result hidden until the animation is over.
+	painting := comp.PaintingViewport(c, n.paintImg, n.codeImg)
 
 	if n.errorMsg != "" {
 		comp.ToastErrorAtLine(c, n.errorLine, n.errorMsg, func() {
@@ -89,42 +97,19 @@ func (n *Ndor) View(c *ui.Context) {
 		})
 	}
 
-	if n.showHelp {
-		opt := comp.DialogOption{
-			Open:    &n.showHelp,
-			Img:     n.helpDialogImg,
-			Buttons: []string{"Examples", "Document"},
-			OnClick: func(btnIndex int) {
-				if btnIndex == 0 {
-					n.showExamples = true
-				} else {
-					n.showHelpDoc = true
-				}
-			},
-		}
-		comp.ShowDialogWithImage(c, opt)
-	}
-
-	// Help document dialog
-	if n.showHelpDoc {
-		n.showHelpDocument(c)
-	}
-
-	// Examples list overlay
-	if n.showExamples {
-		n.showExamplesList(c)
-	}
+	// Help dialog, documentation and examples
+	n.help.View(c)
 
 	// Main layout
 	ui.Row(c).Key("main").Fill().Children(func() {
-		n.pictureArea(c)
+		n.pictureArea(c, painting)
 		n.codeArea(c)
 	})
 
 	// Floating buttons
 	ui.Column(c).Key("help-float").Width(64).Height(72).Bottom(0).Left(4).Absolute().Children(func() {
 		comp.ImageButtonSimple(c, n.helpBtnImg, func() {
-			n.showHelp = true
+			n.help.Open()
 		})
 	})
 
@@ -135,38 +120,9 @@ func (n *Ndor) View(c *ui.Context) {
 	})
 }
 
-// paintDuration is how long the painting animation runs before the picture
-// of the run replaces it.
-const paintDuration = 900 * time.Millisecond
-
-func (n *Ndor) pictureArea(c *ui.Context) {
-	ui.Column(c).WidthPercent(55).Fill().Children(func() {
-		// The painting animation: a timeline keyed on the run, so a new run
-		// plays it again. It shows while the run is in flight and while the
-		// timeline has not come to rest, so the picture updates only once
-		// both the animation and the generation are done.
-		overlay := ui.Column(c).Key("painting")
-		tl := overlay.Timeline("painting", ui.TimelineOptions{Run: n.runSeq})
-		inFlight := n.resultSeq != n.runSeq
-		painting := n.runSeq > 0 && (inFlight || !tl.Settled())
-		if painting {
-			if inFlight {
-				// Keep frames coming until the result arrives; the timeline
-				// only asks for frames while it moves.
-				c.AnimationFrame()
-			}
-			progress := tl.Tween(ui.Tween{From: 0, To: 1, Duration: paintDuration, Ease: ui.Linear})
-			overlay.Fill().Center().Gap(16).Children(func() {
-				if n.paintImg != nil {
-					ui.Image(c, n.paintImg).MaxHeightPercent(40)
-				}
-
-				ui.Progress(c, float64(progress)).Width(200)
-			})
-			return
-		}
-
-		if n.resultImg == nil {
+func (n *Ndor) pictureArea(c *ui.Context, painting bool) {
+	ui.Column(c).WidthPercent(50).Fill().Children(func() {
+		if painting || n.resultImg == nil {
 			return
 		}
 		ui.Row(c).Fill().Height(40).Children(func() {
@@ -201,7 +157,7 @@ func (n *Ndor) saveImage(c *ui.Context) {
 }
 
 func (n *Ndor) codeArea(c *ui.Context) {
-	ui.Column(c).Fill().BorderWidth(0, 0, 0, 0.5).BorderColor(comp.DividerColor).Children(func() {
+	ui.Column(c).Fill().Children(func() {
 		ui.Row(c).Fill().Height(36).Children(func() {
 			ui.Spacer(c)
 			// Copy button
@@ -238,9 +194,8 @@ func (n *Ndor) codeArea(c *ui.Context) {
 }
 
 func (n *Ndor) runCode(c *ui.Context) {
-	if n.resultSeq != n.runSeq {
-		return // a run is already in flight
-	}
+	n.resultImg = nil
+	c.Invalidate()
 
 	width, height := getPictureSize(c)
 	if width <= 0 || height <= 0 {
@@ -248,10 +203,8 @@ func (n *Ndor) runCode(c *ui.Context) {
 	}
 	code := n.editor.Buffer.String()
 
-	// Bump the sequence: the view starts the painting animation for this
-	// run, and the goroutine reports back under the same number.
-	n.runSeq++
-	seq := n.runSeq
+	// The toast owns the overlay and hides itself when its time is over.
+	comp.ShowPainting(c)
 	c.Invalidate()
 
 	pngData, lineErr := pkg.Gen(width, height, code)
@@ -273,75 +226,13 @@ func (n *Ndor) runCode(c *ui.Context) {
 			n.resultImg = bitmap
 		}
 	}
-	n.resultSeq = seq
-}
-
-func (n *Ndor) showExamplesList(c *ui.Context) {
-	opt := comp.OverlayPanelOption{
-		Title:   "Examples",
-		Width:   180,
-		OnClose: func() { n.showExamples = false },
-		ItemFn: func(item string) {
-			code, ok := examples.Default[item]
-			if ok {
-				n.editor.Buffer.Set(code)
-			}
-		},
-		CloseIcon: n.closeIcon,
-	}
-	comp.OverlayPanel(c, opt, examples.DefaultNames)
-}
-
-func (n *Ndor) showHelpDocument(c *ui.Context) {
-	content := loadDoc(n.isEnglish, n.helpDocTab)
-
-	if ui.Modal(c, &n.showHelpDoc, func() {
-		ui.Column(c).Width(800).Height(600).Radius(12).Background(c.Theme().Surface).Children(func() {
-			// Tabs with language toggle and close button
-			ui.Row(c).Fill().Height(40).Children(func() {
-				ui.Tabs(c, &n.helpDocTab, "Home", "API", "Tutorials")
-				ui.Spacer(c)
-				// Language toggle button
-				btn := ui.ButtonBase(c).Width(60).Height(28).Radius(4).
-					OnClick(func() {
-						n.isEnglish = !n.isEnglish
-						c.Invalidate()
-					}).Children(func() {
-					if n.isEnglish {
-						ui.Text(c, "🌐 EN").FontSize(12)
-					} else {
-						ui.Text(c, "🌐 中文").FontSize(12)
-					}
-				})
-				if btn.Hovered() {
-					btn.Background(c.Theme().SurfaceHover)
-				}
-				// Close button
-				comp.IconButton(c, comp.IconButtonOption{
-					Icon: n.closeIcon,
-					OnClick: func() {
-						n.showHelpDoc = false
-						c.Invalidate()
-					},
-				})
-			})
-			// Markdown content - scrollable
-			ui.Scroll(c).Fill().Children(func() {
-				ui.Column(c).Width(760).Padding(10, 0, 0, 0).Children(func() {
-					markdown.View(c, content, nil)
-				})
-			})
-		})
-	}).Dismissed() {
-		n.showHelpDoc = false
-	}
 }
 
 func getPictureSize(c *ui.Context) (int, int) {
 	win := mygo.FocusedWindow()
 	if win != nil {
 		bounds := win.ContentBounds()
-		return bounds.Width * 55 / 100, bounds.Height - 40 - 72
+		return bounds.Width / 2, bounds.Height - 40 - 72
 	}
 	return 800, 600
 }

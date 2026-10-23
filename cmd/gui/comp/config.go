@@ -7,8 +7,6 @@ var (
 	ErrorBgColor   = ui.RGB(80, 40, 40)
 	ErrorTextColor = ui.RGB(255, 200, 200)
 
-	DividerColor = ui.RGB(180, 180, 180)
-
 	ButtonWidth  = float32(64)
 	ButtonHeight = float32(72)
 
