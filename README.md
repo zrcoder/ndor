@@ -6,7 +6,7 @@
 
 ## cli
 
-Install with go:
+Install with Go:
 
 ```shell
 go install github.com/zrcoder/ndor/cmd/ndor@latest
@@ -26,7 +26,7 @@ A native GUI version built with [mygo](https://github.com/egoist/mygo).
 
 ## develop
 
-`ndor` is implemented with go.
+`ndor` is implemented with Go.
 
 If you want to run `ndor` on your local machine：
 
