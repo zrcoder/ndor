@@ -17,3 +17,7 @@ tasks:
   gui:
     cmds:
       - go run ./cmd/gui
+  build:
+    dir: cmd/gui
+    cmds:
+      - go tool github.com/egoist/mygo/cmd/mygo build
