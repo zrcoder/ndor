@@ -2,13 +2,7 @@
 
 `ndor` is an app with which you can draw by codes, for kids and coders~
 
-![ndor](https://raw.githubusercontent.com/wiki/zrcoder/ndor/images/main.png)
-
-You can take a look at the [wiki](https://github.com/zrcoder/ndor/wiki) for detail.
-
-## web
-
-Vist <https://ndor.netlify.app> or run on your local machine as described bellow.
+![ndor](ndor.png)
 
 ## cli
 
@@ -32,7 +26,7 @@ A native GUI version built with [mygo](https://github.com/egoist/mygo).
 
 ## develop
 
-`ndor` is implemented with go, js and wasm.
+`ndor` is implemented with go.
 
 If you want to run `ndor` on your local machine：
 
@@ -44,19 +38,6 @@ If you want to run `ndor` on your local machine：
    ```
 
 3. Run
-   - web app:
-
-     ```shell
-     task web
-     ```
-
-     > delete or comment the line "Version: version" in cmd/web/main.go for every dev build
-     > this is to break the cache mechanism, just for developing
-     >
-     > for product, modify the const "version" variable and then push and make pr
-     >
-     > Open `http://localhost:9999`, start your painting journey～
-
    - cli app
 
      ```shell
