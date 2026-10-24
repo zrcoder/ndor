@@ -34,23 +34,15 @@ type Ndor struct {
 
 func New() *Ndor {
 	n := new(Ndor)
-	if bmp, err := ui.DecodeBitmap(teacherLabeledImgData); err == nil {
-		n.helpBtnImg = bmp
-	}
-	if bmp, err := ui.DecodeBitmap(gopherLabeledImgData); err == nil {
-		n.runBtnImg = bmp
-	}
+	n.helpBtnImg, _ = ui.DecodeBitmap(teacherLabeledImgData)
+	n.runBtnImg, _ = ui.DecodeBitmap(gopherLabeledImgData)
 	n.copyIcon = ui.MustParseSVG(copyIconData)
 	n.checkIcon = ui.MustParseSVG(checkIconData)
 	n.saveIcon = ui.MustParseSVG(saveIconData)
 	n.sunIcon = ui.MustParseSVG(sunIconData)
 	n.moonIcon = ui.MustParseSVG(moonIconData)
-	if bmp, err := ui.DecodeBitmap(paintImgData); err == nil {
-		n.paintImg = bmp
-	}
-	if bmp, err := ui.DecodeBitmap(codeImgData); err == nil {
-		n.codeImg = bmp
-	}
+	n.paintImg, _ = ui.DecodeBitmap(paintImgData)
+	n.codeImg, _ = ui.DecodeBitmap(codeImgData)
 	code := `context 800, 800
 color "lightgreen"
 circle 400, 400, 300
@@ -60,9 +52,7 @@ fill
 	n.editor.Buffer.SetLanguage(editor.LanguageNamed("c"))
 
 	var dialogImg *ui.Bitmap
-	if bmp, err := ui.DecodeBitmap(teacherImgData); err == nil {
-		dialogImg = bmp
-	}
+	dialogImg, _ = ui.DecodeBitmap(teacherImgData)
 	n.help = comp.NewHelp(comp.HelpConfig{
 		DialogImg:    dialogImg,
 		CloseIcon:    ui.MustParseSVG(closeIconData),
@@ -122,7 +112,7 @@ func (n *Ndor) View(c *ui.Context) {
 
 func (n *Ndor) pictureArea(c *ui.Context, painting bool) {
 	ui.Column(c).WidthPercent(50).Fill().Children(func() {
-		if painting || n.resultImg == nil {
+		if painting {
 			return
 		}
 		ui.Row(c).Fill().Height(40).Children(func() {
@@ -194,9 +184,6 @@ func (n *Ndor) codeArea(c *ui.Context) {
 }
 
 func (n *Ndor) runCode(c *ui.Context) {
-	n.resultImg = nil
-	c.Invalidate()
-
 	width, height := getPictureSize(c)
 	if width <= 0 || height <= 0 {
 		width, height = 800, 800
