@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"time"
 
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
@@ -20,27 +19,17 @@ type Ndor struct {
 	editor        *editor.State
 	helpBtnImg    *ui.Bitmap
 	runBtnImg     *ui.Bitmap
-	copyCodeDone  time.Time
-	copyIcon      *ui.SVG
-	checkIcon     *ui.SVG
-	saveIcon      *ui.SVG
-	sunIcon       *ui.SVG
-	moonIcon      *ui.SVG
 	paintImg      *ui.Bitmap
 	codeImg       *ui.Bitmap
 	// help owns the help dialog, documentation viewer and examples overlay.
-	help *comp.Help
+	help    *comp.Help
+	toolbar *comp.Toolbar
 }
 
 func New() *Ndor {
 	n := new(Ndor)
 	n.helpBtnImg, _ = ui.DecodeBitmap(teacherLabeledImgData)
 	n.runBtnImg, _ = ui.DecodeBitmap(gopherLabeledImgData)
-	n.copyIcon = ui.MustParseSVG(copyIconData)
-	n.checkIcon = ui.MustParseSVG(checkIconData)
-	n.saveIcon = ui.MustParseSVG(saveIconData)
-	n.sunIcon = ui.MustParseSVG(sunIconData)
-	n.moonIcon = ui.MustParseSVG(moonIconData)
 	n.paintImg, _ = ui.DecodeBitmap(paintImgData)
 	n.codeImg, _ = ui.DecodeBitmap(codeImgData)
 	code := `context 800, 800
@@ -62,6 +51,25 @@ fill
 			n.editor.Buffer.Set(code)
 		},
 		LoadDoc: loadDoc,
+	})
+
+	n.toolbar = comp.NewToolbar(comp.ToolbarConfig{
+		CopyIcon:  ui.MustParseSVG(copyIconData),
+		CheckIcon: ui.MustParseSVG(checkIconData),
+		SaveIcon:  ui.MustParseSVG(saveIconData),
+		SunIcon:   ui.MustParseSVG(sunIconData),
+		MoonIcon:  ui.MustParseSVG(moonIconData),
+		CloseIcon: ui.MustParseSVG(closeIconData),
+		GetCode:   func() string { return n.editor.Buffer.String() },
+		OnCopy:    func(string) {},
+		OnSave:    func() { n.saveImage(nil) },
+		OnToggleTheme: func() {
+			if mygo.Theme.IsDark() {
+				mygo.Theme.SetSource(mygo.ThemeLight)
+			} else {
+				mygo.Theme.SetSource(mygo.ThemeDark)
+			}
+		},
 	})
 	return n
 }
@@ -117,18 +125,15 @@ func (n *Ndor) pictureArea(c *ui.Context, painting bool) {
 		}
 		ui.Row(c).Fill().Height(40).Children(func() {
 			ui.Spacer(c)
-			comp.IconButton(c, comp.IconButtonOption{
-				Icon: n.saveIcon,
-				OnClick: func() {
-					n.saveImage(c)
-				},
-			})
+			if n.toolbar != nil {
+				n.toolbar.SaveButton(c)
+			}
 		})
 		ui.Image(c, n.resultImg).MaxWidthPercent(100).MaxHeightPercent(100)
 	})
 }
 
-func (n *Ndor) saveImage(c *ui.Context) {
+func (n *Ndor) saveImage(_ *ui.Context) {
 	if n.resultPNGData == nil {
 		return
 	}
@@ -148,37 +153,9 @@ func (n *Ndor) saveImage(c *ui.Context) {
 
 func (n *Ndor) codeArea(c *ui.Context) {
 	ui.Column(c).Fill().Children(func() {
-		ui.Row(c).Fill().Height(36).Children(func() {
-			ui.Spacer(c)
-			// Copy button
-			copied := !n.copyCodeDone.IsZero() && c.Now().Sub(n.copyCodeDone) < 2*time.Second
-			comp.IconButton(c, comp.IconButtonOption{
-				Icon:       n.copyIcon,
-				SecondIcon: n.checkIcon,
-				ShowSecond: copied,
-				OnClick: func() {
-					c.Services().WriteClipboard(n.editor.Buffer.String())
-					n.copyCodeDone = c.Now()
-					c.Invalidate()
-				},
-			})
-			// Theme toggle button
-			themeIcon := n.moonIcon
-			if c.Theme().Dark {
-				themeIcon = n.sunIcon
-			}
-			comp.IconButton(c, comp.IconButtonOption{
-				Icon: themeIcon,
-				OnClick: func() {
-					if mygo.Theme.IsDark() {
-						mygo.Theme.SetSource(mygo.ThemeLight)
-					} else {
-						mygo.Theme.SetSource(mygo.ThemeDark)
-					}
-					c.Invalidate()
-				},
-			})
-		})
+		if n.toolbar != nil {
+			n.toolbar.View(c, c.Theme().Dark)
+		}
 		editor.View(c, n.editor).Fill()
 	})
 }
