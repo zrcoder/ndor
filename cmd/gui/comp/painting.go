@@ -58,7 +58,7 @@ func PaintingViewport(c *ui.Context, left, right *ui.Bitmap) bool {
 }
 
 func painting(c *ui.Context, left, right *ui.Bitmap) {
-	ui.Row(c).Key("painting").Absolute().Top(0).Bottom(0).Left(0).Right(0).
+	ui.Row(c.Key("painting")).Absolute().Top(0).Bottom(0).Left(0).Right(0).
 		Center().Gap(6).PassThrough().Children(func() {
 		if left != nil {
 			ui.Image(c, left).MaxHeightPercent(11)

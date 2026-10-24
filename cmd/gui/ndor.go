@@ -99,19 +99,19 @@ func (n *Ndor) View(c *ui.Context) {
 	n.help.View(c)
 
 	// Main layout
-	ui.Row(c).Key("main").Fill().Children(func() {
+	ui.Row(c.Key("main")).Fill().Children(func() {
 		n.pictureArea(c, painting)
 		n.codeArea(c)
 	})
 
 	// Floating buttons
-	ui.Column(c).Key("help-float").Width(64).Height(72).Bottom(0).Left(4).Absolute().Children(func() {
+	ui.Column(c.Key("help-float")).Width(64).Height(72).Bottom(0).Left(4).Absolute().Children(func() {
 		comp.ImageButtonSimple(c, n.helpBtnImg, func() {
 			n.help.Open()
 		})
 	})
 
-	ui.Column(c).Key("run-float").Width(64).Height(72).Bottom(0).Right(0).Absolute().Children(func() {
+	ui.Column(c.Key("run-float")).Width(64).Height(72).Bottom(0).Right(0).Absolute().Children(func() {
 		comp.ImageButtonSimple(c, n.runBtnImg, func() {
 			n.runCode(c)
 		})
