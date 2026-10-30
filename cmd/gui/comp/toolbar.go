@@ -3,7 +3,6 @@ package comp
 import (
 	"time"
 
-	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 )
 
@@ -12,14 +11,11 @@ type ToolbarConfig struct {
 	CopyIcon  *ui.SVG
 	CheckIcon *ui.SVG
 	SaveIcon  *ui.SVG
-	SunIcon   *ui.SVG
-	MoonIcon  *ui.SVG
 	CloseIcon *ui.SVG
 
-	GetCode       func() string
-	OnCopy        func(string)
-	OnSave        func()
-	OnToggleTheme func()
+	GetCode func() string
+	OnCopy  func(string)
+	OnSave  func()
 }
 
 // Toolbar owns the code area toolbar state and actions.
@@ -33,8 +29,8 @@ func NewToolbar(cfg ToolbarConfig) *Toolbar {
 	return &Toolbar{cfg: cfg}
 }
 
-// View renders the toolbar. isDark indicates if dark theme is active.
-func (t *Toolbar) View(c *ui.Context, isDark bool) {
+// View renders the toolbar.
+func (t *Toolbar) View(c *ui.Context) {
 	ui.Row(c).Fill().Height(36).Children(func() {
 		ui.Spacer(c)
 
@@ -62,29 +58,6 @@ func (t *Toolbar) View(c *ui.Context, isDark bool) {
 				c.Invalidate()
 			},
 		})
-
-		// Theme toggle button
-		themeIcon := t.cfg.MoonIcon
-		if isDark {
-			themeIcon = t.cfg.SunIcon
-		}
-		if themeIcon != nil {
-			IconButton(c, IconButtonOption{
-				Icon: themeIcon,
-				OnClick: func() {
-					if t.cfg.OnToggleTheme != nil {
-						t.cfg.OnToggleTheme()
-					} else {
-						if mygo.Theme.IsDark() {
-							mygo.Theme.SetSource(mygo.ThemeLight)
-						} else {
-							mygo.Theme.SetSource(mygo.ThemeDark)
-						}
-						c.Invalidate()
-					}
-				},
-			})
-		}
 	})
 }
 

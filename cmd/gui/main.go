@@ -12,6 +12,8 @@ var ndor = New()
 func main() {
 	log.SetFlags(log.Lshortfile)
 
+	mygo.Theme.SetSource(mygo.ThemeLight)
+
 	mygo.App.WhenReady(func() {
 		mygo.NewWindow(mygo.WindowOptions{
 			Title:   "Ndor",

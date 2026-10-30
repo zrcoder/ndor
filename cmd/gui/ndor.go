@@ -57,19 +57,10 @@ fill
 		CopyIcon:  ui.MustParseSVG(copyIconData),
 		CheckIcon: ui.MustParseSVG(checkIconData),
 		SaveIcon:  ui.MustParseSVG(saveIconData),
-		SunIcon:   ui.MustParseSVG(sunIconData),
-		MoonIcon:  ui.MustParseSVG(moonIconData),
 		CloseIcon: ui.MustParseSVG(closeIconData),
 		GetCode:   func() string { return n.editor.Buffer.String() },
 		OnCopy:    func(string) {},
 		OnSave:    func() { n.saveImage(nil) },
-		OnToggleTheme: func() {
-			if mygo.Theme.IsDark() {
-				mygo.Theme.SetSource(mygo.ThemeLight)
-			} else {
-				mygo.Theme.SetSource(mygo.ThemeDark)
-			}
-		},
 	})
 	return n
 }
@@ -123,6 +114,9 @@ func (n *Ndor) pictureArea(c *ui.Context, painting bool) {
 		if painting {
 			return
 		}
+		if n.resultImg == nil {
+			return
+		}
 		ui.Row(c).Fill().Height(40).Children(func() {
 			ui.Spacer(c)
 			if n.toolbar != nil {
@@ -154,7 +148,7 @@ func (n *Ndor) saveImage(_ *ui.Context) {
 func (n *Ndor) codeArea(c *ui.Context) {
 	ui.Column(c).Fill().Children(func() {
 		if n.toolbar != nil {
-			n.toolbar.View(c, c.Theme().Dark)
+			n.toolbar.View(c)
 		}
 		editor.View(c, n.editor).Fill()
 	})

@@ -34,9 +34,3 @@ var saveIconData []byte
 
 //go:embed resources/icons/close.svg
 var closeIconData []byte
-
-//go:embed resources/icons/sun.svg
-var sunIconData []byte
-
-//go:embed resources/icons/moon.svg
-var moonIconData []byte
