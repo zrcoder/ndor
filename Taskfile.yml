@@ -6,7 +6,7 @@ tasks:
   test:
     cmds:
       - go test ./...
-  clear:
+  clean:
     dir: cmd
     cmds:
       - rm -rf ndor/examples/*.html
@@ -15,9 +15,18 @@ tasks:
     cmds:
       - go run ./cmd/ndor {{.CLI_ARGS}}
   gui:
+    dir: cmd/gui
     cmds:
-      - go run ./cmd/gui
+      - go tool mygo dev
   build:
     dir: cmd/gui
     cmds:
-      - go tool github.com/egoist/mygo/cmd/mygo build
+      - go tool mygo build
+  vet:
+    cmds:
+      - go tool mygo vet ./cmd/gui
+      - go vet ./...
+  fix:
+    cmds:
+      - go tool mygo migrate-ui -write ./cmd/gui
+      - go fix ./...
