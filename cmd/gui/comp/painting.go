@@ -58,19 +58,24 @@ func PaintingViewport(c *ui.Context, left, right *ui.Bitmap) bool {
 }
 
 func painting(c *ui.Context, left, right *ui.Bitmap) {
+	t := c.Theme()
 	ui.Row(c.Key("painting")).Absolute().Top(0).Bottom(0).Left(0).Right(0).
-		Center().Gap(6).PassThrough().Children(func() {
-		if left != nil {
-			ui.Image(c, left).MaxHeightPercent(11)
-		}
+		Center().PassThrough().Background(ui.RGBA(0, 0, 0, 0.2)).Children(func() {
+		ui.Row(c).Radius(t.Space(2.5)).
+			Background(t.Surface).Border(1, t.Border).
+			Shadow(0, 10, 30, 0, ui.RGBA(0, 0, 0, 0.3)).Children(func() {
+			if left != nil {
+				ui.Image(c, left).MaxHeightPercent(31)
+			}
 
-		loading.Blocks(c, loading.Options{
-			Size:  80,
-			Color: c.Theme().Accent,
-		}).Label("Painting")
+			loading.Blocks(c, loading.Options{
+				Size:  80,
+				Color: t.Accent,
+			}).Label("Painting")
 
-		if right != nil {
-			ui.Image(c, right).MaxHeightPercent(8)
-		}
+			if right != nil {
+				ui.Image(c, right).MaxHeightPercent(28)
+			}
+		})
 	})
 }
