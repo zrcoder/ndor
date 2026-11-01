@@ -76,9 +76,6 @@ func (n *Ndor) View(c *ui.Context) {
 		n.runCode(c)
 	}
 
-	// The painting toast keeps the result hidden until the animation is over.
-	painting := comp.PaintingViewport(c, n.paintImg, n.codeImg)
-
 	if n.errorMsg != "" {
 		comp.ToastErrorAtLine(c, n.errorLine, n.errorMsg, func() {
 			n.errorMsg = ""
@@ -88,6 +85,9 @@ func (n *Ndor) View(c *ui.Context) {
 
 	// Help dialog, documentation and examples
 	n.help.View(c)
+
+	// The painting toast keeps the result hidden until the animation is over.
+	painting := comp.PaintingViewport(c, n.paintImg, n.codeImg)
 
 	// Main layout
 	ui.Row(c.Key("main")).Fill().Children(func() {
@@ -161,29 +161,36 @@ func (n *Ndor) runCode(c *ui.Context) {
 	}
 	code := n.editor.Buffer.String()
 
-	// The toast owns the overlay and hides itself when its time is over.
-	comp.ShowPainting(c)
-	c.Invalidate()
-
+	// First, try to generate the image to check for errors.
 	pngData, lineErr := pkg.Gen(width, height, code)
 	if lineErr != nil {
 		n.errorMsg = lineErr.Msg
 		n.errorLine = lineErr.Number
 		n.resultImg = nil
 		n.resultPNGData = nil
-	} else {
-		n.errorMsg = ""
-		n.errorLine = 0
-		n.resultPNGData = pngData
-		bitmap, err := ui.DecodeBitmap(pngData)
-		if err != nil {
-			n.errorMsg = "Failed to decode image: " + err.Error()
-			n.errorLine = 0
-			n.resultImg = nil
-		} else {
-			n.resultImg = bitmap
-		}
+		// Don't show painting animation on error.
+		c.Invalidate()
+		return
 	}
+
+	n.errorMsg = ""
+	n.errorLine = 0
+	n.resultPNGData = pngData
+	bitmap, err := ui.DecodeBitmap(pngData)
+	if err != nil {
+		n.errorMsg = "Failed to decode image: " + err.Error()
+		n.errorLine = 0
+		n.resultImg = nil
+		n.resultPNGData = nil
+		c.Invalidate()
+		return
+	}
+
+	n.resultImg = bitmap
+
+	// The toast owns the overlay and hides itself when its time is over.
+	comp.ShowPainting(c)
+	c.Invalidate()
 }
 
 func getPictureSize(c *ui.Context) (int, int) {
