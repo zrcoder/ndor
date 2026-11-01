@@ -52,12 +52,12 @@ func parseErrorline(oriCode, flag string) int {
 			j++
 			continue
 		}
-		i := strings.Index(line, " ")
-		if i == -1 {
-			i = strings.Index(line, "(")
+		before, _, found := strings.Cut(line, " ")
+		if !found {
+			before, _, found = strings.Cut(line, "(")
 		}
-		if i != -1 {
-			line = line[:i]
+		if found {
+			line = before
 		}
 		line = lowercaseFirstLetter(line)
 		if line == flag {
