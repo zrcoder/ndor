@@ -1,0 +1,17 @@
+// turtle
+
+context 600, 600
+color "red"
+linew 4
+
+penup
+forward -150
+right 90
+forward -150
+left 90
+pendown
+
+for i <- :4 {
+    forward 300
+    right 90
+}

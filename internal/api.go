@@ -29,4 +29,5 @@ var (
 func Init(width, height int) {
 	GlobalErr = nil
 	GlobalCtx = gg.NewContext(width, height)
+	ResetTurtle(width, height)
 }

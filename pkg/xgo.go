@@ -32,14 +32,24 @@ const (
 	const preserve = Preserve
 
 	var (
-		color  = Color
-		dash   = Dash
-		fill   = Fill
-		stroke = Stroke
-		clip   = Clip
-		pop    = Pop
-		push   = Push
-		clear  = Clear
+		color   = Color
+		dash    = Dash
+		fill    = Fill
+		stroke  = Stroke
+		clip    = Clip
+		pop     = Pop
+		push    = Push
+		clear   = Clear
+		turtle  = Turtle
+		forward = Forward
+		back    = Back
+		left    = Left
+		right   = Right
+		angle   = Angle
+		jump    = Jump
+		penup   = PenUp
+		pendown = PenDown
+		home    = Home
 	)
 	`
 )

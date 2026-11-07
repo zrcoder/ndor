@@ -21,6 +21,7 @@ func Color(args ...any) {
 		return
 	}
 	internal.GlobalCtx.SetRGBA255(int(rgba.R), int(rgba.G), int(rgba.B), int(rgba.A))
+	internal.PenColor = rgba
 }
 
 func Rectangle(x, y, w, h float64, r ...float64) {
@@ -57,6 +58,7 @@ func Dash(args ...float64) {
 
 func Linew(width float64) {
 	internal.GlobalCtx.SetLineWidth(width)
+	internal.PenW = width
 }
 
 func Text(x, y float64, s string) {

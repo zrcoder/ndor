@@ -18,8 +18,16 @@ tasks:
     dir: cmd/gui
     cmds:
       - go tool mygo dev
+  turtle:
+    dir: cmd/turtle
+    cmds:
+      - go tool mygo dev
   build:
     dir: cmd/gui
+    cmds:
+      - go tool mygo build
+  build-turtle:
+    dir: cmd/turtle
     cmds:
       - go tool mygo build
   build-web:
