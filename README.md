@@ -1,5 +1,7 @@
 # ndor
 
+[![Listed on Awesome MyGo](https://awesomemygo.dev/badge.svg)](https://awesomemygo.dev/apps/ndor)
+
 `ndor` is an app with which you can draw by codes, for kids and coders~
 
 ![ndor](main.png)
