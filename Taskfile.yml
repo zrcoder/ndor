@@ -22,6 +22,10 @@ tasks:
     dir: cmd/gui
     cmds:
       - go tool mygo build
+  build-web:
+    dir: cmd/gui
+    cmds:
+      - go tool mygo build -platform web
   vet:
     cmds:
       - go tool mygo vet ./cmd/gui
