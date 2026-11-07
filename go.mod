@@ -3,7 +3,7 @@ module github.com/zrcoder/ndor
 go 1.27.3
 
 require (
-	github.com/egoist/mygo v0.7.3
+	github.com/egoist/mygo v0.8.3
 	github.com/fogleman/gg v1.3.0
 	github.com/goplus/ixgo v1.2.6
 	github.com/yuin/goldmark v1.8.7
@@ -11,7 +11,7 @@ require (
 )
 
 require (
-	github.com/ebitengine/purego v0.11.2 // indirect
+	github.com/ebitengine/purego v0.11.3 // indirect
 	github.com/go-text/typesetting v0.3.5 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/goplus/gogen v1.24.7 // indirect

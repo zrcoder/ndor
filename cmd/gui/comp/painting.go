@@ -62,7 +62,7 @@ func painting(c *ui.Context, left, right *ui.Bitmap) {
 	ui.Row(c.Key("painting")).Absolute().Top(0).Bottom(0).Left(0).Right(0).Center().PassThrough().Children(func() {
 		ui.Row(c).Radius(t.Space(2.5)).
 			Background(ui.RGBA(255, 255, 255, 0.6)).Border(1, t.Border).
-			Shadow(0, 10, 30, 0, ui.RGBA(0, 0, 0, 0.3)).Children(func() {
+			Shadow(0, 10, 30, 0, ui.RGBA(0, 0, 0, 0.3)).Label("Painting").Children(func() {
 			if left != nil {
 				ui.Image(c, left).MaxHeightPercent(31)
 			}
@@ -70,7 +70,7 @@ func painting(c *ui.Context, left, right *ui.Bitmap) {
 			loading.Blocks(c, loading.Options{
 				Size:  80,
 				Color: t.Accent,
-			}).Label("Painting")
+			}).Key("painting-spinner")
 
 			if right != nil {
 				ui.Image(c, right).MaxHeightPercent(28)
