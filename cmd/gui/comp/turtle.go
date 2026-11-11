@@ -20,12 +20,9 @@ const (
 func Turtle(c *ui.Context, plan *pkg.TurtlePlan, runId uint64) {
 	t := c.Theme()
 	n := len(plan.Steps)
-	total := time.Duration(n) * turtleStepDur
-	if total > turtleMaxTotal {
-		total = turtleMaxTotal
-	}
+	total := min(time.Duration(n)*turtleStepDur, turtleMaxTotal)
 
-	box := ui.Box(c).Key("turtle").Fill()
+	box := ui.Box(c.Key("turtle")).Fill()
 	started := ui.Local(box, runId, func() time.Time { return time.Now() })
 
 	box.Draw(func(p *ui.Painter, r ui.Rect) {
@@ -44,10 +41,7 @@ func Turtle(c *ui.Context, plan *pkg.TurtlePlan, runId uint64) {
 				if prog > 1 {
 					prog = 1
 				}
-				iEnd := int(prog * float64(n))
-				if iEnd > n {
-					iEnd = n
-				}
+				iEnd := min(int(prog*float64(n)), n)
 				frac := prog*float64(n) - float64(iEnd)
 				if frac > 1 {
 					frac = 1
