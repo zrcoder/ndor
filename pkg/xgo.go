@@ -40,16 +40,6 @@ const (
 		pop     = Pop
 		push    = Push
 		clear   = Clear
-		turtle  = Turtle
-		forward = Forward
-		back    = Back
-		left    = Left
-		right   = Right
-		angle   = Angle
-		jump    = Jump
-		penup   = PenUp
-		pendown = PenDown
-		home    = Home
 	)
 	`
 )

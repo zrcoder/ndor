@@ -31,7 +31,6 @@ var (
 		"rainbow",
 		"spiral",
 		"star",
-		"turtle",
 	}
 )
 
