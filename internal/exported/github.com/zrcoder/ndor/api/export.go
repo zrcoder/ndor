@@ -16,7 +16,6 @@ func init() {
 		Name: "api",
 		Path: "github.com/zrcoder/ndor/api",
 		Deps: map[string]string{
-			"github.com/fogleman/gg":           "gg",
 			"github.com/zrcoder/ndor/internal": "internal",
 		},
 		Interfaces: map[string]reflect.Type{},

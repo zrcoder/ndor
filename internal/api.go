@@ -1,9 +1,5 @@
 package internal
 
-import (
-	"github.com/fogleman/gg"
-)
-
 type LineError struct {
 	Number int
 	Flag   string
@@ -17,7 +13,7 @@ const (
 )
 
 var (
-	GlobalCtx *gg.Context
+	GlobalCtx *Context
 	GlobalErr *LineError
 
 	ErrEmptyInput = &LineError{
@@ -28,5 +24,5 @@ var (
 
 func Init(width, height int) {
 	GlobalErr = nil
-	GlobalCtx = gg.NewContext(width, height)
+	GlobalCtx = NewContext(width, height)
 }

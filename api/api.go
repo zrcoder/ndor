@@ -2,8 +2,6 @@ package api
 
 import (
 	"github.com/zrcoder/ndor/internal"
-
-	"github.com/fogleman/gg"
 )
 
 const (
@@ -11,7 +9,7 @@ const (
 )
 
 func Context(w, h int) {
-	internal.GlobalCtx = gg.NewContext(w, h)
+	internal.GlobalCtx = internal.NewContext(w, h)
 }
 
 func Color(args ...any) {
@@ -64,14 +62,14 @@ func Text(x, y float64, s string) {
 }
 
 func Arc(x, y, r, angle1, angle2 float64) {
-	angle1 = gg.Radians(angle1)
-	angle2 = gg.Radians(angle2)
+	angle1 = internal.Radians(angle1)
+	angle2 = internal.Radians(angle2)
 	internal.GlobalCtx.DrawArc(x, y, r, angle1, angle2)
 }
 
 func Earc(x, y, rx, ry, angle1, angle2 float64) {
-	angle1 = gg.Radians(angle1)
-	angle2 = gg.Radians(angle2)
+	angle1 = internal.Radians(angle1)
+	angle2 = internal.Radians(angle2)
 	internal.GlobalCtx.DrawEllipticalArc(x, y, rx, ry, angle1, angle2)
 }
 
@@ -80,7 +78,7 @@ func Polygon(n int, x, y, r float64, degree ...float64) {
 	if len(degree) > 0 {
 		deg = degree[0]
 	}
-	internal.GlobalCtx.DrawRegularPolygon(n, x, y, r, gg.Radians(deg))
+	internal.GlobalCtx.DrawRegularPolygon(n, x, y, r, internal.Radians(deg))
 }
 
 func Translate(x, y float64) {
@@ -92,7 +90,7 @@ func Scale(x, y float64) {
 }
 
 func Rotate(x, y, angle float64) {
-	internal.GlobalCtx.RotateAbout(gg.Radians(angle), x, y)
+	internal.GlobalCtx.RotateAbout(internal.Radians(angle), x, y)
 }
 
 func Bezier(x1, y1, x2, y2 float64, p ...float64) {
