@@ -28,8 +28,7 @@ var (
 )
 
 var (
-	forward = Forward
-	backward = Backward
+	step = Step
 	left = Left
 	right = Right
 	color = PenColor

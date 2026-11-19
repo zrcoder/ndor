@@ -23,14 +23,10 @@ type cmd struct {
 // CmdQueue holds all commands produced by the user's code, in order.
 var CmdQueue []cmd
 
-// Forward moves the turtle forward by d (user units, 1 = 1 grid cell).
-func Forward(d float64) {
+// Step moves the turtle d steps (user units, 1 = 1 grid cell);
+// a negative d moves it backward.
+func Step(d float64) {
 	CmdQueue = append(CmdQueue, cmd{Kind: "step", Val: d})
-}
-
-// Backward moves the turtle backward by d.
-func Backward(d float64) {
-	CmdQueue = append(CmdQueue, cmd{Kind: "step", Val: -d})
 }
 
 // Left turns the turtle left by d degrees.

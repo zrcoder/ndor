@@ -11,7 +11,7 @@ var examples = []example{
 		name: "Star（五角星）",
 		code: `
 for range 5 {
-    forward 10
+    step 10
     right 144
 }`,
 	},
@@ -22,7 +22,7 @@ func branch(size, ratio, angle float64, iterations int) {
     color "black"
     width size
     pen "down"
-    forward size
+    step size
     pen "up"
 
     if iterations > 0 {
@@ -36,7 +36,7 @@ func branch(size, ratio, angle float64, iterations int) {
     }
 
     left 180
-    forward size
+    step size
     left 180
 }
 
@@ -47,13 +47,13 @@ branch 5, 0.7, 30, 5
 	{
 		name: "Colored squares（彩色正方形）",
 		code: `func squar() {
-forward 5
+step 5
 right 90
-forward 5
+step 5
 right 90
-forward 5
+step 5
 right 90
-forward 5
+step 5
 }
 
 colors := ["red", "green", "blue"]
