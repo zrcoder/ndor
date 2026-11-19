@@ -14,3 +14,4 @@ cmd/web/examples/*.png
 internal/goldmark/testdata/*.html
 /gui
 .mygo
+.agents

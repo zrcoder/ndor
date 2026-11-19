@@ -37,5 +37,6 @@ tasks:
       - go vet ./...
   fix:
     cmds:
+      - go tool mygo install-skills
       - go tool mygo migrate-ui -write ./cmd/gui
       - go fix ./...
