@@ -11,7 +11,6 @@ type ToolbarConfig struct {
 	CopyIcon  *ui.SVG
 	CheckIcon *ui.SVG
 	SaveIcon  *ui.SVG
-	CloseIcon *ui.SVG
 
 	GetCode func() string
 	OnCopy  func(string)

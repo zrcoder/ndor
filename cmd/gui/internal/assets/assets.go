@@ -7,13 +7,17 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
-// Bitmap decodes an embedded PNG from the resources directory.
-func Bitmap(fsys fs.FS, name string) *ui.Bitmap {
-	data, err := fs.ReadFile(fsys, "resources/"+name)
+func read(fsys fs.FS, name string) []byte {
+	data, err := fs.ReadFile(fsys, name)
 	if err != nil {
 		panic(err)
 	}
-	b, err := ui.DecodeBitmap(data)
+	return data
+}
+
+// Bitmap decodes an embedded PNG from the resources directory.
+func Bitmap(fsys fs.FS, name string) *ui.Bitmap {
+	b, err := ui.DecodeBitmap(read(fsys, "resources/"+name))
 	if err != nil {
 		panic(err)
 	}
@@ -22,20 +26,12 @@ func Bitmap(fsys fs.FS, name string) *ui.Bitmap {
 
 // SVG parses an embedded icon from resources/icons.
 func SVG(fsys fs.FS, name string) *ui.SVG {
-	data, err := fs.ReadFile(fsys, "resources/icons/"+name)
-	if err != nil {
-		panic(err)
-	}
-	return ui.MustParseSVG(data)
+	return ui.MustParseSVG(read(fsys, "resources/icons/"+name))
 }
 
 // Sprite rasterizes an embedded SVG from the resources directory.
 func Sprite(fsys fs.FS, name string, size int) *ui.Bitmap {
-	data, err := fs.ReadFile(fsys, "resources/"+name)
-	if err != nil {
-		panic(err)
-	}
-	return ui.NewBitmap(ui.MustParseSVG(data).Image(size, size, nil))
+	return ui.NewBitmap(ui.MustParseSVG(read(fsys, "resources/"+name)).Image(size, size, nil))
 }
 
 // DocLoader returns a wiki loader for a module: "ndor" or "turtle".

@@ -124,10 +124,5 @@ func (a *App) View(c *ui.Context) {
 		})
 	})
 
-	ui.Column(c.Key("help-float")).Width(64).Height(72).Bottom(0).Left(4).Absolute().Children(func() {
-		comp.ImageButtonSimple(c, a.helpImg, func() { a.help.Open() })
-	})
-	ui.Column(c.Key("run-float")).Width(64).Height(72).Bottom(0).Right(0).Absolute().Children(func() {
-		comp.ImageButtonSimple(c, a.runImg, func() { a.runXGoCode(c) })
-	})
+	comp.FloatButtons(c, a.helpImg, a.runImg, a.help.Open, func() { a.runXGoCode(c) })
 }

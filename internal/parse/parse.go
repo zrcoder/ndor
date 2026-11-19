@@ -2,7 +2,6 @@
 package parse
 
 import (
-	"errors"
 	icolor "image/color"
 	"strconv"
 
@@ -22,83 +21,53 @@ func Color(args ...any) (icolor.RGBA, bool) {
 		}
 		return hexColor(s)
 	case 3, 4:
-		floats, err := Floats(args)
-		if err != nil {
-			return icolor.RGBA{}, false
+		values := [4]float64{0, 0, 0, 0xff}
+		for i, arg := range args {
+			f, ok := toFloat(arg)
+			if !ok {
+				return icolor.RGBA{}, false
+			}
+			values[i] = f
 		}
-		var a uint8 = 0xff
-		if len(args) == 4 {
-			a = uint8(floats[3])
-		}
-		return icolor.RGBA{
-			R: uint8(floats[0]),
-			G: uint8(floats[1]),
-			B: uint8(floats[2]),
-			A: a,
-		}, true
+		return icolor.RGBA{R: uint8(values[0]), G: uint8(values[1]), B: uint8(values[2]), A: uint8(values[3])}, true
 	}
 	return icolor.RGBA{}, false
-}
-
-// Floats converts each argument to a float64.
-func Floats(pars []any) ([]float64, error) {
-	res := make([]float64, len(pars))
-	for i, s := range pars {
-		n, err := parseFloat(s)
-		if err != nil {
-			return nil, err
-		}
-		res[i] = n
-	}
-	return res, nil
 }
 
 func hexColor(s string) (icolor.RGBA, bool) {
 	if s == "" || s[0] != '#' {
 		return icolor.RGBA{}, false
 	}
-	res := true
-	hexToByte := func(b byte) byte {
-		switch {
-		case b >= '0' && b <= '9':
-			return b - '0'
-		case b >= 'a' && b <= 'f':
-			return b - 'a' + 10
-		case b >= 'A' && b <= 'F':
-			return b - 'A' + 10
-		default:
-			res = false
-			return 0
-		}
-	}
-	c := icolor.RGBA{A: 0xff}
 	switch len(s) {
 	case 7:
-		c.R = hexToByte(s[1])<<4 + hexToByte(s[2])
-		c.G = hexToByte(s[3])<<4 + hexToByte(s[4])
-		c.B = hexToByte(s[5])<<4 + hexToByte(s[6])
+		v, err := strconv.ParseUint(s[1:], 16, 32)
+		if err != nil {
+			return icolor.RGBA{}, false
+		}
+		return icolor.RGBA{R: uint8(v >> 16), G: uint8(v >> 8), B: uint8(v), A: 0xff}, true
 	case 4:
-		c.R = hexToByte(s[1]) * 17
-		c.G = hexToByte(s[2]) * 17
-		c.B = hexToByte(s[3]) * 17
-	default:
-		res = false
+		v, err := strconv.ParseUint(s[1:], 16, 16)
+		if err != nil {
+			return icolor.RGBA{}, false
+		}
+		return icolor.RGBA{R: uint8(v>>8&0xf) * 17, G: uint8(v>>4&0xf) * 17, B: uint8(v&0xf) * 17, A: 0xff}, true
 	}
-	return c, res
+	return icolor.RGBA{}, false
 }
 
-func parseFloat(param any) (float64, error) {
+func toFloat(param any) (float64, bool) {
 	switch v := param.(type) {
 	case string:
-		return strconv.ParseFloat(v, 64)
+		f, err := strconv.ParseFloat(v, 64)
+		return f, err == nil
 	case int:
-		return float64(v), nil
+		return float64(v), true
 	case uint:
-		return float64(v), nil
+		return float64(v), true
 	case float32:
-		return float64(v), nil
+		return float64(v), true
 	case float64:
-		return v, nil
+		return v, true
 	}
-	return 0, errors.New("invalid parameter")
+	return 0, false
 }

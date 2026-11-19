@@ -26,7 +26,10 @@ func main() {
 	outFile := ""
 	if strings.HasSuffix(inFile, ".md") {
 		outFile = getOutfile(inFile, ".html")
-		data, err = md2html(data)
+		md := goldmark.New(goldmark.WithExtensions(&nmd.Extender{}))
+		buf := new(bytes.Buffer)
+		err = md.Convert(data, buf)
+		data = buf.Bytes()
 	} else {
 		outFile = getOutfile(inFile, ".png")
 		data, err = genPng(data)
@@ -38,18 +41,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func md2html(data []byte) ([]byte, error) {
-	md := goldmark.New(
-		goldmark.WithExtensions(&nmd.Extender{}),
-	)
-
-	buf := new(bytes.Buffer)
-	if err := md.Convert(data, buf); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
 }
 
 func genPng(data []byte) ([]byte, error) {

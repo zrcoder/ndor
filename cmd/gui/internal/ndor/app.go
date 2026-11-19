@@ -57,7 +57,6 @@ fill
 		CopyIcon:  assets.SVG(fsys, "copy.svg"),
 		CheckIcon: assets.SVG(fsys, "check.svg"),
 		SaveIcon:  assets.SVG(fsys, "save.svg"),
-		CloseIcon: assets.SVG(fsys, "close.svg"),
 		GetCode:   func() string { return a.editor.Buffer.String() },
 		OnCopy:    func(string) {},
 		OnSave:    func() { a.saveImage(nil) },
@@ -91,17 +90,7 @@ func (a *App) View(c *ui.Context) {
 		a.codeArea(c)
 	})
 
-	ui.Column(c.Key("help-float")).Width(64).Height(72).Bottom(0).Left(4).Absolute().Children(func() {
-		comp.ImageButtonSimple(c, a.helpBtnImg, func() {
-			a.help.Open()
-		})
-	})
-
-	ui.Column(c.Key("run-float")).Width(64).Height(72).Bottom(0).Right(0).Absolute().Children(func() {
-		comp.ImageButtonSimple(c, a.runBtnImg, func() {
-			a.runCode(c)
-		})
-	})
+	comp.FloatButtons(c, a.helpBtnImg, a.runBtnImg, a.help.Open, func() { a.runCode(c) })
 }
 
 func (a *App) pictureArea(c *ui.Context, painting bool) {
@@ -114,9 +103,7 @@ func (a *App) pictureArea(c *ui.Context, painting bool) {
 		}
 		ui.Row(c).Fill().Height(40).Children(func() {
 			ui.Spacer(c)
-			if a.toolbar != nil {
-				a.toolbar.SaveButton(c)
-			}
+			a.toolbar.SaveButton(c)
 		})
 		ui.Image(c, a.resultImg).MaxWidthPercent(100).MaxHeightPercent(100)
 	})
@@ -142,9 +129,7 @@ func (a *App) saveImage(_ *ui.Context) {
 
 func (a *App) codeArea(c *ui.Context) {
 	ui.Column(c).Fill().Children(func() {
-		if a.toolbar != nil {
-			a.toolbar.View(c)
-		}
+		a.toolbar.View(c)
 		editor.View(c, a.editor).Fill()
 	})
 }

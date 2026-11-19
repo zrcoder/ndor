@@ -7,9 +7,15 @@ func (p *Program) Draw(painter *ui.Painter, r ui.Rect, gopher *ui.Bitmap) {
 	cx, cy := r.X+r.W/2, r.Y+r.H/2
 
 	// Grid lines darken with distance from the origin; the axes are darkest.
-	gridLight := ui.RGB(240, 240, 240)
-	gridMid := ui.RGB(220, 220, 220)
-	gridCenter := ui.RGB(150, 150, 150)
+	gridColor := func(k int) ui.Color {
+		switch {
+		case k == 0:
+			return ui.RGB(150, 150, 150)
+		case k%5 == 0:
+			return ui.RGB(220, 220, 220)
+		}
+		return ui.RGB(240, 240, 240)
+	}
 
 	strokeGrid := func(x0, y0, x1, y1 float32, col ui.Color) {
 		ln := ui.Path{}
@@ -17,35 +23,24 @@ func (p *Program) Draw(painter *ui.Painter, r ui.Rect, gopher *ui.Bitmap) {
 		painter.StrokePath(&ln, 1, col)
 	}
 
-	nx := int(cx / cell)
-	for k := -nx; k <= nx; k++ {
-		x := cx + float32(k)*cell
-		if x < r.X || x > r.X+r.W {
-			continue
+	drawGrid := func(vertical bool, n int) {
+		for k := -n; k <= n; k++ {
+			col := gridColor(k)
+			if vertical {
+				x := cx + float32(k)*cell
+				if x >= r.X && x <= r.X+r.W {
+					strokeGrid(x, r.Y, x, r.Y+r.H, col)
+				}
+				continue
+			}
+			y := cy + float32(k)*cell
+			if y >= r.Y && y <= r.Y+r.H {
+				strokeGrid(r.X, y, r.X+r.W, y, col)
+			}
 		}
-		col := gridLight
-		if k == 0 {
-			col = gridCenter
-		} else if k%5 == 0 {
-			col = gridMid
-		}
-		strokeGrid(x, r.Y, x, r.Y+r.H, col)
 	}
-
-	ny := int(cy / cell)
-	for k := -ny; k <= ny; k++ {
-		y := cy + float32(k)*cell
-		if y < r.Y || y > r.Y+r.H {
-			continue
-		}
-		col := gridLight
-		if k == 0 {
-			col = gridCenter
-		} else if k%5 == 0 {
-			col = gridMid
-		}
-		strokeGrid(r.X, y, r.X+r.W, y, col)
-	}
+	drawGrid(true, int(cx/cell))
+	drawGrid(false, int(cy/cell))
 
 	sx := func(q pt) float32 { return cx + q.X }
 	sy := func(q pt) float32 { return cy - q.Y }

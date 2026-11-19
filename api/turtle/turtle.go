@@ -15,21 +15,19 @@ type cmd struct {
 // CmdQueue holds all commands produced by the user's code, in order.
 var CmdQueue []cmd
 
+func push(kind string, val float64) {
+	CmdQueue = append(CmdQueue, cmd{Kind: kind, Val: val})
+}
+
 // Step moves the turtle d steps (user units, 1 = 1 grid cell);
 // a negative d moves it backward.
-func Step(d float64) {
-	CmdQueue = append(CmdQueue, cmd{Kind: "step", Val: d})
-}
+func Step(d float64) { push("step", d) }
 
 // Left turns the turtle left by d degrees.
-func Left(d float64) {
-	CmdQueue = append(CmdQueue, cmd{Kind: "turn", Val: d})
-}
+func Left(d float64) { push("turn", d) }
 
 // Right turns the turtle right by d degrees.
-func Right(d float64) {
-	CmdQueue = append(CmdQueue, cmd{Kind: "turn", Val: -d})
-}
+func Right(d float64) { push("turn", -d) }
 
 // PenColor sets the pen color. Accepts a color name string (e.g. "red", "#ff0000")
 // or 3-4 numeric args (r, g, b[, a]).
@@ -42,9 +40,7 @@ func PenColor(args ...any) {
 }
 
 // PenWidth sets the pen width.
-func PenWidth(w float64) {
-	CmdQueue = append(CmdQueue, cmd{Kind: "setWidth", Val: w})
-}
+func PenWidth(w float64) { push("setWidth", w) }
 
 // Clear clears the drawing and resets the turtle.
 func Clear() {
@@ -53,15 +49,13 @@ func Clear() {
 }
 
 // Home resets the turtle position and angle without clearing the drawing.
-func Home() {
-	CmdQueue = append(CmdQueue, cmd{Kind: "home"})
-}
+func Home() { push("home", 0) }
 
 // Pen lifts or lowers the pen. Accepts "up" or "down" (default).
 func Pen(args ...string) {
 	if len(args) > 0 && args[0] == "up" {
-		CmdQueue = append(CmdQueue, cmd{Kind: "penUp"})
+		push("penUp", 0)
 		return
 	}
-	CmdQueue = append(CmdQueue, cmd{Kind: "penDown"})
+	push("penDown", 0)
 }

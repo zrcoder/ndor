@@ -61,18 +61,16 @@ func (t *state) clear() {
 
 func (t *state) setColor(r, g, b uint8) {
 	t.penColor = [3]uint8{r, g, b}
-	if t.cur != nil && len(t.cur.pts) > 1 {
-		// Split the stroke so the new color does not recolor old points.
-		t.segments = append(t.segments, *t.cur)
-		t.cur = nil
-	}
-	if t.down && t.cur == nil {
-		t.penDown()
-	}
+	t.splitStroke()
 }
 
 func (t *state) setWidth(w float32) {
 	t.penWidth = w
+	t.splitStroke()
+}
+
+// splitStroke ends the current stroke so later changes keep old points intact.
+func (t *state) splitStroke() {
 	if t.cur != nil && len(t.cur.pts) > 1 {
 		t.segments = append(t.segments, *t.cur)
 		t.cur = nil

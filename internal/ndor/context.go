@@ -17,23 +17,6 @@ type matrix struct {
 	XX, YX, XY, YY, X0, Y0 float64
 }
 
-func identity() matrix {
-	return matrix{XX: 1, YY: 1}
-}
-
-func translateMatrix(x, y float64) matrix {
-	return matrix{XX: 1, YY: 1, X0: x, Y0: y}
-}
-
-func scaleMatrix(x, y float64) matrix {
-	return matrix{XX: x, YY: y}
-}
-
-func rotateMatrix(angle float64) matrix {
-	c, s := math.Cos(angle), math.Sin(angle)
-	return matrix{XX: c, YX: s, XY: -s, YY: c}
-}
-
 func (a matrix) multiply(b matrix) matrix {
 	return matrix{
 		XX: a.XX*b.XX + a.YX*b.XY,
@@ -146,7 +129,7 @@ func NewContext(width, height int) *Context {
 	return &Context{
 		width:       width,
 		height:      height,
-		matrix:      identity(),
+		matrix:      matrix{XX: 1, YY: 1},
 		fillColor:   ui.RGB(255, 255, 255),
 		strokeColor: ui.RGB(0, 0, 0),
 		textColor:   ui.Transparent,
@@ -164,7 +147,7 @@ func (c *Context) newSubPath() {
 	c.hasCurrent = false
 }
 
-func (c *Context) moveTo(x, y float64) {
+func (c *Context) MoveTo(x, y float64) {
 	x, y = c.matrix.transformPoint(x, y)
 	c.path.MoveTo(float32(x), float32(y))
 	c.startX, c.startY = x, y
@@ -172,9 +155,9 @@ func (c *Context) moveTo(x, y float64) {
 	c.hasCurrent = true
 }
 
-func (c *Context) lineTo(x, y float64) {
+func (c *Context) LineTo(x, y float64) {
 	if !c.hasCurrent {
-		c.moveTo(x, y)
+		c.MoveTo(x, y)
 		return
 	}
 	x, y = c.matrix.transformPoint(x, y)
@@ -182,9 +165,9 @@ func (c *Context) lineTo(x, y float64) {
 	c.curX, c.curY = x, y
 }
 
-func (c *Context) quadTo(x1, y1, x2, y2 float64) {
+func (c *Context) QuadraticTo(x1, y1, x2, y2 float64) {
 	if !c.hasCurrent {
-		c.moveTo(x1, y1)
+		c.MoveTo(x1, y1)
 	}
 	x1, y1 = c.matrix.transformPoint(x1, y1)
 	x2, y2 = c.matrix.transformPoint(x2, y2)
@@ -192,9 +175,9 @@ func (c *Context) quadTo(x1, y1, x2, y2 float64) {
 	c.curX, c.curY = x2, y2
 }
 
-func (c *Context) cubicTo(x1, y1, x2, y2, x3, y3 float64) {
+func (c *Context) CubicTo(x1, y1, x2, y2, x3, y3 float64) {
 	if !c.hasCurrent {
-		c.moveTo(x1, y1)
+		c.MoveTo(x1, y1)
 	}
 	x1, y1 = c.matrix.transformPoint(x1, y1)
 	x2, y2 = c.matrix.transformPoint(x2, y2)
@@ -216,18 +199,12 @@ func (c *Context) clearPath() {
 	c.hasCurrent = false
 }
 
-func (c *Context) MoveTo(x, y float64) { c.moveTo(x, y) }
-func (c *Context) LineTo(x, y float64) { c.lineTo(x, y) }
-
-func (c *Context) CubicTo(x1, y1, x2, y2, x3, y3 float64) { c.cubicTo(x1, y1, x2, y2, x3, y3) }
-func (c *Context) QuadraticTo(x1, y1, x2, y2 float64)     { c.quadTo(x1, y1, x2, y2) }
-
 func (c *Context) DrawRectangle(x, y, w, h float64) {
 	c.newSubPath()
-	c.moveTo(x, y)
-	c.lineTo(x+w, y)
-	c.lineTo(x+w, y+h)
-	c.lineTo(x, y+h)
+	c.MoveTo(x, y)
+	c.LineTo(x+w, y)
+	c.LineTo(x+w, y+h)
+	c.LineTo(x, y+h)
 	c.closePath()
 }
 
@@ -235,15 +212,15 @@ func (c *Context) DrawRoundedRectangle(x, y, w, h, r float64) {
 	x0, x1, x2, x3 := x, x+r, x+w-r, x+w
 	y0, y1, y2, y3 := y, y+r, y+h-r, y+h
 	c.newSubPath()
-	c.moveTo(x1, y0)
-	c.lineTo(x2, y0)
-	c.drawArc(x2, y1, r, Radians(270), Radians(360))
-	c.lineTo(x3, y2)
-	c.drawArc(x2, y2, r, Radians(0), Radians(90))
-	c.lineTo(x1, y3)
-	c.drawArc(x1, y2, r, Radians(90), Radians(180))
-	c.lineTo(x0, y1)
-	c.drawArc(x1, y1, r, Radians(180), Radians(270))
+	c.MoveTo(x1, y0)
+	c.LineTo(x2, y0)
+	c.DrawArc(x2, y1, r, Radians(270), Radians(360))
+	c.LineTo(x3, y2)
+	c.DrawArc(x2, y2, r, Radians(0), Radians(90))
+	c.LineTo(x1, y3)
+	c.DrawArc(x1, y2, r, Radians(90), Radians(180))
+	c.LineTo(x0, y1)
+	c.DrawArc(x1, y1, r, Radians(180), Radians(270))
 	c.closePath()
 }
 
@@ -264,16 +241,16 @@ func (c *Context) DrawEllipticalArc(x, y, rx, ry, angle1, angle2 float64) {
 		cy := 2*y1 - y0/2 - y2/2
 		if i == 0 {
 			if c.hasCurrent {
-				c.lineTo(x0, y0)
+				c.LineTo(x0, y0)
 			} else {
-				c.moveTo(x0, y0)
+				c.MoveTo(x0, y0)
 			}
 		}
-		c.quadTo(cx, cy, x2, y2)
+		c.QuadraticTo(cx, cy, x2, y2)
 	}
 }
 
-func (c *Context) drawArc(x, y, r, angle1, angle2 float64) {
+func (c *Context) DrawArc(x, y, r, angle1, angle2 float64) {
 	c.DrawEllipticalArc(x, y, r, r, angle1, angle2)
 }
 
@@ -282,8 +259,6 @@ func (c *Context) DrawEllipse(x, y, rx, ry float64) {
 	c.DrawEllipticalArc(x, y, rx, ry, 0, 2*math.Pi)
 	c.closePath()
 }
-
-func (c *Context) DrawArc(x, y, r, angle1, angle2 float64) { c.drawArc(x, y, r, angle1, angle2) }
 
 func (c *Context) DrawCircle(x, y, r float64) {
 	c.newSubPath()
@@ -300,7 +275,7 @@ func (c *Context) DrawRegularPolygon(n int, x, y, r, rotation float64) {
 	c.newSubPath()
 	for i := range n {
 		a := rotation + angle*float64(i)
-		c.lineTo(x+r*math.Cos(a), y+r*math.Sin(a))
+		c.LineTo(x+r*math.Cos(a), y+r*math.Sin(a))
 	}
 	c.closePath()
 }
@@ -335,11 +310,15 @@ func (c *Context) Stroke() {
 }
 
 func (c *Context) StrokePreserve() {
+	dashes := make([]float32, len(c.dashes))
+	for i, v := range c.dashes {
+		dashes[i] = float32(v)
+	}
 	c.ops = append(c.ops, strokeOp{
 		path:   c.path,
 		color:  c.strokeColor,
 		width:  float32(c.lineWidth),
-		dashes: toFloat32s(c.dashes),
+		dashes: dashes,
 	})
 }
 
@@ -378,16 +357,17 @@ func (c *Context) Pop() {
 }
 
 func (c *Context) Translate(x, y float64) {
-	c.matrix = translateMatrix(x, y).multiply(c.matrix)
+	c.matrix = matrix{XX: 1, YY: 1, X0: x, Y0: y}.multiply(c.matrix)
 }
 
 func (c *Context) Scale(x, y float64) {
-	c.matrix = scaleMatrix(x, y).multiply(c.matrix)
+	c.matrix = matrix{XX: x, YY: y}.multiply(c.matrix)
 }
 
 func (c *Context) RotateAbout(angle, x, y float64) {
 	c.Translate(x, y)
-	c.matrix = rotateMatrix(angle).multiply(c.matrix)
+	cos, sin := math.Cos(angle), math.Sin(angle)
+	c.matrix = matrix{XX: cos, YX: sin, XY: -sin, YY: cos}.multiply(c.matrix)
 	c.Translate(-x, -y)
 }
 
@@ -448,15 +428,4 @@ func replay(p *ui.Painter, ops []drawOp, clips []ui.Path) {
 		p.ClipPath(&path, func() { wrap(k + 1) })
 	}
 	wrap(0)
-}
-
-func toFloat32s(vs []float64) []float32 {
-	if len(vs) == 0 {
-		return nil
-	}
-	out := make([]float32, len(vs))
-	for i, v := range vs {
-		out[i] = float32(v)
-	}
-	return out
 }
