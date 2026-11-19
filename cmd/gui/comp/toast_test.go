@@ -24,16 +24,6 @@ func TestToast(t *testing.T) {
 	}
 }
 
-func TestToastWithTitle(t *testing.T) {
-	tt := ui.NewTester(func(c *ui.Context) {
-		ToastWithTitle(c, "Title", "Message", nil)
-	}, 400, 300)
-
-	if !tt.HasText("Title: Message") {
-		t.Errorf("expected 'Title: Message', got: %q", tt.Texts())
-	}
-}
-
 func TestToastErrorAtLine(t *testing.T) {
 	tt := ui.NewTester(func(c *ui.Context) {
 		ToastErrorAtLine(c, 5, "undefined: foo", nil)

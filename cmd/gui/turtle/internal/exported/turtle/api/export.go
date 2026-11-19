@@ -15,9 +15,7 @@ func init() {
 		Name: "api",
 		Path: "turtle/api",
 		Deps: map[string]string{
-			"errors":                        "errors",
-			"golang.org/x/image/colornames": "colornames",
-			"image/color":                   "color",
+			"github.com/zrcoder/ndor/internal/parse": "parse",
 		},
 		Interfaces: map[string]reflect.Type{},
 		NamedTypes: map[string]reflect.Type{},
