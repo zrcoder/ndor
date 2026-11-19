@@ -10,12 +10,10 @@ import (
 // PaintingDuration is how long the painting overlay shows.
 const PaintingDuration = 1200 * time.Millisecond
 
-// paintingToast names the toast that shows the painting overlay, so the
-// viewport can tell it apart from other toasts.
+// paintingToast identifies the painting overlay among toasts.
 const paintingToast = "painting"
 
-// ShowPainting shows the painting overlay. It is a toast, so its own
-// lifetime decides when the overlay goes away.
+// ShowPainting shows the painting overlay as a timed toast.
 func ShowPainting(c *ui.Context) {
 	if c.Preferences().ReduceMotion {
 		return
@@ -27,10 +25,8 @@ func ShowPainting(c *ui.Context) {
 	})
 }
 
-// PaintingViewport draws the painting toast centered over the window, and
-// reports whether it shows, so the caller can keep the result hidden until
-// the painting is over. Call it once in the view, where the window's toasts
-// show.
+// PaintingViewport draws the painting toast and reports whether it shows,
+// so the caller can hide the result until the animation is over.
 func PaintingViewport(c *ui.Context, left, right *ui.Bitmap) bool {
 	showing := false
 	ui.ToastViewportBase(c, func(viewport ui.Element, toasts []ui.Toast) {
@@ -41,7 +37,6 @@ func PaintingViewport(c *ui.Context, left, right *ui.Bitmap) bool {
 				painting(c, left, right)
 				continue
 			}
-			// Other toasts keep a plain look at the bottom.
 			toast := ui.ToastBase(c, t)
 			toast.Root.Row().Gap(12).Padding(10, 14).Radius(8).
 				Background(c.Theme().Surface).Children(func() {

@@ -8,9 +8,6 @@ var paintImgData []byte
 //go:embed resources/teacher.png
 var teacherImgData []byte
 
-// //go:embed resources/gopher.png
-// var gopherImgData []byte
-
 //go:embed resources/code.png
 var codeImgData []byte
 

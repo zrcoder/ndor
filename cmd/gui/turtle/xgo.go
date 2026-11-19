@@ -40,9 +40,7 @@ var (
 `
 )
 
-// runCode compiles and runs the user's xgo code through ixgo.
-// All turtle commands are appended to api.CmdQueue during execution.
-// After execution, the caller drains CmdQueue frame by frame.
+// runCode runs xgo code; turtle commands collect in api.CmdQueue.
 func runCode(code string) error {
 	code = preCodes + code
 	_, err := ixgo.RunFile(xgoFileName, code, nil, 0)

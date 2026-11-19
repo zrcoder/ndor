@@ -22,17 +22,14 @@ func TestOverlayPanel(t *testing.T) {
 		OverlayPanel(c, cfg, []string{"Item 1", "Item 2"})
 	}, 400, 300)
 
-	// Verify panel title is shown
 	if !tt.HasText("Test Panel") {
 		t.Errorf("expected panel title, got: %q", tt.Texts())
 	}
 
-	// Verify items are shown
 	if !tt.HasText("Item 1") || !tt.HasText("Item 2") {
 		t.Errorf("expected items, got: %q", tt.Texts())
 	}
 
-	// Click on an item
 	if err := tt.Click("Item 1"); err != nil {
 		t.Fatal(err)
 	}
@@ -55,7 +52,6 @@ func TestOverlayPanelCloseOnClickOutside(t *testing.T) {
 		OverlayPanel(c, opt, []string{"Item"})
 	}, 400, 300)
 
-	// Click outside the panel (at top-left corner where there's no panel)
 	tt.ClickAt(5, 5)
 	if !closed {
 		t.Error("expected panel to close on click outside")

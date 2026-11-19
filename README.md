@@ -6,11 +6,18 @@
 
 ![ndor](main.png)
 
+It contains two drawing modules, both driven by code in [XGo](https://xgo.dev) or Go:
+
+- **ndor** — free drawing with a canvas and a shape/path API (`circle`, `rectangle`, `bezier`, `fill`, `stroke`, colors, text, transforms...).
+- **turtle** — turtle graphics on a grid, where a turtle moves with `step`, `left`/`right`, `pen`, `color` and `width`, and the drawing is animated stroke by stroke.
+
 ## gui
 
-A native GUI version built with [mygo](https://github.com/egoist/mygo).
+A native GUI version built with [mygo](https://github.com/egoist/mygo), with one window per module. Switch between `ndor` and `turtle` from the **Window** menu.
 
 ## cli
+
+The CLI generates images for the **ndor** module.
 
 Install with Go:
 

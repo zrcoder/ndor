@@ -20,12 +20,10 @@ func TestShowDialogWithImage(t *testing.T) {
 		ShowDialogWithImage(c, opt)
 	}, 400, 300)
 
-	// Verify buttons are shown
 	if !tt.HasText("Left") || !tt.HasText("Right") {
 		t.Errorf("expected buttons, got: %q", tt.Texts())
 	}
 
-	// Click the left button
 	if err := tt.Click("Left"); err != nil {
 		t.Fatal(err)
 	}
@@ -49,7 +47,6 @@ func TestShowDialogWithImageDismissed(t *testing.T) {
 		ShowDialogWithImage(c, opt)
 	}, 400, 300)
 
-	// Initial state: outsideClicked should be false since we haven't clicked outside yet
 	if outsideClicked {
 		t.Error("outside click should not trigger before modal is dismissed")
 	}

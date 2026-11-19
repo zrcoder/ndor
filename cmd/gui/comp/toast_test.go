@@ -18,7 +18,6 @@ func TestToast(t *testing.T) {
 		t.Errorf("expected toast message, got: %q", tt.Texts())
 	}
 
-	// Click to dismiss
 	tt.ClickAt(200, 150)
 	if !dismissed {
 		t.Error("expected toast to be dismissed on click")

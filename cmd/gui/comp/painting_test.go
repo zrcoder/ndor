@@ -43,7 +43,6 @@ func TestPaintingShowsAsToastAndCloses(t *testing.T) {
 		t.Fatal("painting spinner still shows after its toast closes")
 	}
 
-	// Showing it again starts a fresh toast.
 	show = true
 	tt.Frame()
 	if !showing {

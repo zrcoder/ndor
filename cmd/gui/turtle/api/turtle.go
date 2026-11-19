@@ -1,8 +1,5 @@
-// Package api exports the turtle drawing functions that user xgo code can call.
-//
-// All functions append commands to CmdQueue instead of executing them
-// immediately. After ixgo finishes running the user's code, the turtle app
-// drains CmdQueue frame by frame to show the drawing process as animation.
+// Package api provides the turtle drawing commands used by xgo code.
+// Commands collect in CmdQueue and are replayed frame by frame by the app.
 package api
 
 import (
@@ -83,7 +80,6 @@ func Pen(args ...string) {
 	CmdQueue = append(CmdQueue, cmd{Kind: "penDown"})
 }
 
-// parseColor parses a color from args.
 func parseColor(args []any) ([3]uint8, bool) {
 	var c icolor.RGBA
 	switch len(args) {
@@ -207,7 +203,7 @@ func parseStrFloat(s string, out *float64) error {
 	return nil
 }
 
-// Package-level turtle state (mirrored in the app, but kept here for reference).
+// Turtle state mirrored by the app.
 var (
 	turtleX, turtleY, turtleAngle float64
 	turtleDown                    = true

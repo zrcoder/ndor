@@ -13,12 +13,12 @@ import (
 )
 
 const (
-	cell               = 10                    // 网格间距（DIPs），原来 40，现在更细密（4 倍线条）
-	cw                 = 560                   // 画布宽
-	ch                 = 440                   // 画布高
-	stepDelay          = 80 * time.Millisecond // 每帧/每微步的间隔
+	cell               = 10
+	cw                 = 560
+	ch                 = 440
+	stepDelay          = 80 * time.Millisecond
 	turnDelay          = 150 * time.Millisecond
-	stepPixelsPerFrame = 4 // step 每帧移动的固定距离（DIPs），总时间与距离成正比
+	stepPixelsPerFrame = 4
 )
 
 // stepOp is one micro-operation produced by the user's xgo code.
@@ -45,9 +45,9 @@ type App struct {
 	helpImg   *ui.Bitmap
 	runImg    *ui.Bitmap
 	errorMsg  string
-	stepQueue []stepOp // 按帧执行的微操作队列（不用 sleep，不用 goroutine）
+	stepQueue []stepOp
 	stepIdx   int
-	stepTimer time.Time // 下一帧应执行的时间点
+	stepTimer time.Time
 }
 
 // New builds a turtle app; call SetWindow once its mygo window exists.
@@ -89,20 +89,17 @@ for range 4 {
 
 func (a *App) SetWindow(w *mygo.Window) { a.win = w }
 
-// pushStep 把一个微操作压入队列。
 func (a *App) pushStep(op stepOp) {
 	a.stepQueue = append(a.stepQueue, op)
 }
 
-// runXGoCode 解析并运行编辑器里的 xgo 代码，将其转成按帧执行的微操作队列。
-// 立即返回，不阻塞主线程。实际执行由 draw 里的 DrawOver 每帧推进。
+// runXGoCode runs the editor's xgo code and queues drawing operations.
 func (a *App) runXGoCode(c *ui.Context) {
 	a.stepQueue = nil
 	a.stepIdx = 0
 	a.stepTimer = time.Time{}
 	a.t.clear()
 
-	// 重置 api 命令队列
 	api.CmdQueue = nil
 
 	if err := runCode(a.editor.Buffer.String()); err != nil {
@@ -112,18 +109,13 @@ func (a *App) runXGoCode(c *ui.Context) {
 	}
 	a.errorMsg = ""
 
-	// 把 api.CmdQueue 转成 stepOp 队列
 	for _, cmd := range api.CmdQueue {
 		switch cmd.Kind {
 		case "step":
-			// 用户单位 × cell = 实际 DIPs
 			dist := float32(cmd.Val) * cell
-			n := int(math.Ceil(float64(dist) / float64(stepPixelsPerFrame)))
-			if n < 1 {
-				n = 1
-			}
+			n := max(int(math.Ceil(float64(dist)/float64(stepPixelsPerFrame))), 1)
 			step := dist / float32(n)
-			for i := 0; i < n; i++ {
+			for range n {
 				a.pushStep(stepOp{kind: "step", val: step})
 			}
 		case "turn":
@@ -149,13 +141,12 @@ func (a *App) runXGoCode(c *ui.Context) {
 	}
 }
 
-// tickStep 由 draw 里的 DrawOver 每帧调用：若到了时间点，执行队列中下一个 op。
+// tickStep runs one queued operation per frame.
 func (a *App) tickStep(p *ui.Painter) {
 	if a.stepIdx >= len(a.stepQueue) {
 		return
 	}
 	if !a.stepTimer.IsZero() && p.Now().Sub(a.stepTimer) < stepDelay {
-		// 还没到时间，请求下一帧继续等待，保持动画流畅
 		p.AnimationFrame()
 		return
 	}
@@ -164,7 +155,7 @@ func (a *App) tickStep(p *ui.Painter) {
 	a.stepIdx++
 	a.stepTimer = p.Now()
 
-	// 直接在绘图回调里改状态，不再走 win.Update
+	// Mutate state in the draw callback, avoiding win.Update.
 	switch op.kind {
 	case "step":
 		a.t.step(op.val)
@@ -202,23 +193,19 @@ func (a *App) View(c *ui.Context) {
 		comp.Toast(c, a.errorMsg, func() { a.errorMsg = "" })
 	}
 
-	// Help dialog, documentation and examples.
 	a.help.View(c)
 
 	ui.Row(c.Key("main")).Fill().Children(func() {
-		// 左：画布，按帧推进动画队列（不用 sleep，不用 goroutine）。
 		ui.Box(c).WidthPercent(50).Fill().Background(ui.RGB(255, 255, 255)).DrawOver(func(p *ui.Painter, r ui.Rect) {
 			a.tickStep(p)
 			a.draw(p, r)
 		})
 
-		// 右：代码编辑器，布局与 ndor 一致。
 		ui.Column(c).Fill().Children(func() {
 			editor.View(c, a.editor).Fill()
 		})
 	})
 
-	// Floating help/run buttons, like ndor.
 	ui.Column(c.Key("help-float")).Width(64).Height(72).Bottom(0).Left(4).Absolute().Children(func() {
 		comp.ImageButtonSimple(c, a.helpImg, func() { a.help.Open() })
 	})
@@ -230,11 +217,10 @@ func (a *App) View(c *ui.Context) {
 func (a *App) draw(p *ui.Painter, r ui.Rect) {
 	cx, cy := r.X+r.W/2, r.Y+r.H/2
 
-	// 坐标网格：参考 goplayspace，按距中心格数分三级深浅，
-	// 穿过原点的那条竖线和横线最深，作为坐标轴。
-	gridLight := ui.RGB(240, 240, 240)  // 普通网格
-	gridMid := ui.RGB(220, 220, 220)    // 每 5 格
-	gridCenter := ui.RGB(150, 150, 150) // 中心线（坐标轴）
+	// Grid lines darken with distance from the origin; the axes are darkest.
+	gridLight := ui.RGB(240, 240, 240)
+	gridMid := ui.RGB(220, 220, 220)
+	gridCenter := ui.RGB(150, 150, 150)
 
 	strokeGrid := func(x0, y0, x1, y1 float32, col ui.Color) {
 		ln := ui.Path{}
@@ -242,7 +228,6 @@ func (a *App) draw(p *ui.Painter, r ui.Rect) {
 		p.StrokePath(&ln, 1, col)
 	}
 
-	// 垂直网格线，k=0 为原点（Y 轴）。
 	nx := int(cx / cell)
 	for k := -nx; k <= nx; k++ {
 		x := cx + float32(k)*cell
@@ -258,7 +243,6 @@ func (a *App) draw(p *ui.Painter, r ui.Rect) {
 		strokeGrid(x, r.Y, x, r.Y+r.H, col)
 	}
 
-	// 水平网格线，k=0 为原点（X 轴）。
 	ny := int(cy / cell)
 	for k := -ny; k <= ny; k++ {
 		y := cy + float32(k)*cell
@@ -295,7 +279,6 @@ func (a *App) draw(p *ui.Painter, r ui.Rect) {
 		strokeSeg(*a.t.cur)
 	}
 
-	// 海龟本体：goplayspace 的 gopher 图，中心在 (px,py)，尖朝向 angle。
 	px, py := sx(pt{a.t.x, a.t.y}), sy(pt{a.t.x, a.t.y})
 	drawGopher(p, px, py, a.t.angle)
 }

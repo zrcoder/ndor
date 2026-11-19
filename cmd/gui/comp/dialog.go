@@ -11,19 +11,14 @@ type DialogOption struct {
 	OnClick func(btnIndex int)
 }
 
-// ShowDialogWithImage shows a dialog with an image (similar to web help dialog)
-// buttons order: first button appears on left, last button appears on right (and is styled as primary)
-// onClickOutside is called when user clicks outside the dialog (like clicking the cancel button)
+// ShowDialogWithImage shows an image dialog; the last button is the primary action.
 func ShowDialogWithImage(c *ui.Context, opt DialogOption) {
 	if !*opt.Open {
 		return
 	}
 
-	// Check if modal was dismissed (clicked outside or Escape)
 	if ui.Modal(c, opt.Open, func() {
-		// Dialog content
 		ui.Column(c).Width(250).Radius(12).Background(c.Theme().Surface).Children(func() {
-			// Image
 			if opt.Img != nil {
 				ui.Row(c).Fill().Children(func() {
 					ui.Spacer(c)
@@ -32,7 +27,6 @@ func ShowDialogWithImage(c *ui.Context, opt DialogOption) {
 				})
 			}
 
-			// Buttons - centered with spacers
 			if len(opt.Buttons) > 0 {
 				ui.Row(c).Fill().Children(func() {
 					ui.Spacer(c)

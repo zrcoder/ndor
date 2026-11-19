@@ -2,7 +2,7 @@ version: "3"
 tasks:
   gen:
     cmds:
-      - go generate
+      - go generate ./...
   test:
     cmds:
       - go test ./...

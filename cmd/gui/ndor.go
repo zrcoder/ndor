@@ -21,9 +21,8 @@ type Ndor struct {
 	runBtnImg     *ui.Bitmap
 	paintImg      *ui.Bitmap
 	codeImg       *ui.Bitmap
-	// help owns the help dialog, documentation viewer and examples overlay.
-	help    *comp.Help
-	toolbar *comp.Toolbar
+	help          *comp.Help
+	toolbar       *comp.Toolbar
 }
 
 func New() *Ndor {
@@ -66,8 +65,7 @@ fill
 }
 
 func (n *Ndor) View(c *ui.Context) {
-	// Handle keyboard shortcuts before building the toast viewport, so a run
-	// started here shows the painting in this same frame.
+	// Handle shortcuts before the toast viewport so a run shows this frame.
 	if c.Shortcut(ui.Ctrl, ui.KeyH) {
 		n.help.Open()
 		c.Invalidate()
@@ -83,19 +81,15 @@ func (n *Ndor) View(c *ui.Context) {
 		})
 	}
 
-	// Help dialog, documentation and examples
 	n.help.View(c)
 
-	// The painting toast keeps the result hidden until the animation is over.
 	painting := comp.PaintingViewport(c, n.paintImg, n.codeImg)
 
-	// Main layout
 	ui.Row(c.Key("main")).Fill().Children(func() {
 		n.pictureArea(c, painting)
 		n.codeArea(c)
 	})
 
-	// Floating buttons
 	ui.Column(c.Key("help-float")).Width(64).Height(72).Bottom(0).Left(4).Absolute().Children(func() {
 		comp.ImageButtonSimple(c, n.helpBtnImg, func() {
 			n.help.Open()
@@ -161,14 +155,12 @@ func (n *Ndor) runCode(c *ui.Context) {
 	}
 	code := n.editor.Buffer.String()
 
-	// First, try to generate the image to check for errors.
 	pngData, lineErr := pkg.Gen(width, height, code)
 	if lineErr != nil {
 		n.errorMsg = lineErr.Msg
 		n.errorLine = lineErr.Number
 		n.resultImg = nil
 		n.resultPNGData = nil
-		// Don't show painting animation on error.
 		c.Invalidate()
 		return
 	}
@@ -188,7 +180,6 @@ func (n *Ndor) runCode(c *ui.Context) {
 
 	n.resultImg = bitmap
 
-	// The toast owns the overlay and hides itself when its time is over.
 	comp.ShowPainting(c)
 	c.Invalidate()
 }

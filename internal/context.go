@@ -7,15 +7,12 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
-// Radians converts degrees to radians, as the ndor API takes angles in
-// degrees for arcs, elliptical arcs, polygons and rotation.
+// Radians converts degrees to radians.
 func Radians(angle float64) float64 {
 	return angle * math.Pi / 180
 }
 
-// matrix is a 2D affine transform laid out as gg's Matrix was, so that the
-// ndor API keeps the same geometry: points are transformed as they are
-// added to a path.
+// matrix is a 2D affine transform laid out like gg's Matrix.
 type matrix struct {
 	XX, YX, XY, YY, X0, Y0 float64
 }
@@ -52,8 +49,7 @@ func (a matrix) transformPoint(x, y float64) (tx, ty float64) {
 	return a.XX*x + a.XY*y + a.X0, a.YX*x + a.YY*y + a.Y0
 }
 
-// state is what Push saves and Pop restores: the transform and the style,
-// but not the current path, which outlives both, as gg's did.
+// state is what Push saves and Pop restores (not the current path).
 type state struct {
 	matrix      matrix
 	fillColor   ui.Color
@@ -63,8 +59,7 @@ type state struct {
 	lineWidth   float64
 }
 
-// drawOp is one drawing command recorded by the ndor API and replayed,
-// in order, by Image.
+// drawOp is one recorded command, replayed in order by Image.
 type drawOp interface {
 	draw(p *ui.Painter)
 }
@@ -124,8 +119,7 @@ type clearOp struct {
 
 func (o clearOp) draw(p *ui.Painter) {}
 
-// Context records the ndor drawing API and renders it with mygo's painter
-// when Image is asked for the result.
+// Context records the ndor API and renders it with mygo's painter.
 type Context struct {
 	width, height int
 
@@ -160,14 +154,11 @@ func NewContext(width, height int) *Context {
 	}
 }
 
-// SetRGBA255 sets the color used by the next fills, strokes, texts and
-// clears, as gg's Context.setFillAndStrokeColor did.
+// SetRGBA255 sets the color for subsequent fills, strokes and text.
 func (c *Context) SetRGBA255(r, g, b, a int) {
 	rgba := ui.Color{R: uint8(r), G: uint8(g), B: uint8(b), A: uint8(a)}
 	c.fillColor, c.strokeColor, c.textColor = rgba, rgba, rgba
 }
-
-// Path building.
 
 func (c *Context) newSubPath() {
 	c.hasCurrent = false
@@ -225,8 +216,6 @@ func (c *Context) clearPath() {
 	c.hasCurrent = false
 }
 
-// Public drawing API, mirroring gg's methods used by package api.
-
 func (c *Context) MoveTo(x, y float64) { c.moveTo(x, y) }
 func (c *Context) LineTo(x, y float64) { c.lineTo(x, y) }
 
@@ -260,7 +249,7 @@ func (c *Context) DrawRoundedRectangle(x, y, w, h, r float64) {
 
 func (c *Context) DrawEllipticalArc(x, y, rx, ry, angle1, angle2 float64) {
 	const n = 16
-	for i := 0; i < n; i++ {
+	for i := range n {
 		p1 := float64(i) / n
 		p2 := float64(i+1) / n
 		a1 := angle1 + (angle2-angle1)*p1
@@ -309,7 +298,7 @@ func (c *Context) DrawRegularPolygon(n int, x, y, r, rotation float64) {
 		rotation += angle / 2
 	}
 	c.newSubPath()
-	for i := 0; i < n; i++ {
+	for i := range n {
 		a := rotation + angle*float64(i)
 		c.lineTo(x+r*math.Cos(a), y+r*math.Sin(a))
 	}
@@ -420,8 +409,7 @@ func (c *Context) Image() image.Image {
 	}, width, height, 1)
 }
 
-// renderPlan finds the last Clear, which erases everything drawn before it,
-// and the clips that were active at that point and still apply after it.
+// renderPlan drops ops before the last Clear and keeps its active clips.
 func (c *Context) renderPlan() (ops []drawOp, clips []ui.Path, bg ui.Color, hasBG bool) {
 	start := 0
 	for i, op := range c.ops {
@@ -437,8 +425,7 @@ func (c *Context) renderPlan() (ops []drawOp, clips []ui.Path, bg ui.Color, hasB
 	return c.ops[start:], clips, bg, hasBG
 }
 
-// replay draws ops in order, nesting a clip around the rest of them when
-// one is met, since a clip in the ndor API applies to everything after it.
+// replay draws ops in order, applying each clip to everything after it.
 func replay(p *ui.Painter, ops []drawOp, clips []ui.Path) {
 	var draw func(int)
 	draw = func(i int) {

@@ -2,10 +2,10 @@ package turtle
 
 import "math"
 
-// pt 是海龟的数学坐标：原点在画布中心，Y 向上。
+// pt is a point in math space: origin at center, +Y up.
 type pt struct{ X, Y float32 }
 
-// seg 是一条连续笔迹，带自己的颜色和宽度。
+// seg is a continuous stroke with its own color and width.
 type seg struct {
 	pts   []pt
 	color [3]uint8
@@ -13,12 +13,12 @@ type seg struct {
 }
 
 type turtle struct {
-	x, y, angle float32 // angle 度，0 指向右（东）
+	x, y, angle float32 // degrees; 0 points right
 	down        bool
 	penColor    [3]uint8
 	penWidth    float32
-	segments    []seg // 已完成的段
-	cur         *seg  // 当前正在画的段（笔下时非 nil）
+	segments    []seg
+	cur         *seg
 }
 
 const defaultWidth = 2
@@ -62,7 +62,7 @@ func (t *turtle) clear() {
 func (t *turtle) setColor(r, g, b uint8) {
 	t.penColor = [3]uint8{r, g, b}
 	if t.cur != nil && len(t.cur.pts) > 1 {
-		// 不抬笔改颜色：先把当前段存入历史，再开新段，避免旧点染上新颜色
+		// Split the stroke so the new color does not recolor old points.
 		t.segments = append(t.segments, *t.cur)
 		t.cur = nil
 	}
@@ -82,7 +82,7 @@ func (t *turtle) setWidth(w float32) {
 	}
 }
 
-// step 向前移动 d（负值即向后），笔下时把新点追加到当前段。
+// step moves d (negative = backward), recording the point when the pen is down.
 func (t *turtle) step(d float32) {
 	rad := t.angle * math.Pi / 180
 	nx := t.x + float32(math.Cos(float64(rad)))*d

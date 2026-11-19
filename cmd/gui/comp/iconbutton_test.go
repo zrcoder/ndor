@@ -21,7 +21,6 @@ func TestIconButton(t *testing.T) {
 		})
 	}, 100, 50)
 
-	// Click at button location (center)
 	tt.ClickAt(50, 25)
 	if clicks != 1 {
 		t.Errorf("expected 1 click, got %d", clicks)

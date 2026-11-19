@@ -35,7 +35,6 @@ func (s *Transformer) Transform(doc *ast.Document, reader text.Reader, pctx pars
 		return ast.WalkContinue, nil
 	})
 
-	// Nothing to do.
 	if len(blocks) == 0 {
 		return
 	}

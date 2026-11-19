@@ -8,7 +8,7 @@ tool (
 )
 
 require (
-	github.com/egoist/mygo v0.9.2
+	github.com/egoist/mygo v0.10.0
 	github.com/goplus/ixgo v1.2.7
 	github.com/yuin/goldmark v1.8.7
 	golang.org/x/image v0.48.0
@@ -31,7 +31,7 @@ require (
 	github.com/visualfc/xtype v0.3.3 // indirect
 	go.digitalxero.dev/rpm v0.3.4 // indirect
 	golang.org/x/crypto v0.58.0 // indirect
-	golang.org/x/mod v0.43.0 // indirect
+	golang.org/x/mod v0.42.0 // indirect
 	golang.org/x/net v0.61.0 // indirect
 	golang.org/x/sys v0.50.0 // indirect
 	golang.org/x/text v0.44.0 // indirect

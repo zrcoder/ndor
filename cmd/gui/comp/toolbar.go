@@ -34,7 +34,6 @@ func (t *Toolbar) View(c *ui.Context) {
 	ui.Row(c).Fill().Height(36).Children(func() {
 		ui.Spacer(c)
 
-		// Copy button
 		copied := !t.copyDone.IsZero() && c.Now().Sub(t.copyDone) < 2*time.Second
 		if copied {
 			c.After(2*time.Second - c.Now().Sub(t.copyDone))

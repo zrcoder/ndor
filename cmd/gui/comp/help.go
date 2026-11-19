@@ -5,25 +5,17 @@ import (
 	"github.com/egoist/mygo/ui/markdown"
 )
 
-// HelpConfig is what the Help component shows and does.
+// HelpConfig configures the Help component.
 type HelpConfig struct {
-	// DialogImg is the image shown in the help dialog.
-	DialogImg *ui.Bitmap
-	// CloseIcon is the icon of the close buttons.
-	CloseIcon *ui.SVG
-	// ExampleNames lists the examples, in order.
-	ExampleNames []string
-	// Examples maps each example name to its code.
-	Examples map[string]string
-	// OnPickExample is called with the code of the chosen example.
+	DialogImg     *ui.Bitmap
+	CloseIcon     *ui.SVG
+	ExampleNames  []string
+	Examples      map[string]string
 	OnPickExample func(code string)
-	// LoadDoc returns the markdown of a documentation tab, in the chosen
-	// language.
-	LoadDoc func(isEnglish bool, tab int) string
+	LoadDoc       func(isEnglish bool, tab int) string
 }
 
-// Help owns the help dialog, the documentation viewer and the examples
-// overlay, including their open, tab and language state.
+// Help owns the help dialog, docs viewer and examples overlay state.
 type Help struct {
 	cfg          HelpConfig
 	showDialog   bool
@@ -33,7 +25,7 @@ type Help struct {
 	isEnglish    bool
 }
 
-// NewHelp creates a Help component that shows what cfg says.
+// NewHelp creates a Help component.
 func NewHelp(cfg HelpConfig) *Help {
 	return &Help{cfg: cfg}
 }
@@ -43,8 +35,7 @@ func (h *Help) Open() {
 	h.showDialog = true
 }
 
-// View renders the help dialog and whatever it opens. It draws nothing while
-// they are closed.
+// View renders the help dialog and whatever it opens.
 func (h *Help) View(c *ui.Context) {
 	if h.showDialog {
 		ShowDialogWithImage(c, DialogOption{
@@ -78,11 +69,9 @@ func (h *Help) showDocument(c *ui.Context) {
 
 	if ui.Modal(c, &h.showDoc, func() {
 		ui.Column(c).Width(800).Height(600).Radius(12).Background(c.Theme().Surface).Children(func() {
-			// Tabs with language toggle and close button
 			ui.Row(c).Fill().Height(40).Children(func() {
 				ui.Tabs(c, &h.docTab, "Home", "API", "Tutorials")
 				ui.Spacer(c)
-				// Language toggle button
 				btn := ui.ButtonBase(c).Width(60).Height(28).Radius(4).
 					OnClick(func() {
 						h.isEnglish = !h.isEnglish
@@ -97,7 +86,6 @@ func (h *Help) showDocument(c *ui.Context) {
 				if btn.Hovered() {
 					btn.Background(c.Theme().SurfaceHover)
 				}
-				// Close button
 				IconButton(c, IconButtonOption{
 					Icon: h.cfg.CloseIcon,
 					OnClick: func() {
@@ -106,7 +94,6 @@ func (h *Help) showDocument(c *ui.Context) {
 					},
 				})
 			})
-			// Markdown content - scrollable
 			ui.Scroll(c).Fill().Children(func() {
 				ui.Column(c).Width(760).Padding(10, 0, 0, 0).Children(func() {
 					markdown.View(c, content, nil)

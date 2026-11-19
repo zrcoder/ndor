@@ -1,6 +1,6 @@
 package turtle
 
-// example 是 goplayspace 里的海龟示例指令（xgo 命令式语法）。
+// example is a turtle example written in xgo command syntax.
 type example struct {
 	name string
 	code string
