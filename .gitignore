@@ -11,6 +11,6 @@ ndor.wiki
 app
 cmd/ndor/examples/*.html
 cmd/web/examples/*.png
-pkg/goldmark/testdata/*.html
+internal/goldmark/testdata/*.html
 /gui
 .mygo

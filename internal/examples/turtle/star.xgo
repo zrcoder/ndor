@@ -1,0 +1,4 @@
+for range 5 {
+    step 10
+    right 144
+}

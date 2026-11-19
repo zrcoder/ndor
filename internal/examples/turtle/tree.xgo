@@ -1,0 +1,24 @@
+func branch(size, ratio, angle float64, iterations int) {
+    color "black"
+    width size
+    pen "down"
+    step size
+    pen "up"
+
+    if iterations > 0 {
+        left angle
+        branch size*ratio, ratio, angle, iterations-1
+
+        right angle*2
+        branch size*ratio, ratio, angle, iterations-1
+
+        left angle
+    }
+
+    left 180
+    step size
+    left 180
+}
+
+left 90
+branch 5, 0.7, 30, 5

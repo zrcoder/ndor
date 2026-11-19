@@ -10,19 +10,24 @@ tasks:
     dir: cmd
     cmds:
       - rm -rf ndor/examples/*.html
-      - rm -rf ../pkg/goldmark/testdata/*.html
+      - rm -rf ../internal/goldmark/testdata/*.html
+      - rm -rf ../internal/exported
   cli:
+    deps: [gen]
     cmds:
       - go run ./cmd/ndor {{.CLI_ARGS}}
   gui:
+    deps: [gen]
     dir: cmd/gui
     cmds:
       - go tool mygo dev
   build:
+    deps: [gen]
     dir: cmd/gui
     cmds:
       - go tool mygo build
   build-web:
+    deps: [gen]
     dir: cmd/gui
     cmds:
       - go tool mygo build -platform web

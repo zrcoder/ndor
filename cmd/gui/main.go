@@ -1,33 +1,25 @@
 package main
 
 import (
+	"embed"
 	"log"
 
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
-	"github.com/zrcoder/ndor/cmd/gui/turtle"
+	"github.com/zrcoder/ndor/cmd/gui/internal/ndor"
+	"github.com/zrcoder/ndor/cmd/gui/internal/turtle"
 )
 
-var ndor = New()
+//go:embed resources
+var resourcesFS embed.FS
 
 func main() {
 	log.SetFlags(log.Lshortfile)
 
 	mygo.Theme.SetSource(mygo.ThemeLight)
 
-	helpBtnImg, _ := ui.DecodeBitmap(teacherLabeledImgData)
-	runBtnImg, _ := ui.DecodeBitmap(gopherLabeledImgData)
-	dialogImg, _ := ui.DecodeBitmap(teacherImgData)
-	turtleApp, err := turtle.New(turtle.Config{
-		HelpButtonImg: helpBtnImg,
-		RunButtonImg:  runBtnImg,
-		HelpDialogImg: dialogImg,
-		CloseIcon:     ui.MustParseSVG(closeIconData),
-		LoadDoc:       loadTurtleDoc,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
+	ndorApp := ndor.New(resourcesFS)
+	turtleApp := turtle.New(resourcesFS)
 
 	var ndorWin, turtleWin *mygo.Window
 	// Only one window is visible at a time; switching hides the other.
@@ -50,7 +42,7 @@ func main() {
 			Title:   "Ndor",
 			Width:   1400,
 			Height:  800,
-			Content: ui.View(ndor.View),
+			Content: ui.View(ndorApp.View),
 		})
 		turtleWin = mygo.NewWindow(mygo.WindowOptions{
 			Title:   "Turtle",
@@ -65,24 +57,4 @@ func main() {
 	if err := mygo.App.Run(); err != nil {
 		log.Fatal(err)
 	}
-}
-
-func loadTurtleDoc(isEnglish bool, tab int) string {
-	base := "resources/wiki/turtle/"
-	if isEnglish {
-		base += "en/"
-	}
-
-	var name string
-	switch tab {
-	case 0:
-		name = "Home.md"
-	case 1:
-		name = "Api.md"
-	case 2:
-		name = "Tutorials.md"
-	}
-
-	data, _ := wikiFS.ReadFile(base + name)
-	return string(data)
 }

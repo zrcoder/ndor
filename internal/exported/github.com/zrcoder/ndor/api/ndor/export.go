@@ -1,0 +1,55 @@
+// export by github.com/goplus/ixgo/cmd/qexp
+
+package ndor
+
+import (
+	q "github.com/zrcoder/ndor/api/ndor"
+
+	"go/constant"
+	"reflect"
+
+	"github.com/goplus/ixgo"
+)
+
+func init() {
+	ixgo.RegisterPackage(&ixgo.Package{
+		Name: "ndor",
+		Path: "github.com/zrcoder/ndor/api/ndor",
+		Deps: map[string]string{
+			"github.com/zrcoder/ndor/internal/ndor": "ndor",
+		},
+		Interfaces: map[string]reflect.Type{},
+		NamedTypes: map[string]reflect.Type{},
+		AliasTypes: map[string]reflect.Type{},
+		Vars:       map[string]reflect.Value{},
+		Funcs: map[string]reflect.Value{
+			"Arc":       reflect.ValueOf(q.Arc),
+			"Bezier":    reflect.ValueOf(q.Bezier),
+			"Circle":    reflect.ValueOf(q.Circle),
+			"Clear":     reflect.ValueOf(q.Clear),
+			"Clip":      reflect.ValueOf(q.Clip),
+			"Color":     reflect.ValueOf(q.Color),
+			"Context":   reflect.ValueOf(q.Context),
+			"Dash":      reflect.ValueOf(q.Dash),
+			"Earc":      reflect.ValueOf(q.Earc),
+			"Ellipse":   reflect.ValueOf(q.Ellipse),
+			"Fill":      reflect.ValueOf(q.Fill),
+			"From":      reflect.ValueOf(q.From),
+			"Linew":     reflect.ValueOf(q.Linew),
+			"Polygon":   reflect.ValueOf(q.Polygon),
+			"Pop":       reflect.ValueOf(q.Pop),
+			"Push":      reflect.ValueOf(q.Push),
+			"Rectangle": reflect.ValueOf(q.Rectangle),
+			"Rotate":    reflect.ValueOf(q.Rotate),
+			"Scale":     reflect.ValueOf(q.Scale),
+			"Stroke":    reflect.ValueOf(q.Stroke),
+			"Text":      reflect.ValueOf(q.Text),
+			"To":        reflect.ValueOf(q.To),
+			"Translate": reflect.ValueOf(q.Translate),
+		},
+		TypedConsts: map[string]ixgo.TypedConst{},
+		UntypedConsts: map[string]ixgo.UntypedConst{
+			"Preserve": {Typ: "untyped string", Value: constant.MakeString(string(q.Preserve))},
+		},
+	})
+}

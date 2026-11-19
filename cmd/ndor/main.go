@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/yuin/goldmark"
-	"github.com/zrcoder/ndor/pkg"
-	nmd "github.com/zrcoder/ndor/pkg/goldmark"
+	"github.com/zrcoder/ndor"
+	nmd "github.com/zrcoder/ndor/internal/goldmark"
 )
 
 func main() {
@@ -53,7 +53,7 @@ func md2html(data []byte) ([]byte, error) {
 }
 
 func genPng(data []byte) ([]byte, error) {
-	src, lerr := pkg.Gen(0, 0, string(data))
+	src, lerr := ndor.Gen(0, 0, string(data))
 	if lerr != nil {
 		return nil, fmt.Errorf("line %d: %s", lerr.Number, lerr.Msg)
 	}

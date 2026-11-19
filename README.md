@@ -6,7 +6,7 @@
 
 ![ndor](main.png)
 
-It contains two drawing modules, both driven by code in [XGo](https://xgo.dev) or Go:
+It contains two drawing modules, both driven by code in [XGo](https://xgo.dev):
 
 - **ndor** — free drawing with a canvas and a shape/path API (`circle`, `rectangle`, `bezier`, `fill`, `stroke`, colors, text, transforms...).
 - **turtle** — turtle graphics on a grid, where a turtle moves with `step`, `left`/`right`, `pen`, `color` and `width`, and the drawing is animated stroke by stroke.
@@ -56,6 +56,6 @@ If you want to run `ndor` on your local machine：
    - cli app
 
      ```shell
-     task cli -- cmd/web/examples/rainbow.xgo
+     task cli -- internal/examples/ndor/rainbow.xgo
      task cli -- cmd/ndor/examples/hello.md
      ```

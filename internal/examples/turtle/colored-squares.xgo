@@ -1,0 +1,17 @@
+func squar() {
+   step 5
+   right 90
+   step 5
+   right 90
+   step 5
+   right 90
+   step 5
+}
+
+colors := ["red", "green", "blue"]
+
+for c <- colors {
+   color c
+   squar
+   right 30
+}
