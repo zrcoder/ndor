@@ -4,7 +4,6 @@ import (
 	"io/fs"
 	"time"
 
-	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 	"github.com/egoist/mygo/ui/editor"
 
@@ -17,7 +16,6 @@ import (
 const stepDelay = 80 * time.Millisecond
 
 type App struct {
-	win       *mygo.Window
 	prog      *turtlelib.Program
 	editor    *editor.State
 	help      *comp.Help
@@ -28,7 +26,7 @@ type App struct {
 	stepTimer time.Time
 }
 
-// New builds a turtle app; call SetWindow once its mygo window exists.
+// New builds a turtle app.
 func New(fsys fs.FS) *App {
 	a := &App{
 		helpImg: assets.Bitmap(fsys, "teacher_labeled.png"),
@@ -60,8 +58,6 @@ for range 4 {
 	return a
 }
 
-func (a *App) SetWindow(w *mygo.Window) { a.win = w }
-
 // runXGoCode compiles the editor's xgo code and starts playback.
 func (a *App) runXGoCode(c *ui.Context) {
 	prog, err := turtlelib.Compile(a.editor.Buffer.String())
@@ -76,7 +72,7 @@ func (a *App) runXGoCode(c *ui.Context) {
 	a.prog = prog
 	a.stepTimer = time.Now().Add(-stepDelay)
 	if !a.prog.Done() {
-		a.win.Invalidate()
+		c.Invalidate()
 	}
 }
 

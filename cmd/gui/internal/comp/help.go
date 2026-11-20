@@ -23,6 +23,7 @@ type Help struct {
 	docTab       int
 	showExamples bool
 	isEnglish    bool
+	exampleList  ui.ListState
 }
 
 // NewHelp creates a Help component.
@@ -106,17 +107,36 @@ func (h *Help) showDocument(c *ui.Context) {
 }
 
 func (h *Help) showExamplesList(c *ui.Context) {
-	OverlayPanel(c, OverlayPanelOption{
-		Title:   "Examples",
-		Width:   180,
-		OnClose: func() { h.showExamples = false },
-		ItemFn: func(item string) {
-			code, ok := h.cfg.Examples[item]
-			if !ok || h.cfg.OnPickExample == nil {
-				return
-			}
-			h.cfg.OnPickExample(code)
-		},
-		CloseIcon: h.cfg.CloseIcon,
-	}, h.cfg.ExampleNames)
+	names := h.cfg.ExampleNames
+	closePanel := func() {
+		h.showExamples = false
+		c.Invalidate()
+	}
+
+	ui.Overlay(c, func() {
+		ui.Row(c).Top(0).Bottom(0).Left(0).Right(0).Absolute().OnClick(closePanel)
+
+		ui.Column(c).Top(40).Left(10).Width(180).Background(c.Theme().Surface).Radius(8).BorderWidth(1).BorderColor(c.Theme().Border).Absolute().Children(func() {
+			ui.Row(c).Fill().Height(36).BorderWidth(0, 0, 1, 0).BorderColor(c.Theme().Border).Children(func() {
+				ui.Text(c, "Examples").FontSize(14).FontWeight(700).Padding(8)
+				ui.Spacer(c)
+				IconButton(c, IconButtonOption{Icon: h.cfg.CloseIcon, OnClick: closePanel})
+				ui.Spacer(c).Width(4)
+			})
+
+			ui.List(c, &h.exampleList, len(names), func(i int) {
+				name := names[i]
+				ui.Row(c).Width(170).Height(28).BorderWidth(0, 0, 1, 0).BorderColor(c.Theme().Border).OnClick(func() {
+					if h.cfg.OnPickExample != nil {
+						if code, ok := h.cfg.Examples[name]; ok {
+							h.cfg.OnPickExample(code)
+						}
+					}
+					closePanel()
+				}).Children(func() {
+					ui.Text(c, name).FontSize(13).Padding(0, 8, 0, 8)
+				})
+			}).Height(float32(len(names) * 28))
+		})
+	})
 }
