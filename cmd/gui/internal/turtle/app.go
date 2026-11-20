@@ -22,7 +22,6 @@ type App struct {
 	helpImg   *ui.Bitmap
 	runImg    *ui.Bitmap
 	gopher    *ui.Bitmap
-	errorMsg  string
 	stepTimer time.Time
 }
 
@@ -63,12 +62,11 @@ func (a *App) runXGoCode(c *ui.Context) {
 	prog, err := turtlelib.Compile(a.editor.Buffer.String())
 	if err != nil {
 		a.prog = turtlelib.New()
-		a.errorMsg = err.Error()
+		c.Toast(err.Error())
 		c.Invalidate()
 		return
 	}
 
-	a.errorMsg = ""
 	a.prog = prog
 	a.stepTimer = time.Now().Add(-stepDelay)
 	if !a.prog.Done() {
@@ -101,10 +99,6 @@ func (a *App) View(c *ui.Context) {
 	}
 	if c.Shortcut(ui.Ctrl, ui.KeyR) {
 		a.runXGoCode(c)
-	}
-
-	if a.errorMsg != "" {
-		comp.Toast(c, a.errorMsg, func() { a.errorMsg = "" })
 	}
 
 	a.help.View(c)

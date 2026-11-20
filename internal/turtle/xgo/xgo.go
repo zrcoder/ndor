@@ -2,20 +2,15 @@
 package xgo
 
 import (
-	"fmt"
-
 	_ "github.com/zrcoder/ndor/internal/exported/github.com/zrcoder/ndor/api/turtle"
+	"github.com/zrcoder/ndor/internal/xgoerr"
 
-	"github.com/goplus/ixgo"
 	_ "github.com/goplus/ixgo/pkg/math"
 	_ "github.com/goplus/ixgo/pkg/math/rand"
 	_ "github.com/goplus/ixgo/xgobuild"
 )
 
-const (
-	xgoFileName = "main.xgo"
-
-	preCodes = `
+const preCodes = `
 import (
 	math "math"
 	rand "math/rand"
@@ -39,14 +34,6 @@ var (
 	pen = Pen
 )
 `
-)
 
 // Run interprets code; turtle commands collect in the api CmdQueue.
-func Run(code string) error {
-	code = preCodes + code
-	_, err := ixgo.RunFile(xgoFileName, code, nil, 0)
-	if err != nil {
-		return fmt.Errorf("xgo: %w", err)
-	}
-	return nil
-}
+func Run(code string) *xgoerr.LineError { return xgoerr.Run(code, preCodes) }

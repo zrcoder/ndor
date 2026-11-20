@@ -1,6 +1,6 @@
 {
-  "name": "ndor",
-  "identifier": "com.example.ndor",
+  "name": "Ndor",
+  "identifier": "edu.example.ndor",
   "version": "0.1.0",
   "out": "build"
 }

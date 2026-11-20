@@ -10,49 +10,13 @@ import (
 // PaintingDuration is how long the painting overlay shows.
 const PaintingDuration = 1200 * time.Millisecond
 
-// paintingToast identifies the painting overlay among toasts.
-const paintingToast = "painting"
-
-// ShowPainting shows the painting overlay as a timed toast.
-func ShowPainting(c *ui.Context) {
-	if c.Preferences().ReduceMotion {
-		return
-	}
-	c.AddToast(ui.Toast{
-		ID:      paintingToast,
-		Title:   "Painting",
-		Timeout: PaintingDuration,
-	})
+// PaintingActive reports whether the painting overlay shows until.
+func PaintingActive(c *ui.Context, until time.Time) bool {
+	return !c.Preferences().ReduceMotion && time.Now().Before(until)
 }
 
-// PaintingViewport draws the painting toast and reports whether it shows,
-// so the caller can hide the result until the animation is over.
-func PaintingViewport(c *ui.Context, left, right *ui.Bitmap) bool {
-	showing := false
-	ui.ToastViewportBase(c, func(viewport ui.Element, toasts []ui.Toast) {
-		viewport.AlignItems(ui.Center).Gap(8).Padding(16)
-		for _, t := range toasts {
-			if t.ID == paintingToast {
-				showing = true
-				painting(c, left, right)
-				continue
-			}
-			toast := ui.ToastBase(c, t)
-			toast.Root.Row().Gap(12).Padding(10, 14).Radius(8).
-				Background(c.Theme().Surface).Children(func() {
-				if t.Title != "" {
-					ui.Text(c, t.Title)
-				}
-				if t.Description != "" {
-					ui.Text(c, t.Description)
-				}
-			})
-		}
-	})
-	return showing
-}
-
-func painting(c *ui.Context, left, right *ui.Bitmap) {
+// Painting draws the painting overlay across the window.
+func Painting(c *ui.Context, left, right *ui.Bitmap) {
 	t := c.Theme()
 	ui.Row(c.Key("painting")).Absolute().Top(0).Bottom(0).Left(0).Right(0).Center().PassThrough().Children(func() {
 		ui.Row(c).Radius(t.Space(2.5)).

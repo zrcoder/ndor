@@ -4,9 +4,10 @@ import (
 	icolor "image/color"
 
 	"github.com/zrcoder/ndor/internal/parse"
+	"github.com/zrcoder/ndor/internal/xgoerr"
 )
 
-func ParseColor(args ...any) (icolor.RGBA, *LineError) {
+func ParseColor(args ...any) (icolor.RGBA, *xgoerr.LineError) {
 	rgba, ok := parse.Color(args...)
 	if ok {
 		return rgba, nil
@@ -19,15 +20,15 @@ func ParseColor(args ...any) (icolor.RGBA, *LineError) {
 	return rgba, newInvalidParsErr(colorFlag, invalidPars)
 }
 
-func KeepLastErr(err *LineError) {
+func KeepLastErr(err *xgoerr.LineError) {
 	if GlobalErr != nil {
 		return
 	}
 	GlobalErr = err
 }
 
-func newInvalidParsErr(flag, msg string) *LineError {
-	return &LineError{
+func newInvalidParsErr(flag, msg string) *xgoerr.LineError {
+	return &xgoerr.LineError{
 		Flag: flag,
 		Msg:  msg,
 	}

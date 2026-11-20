@@ -1,13 +1,11 @@
 package xgo
 
 import (
-	"errors"
 	"reflect"
 	"strconv"
-	"strings"
 	"testing"
 
-	"github.com/zrcoder/ndor/internal/ndor"
+	"github.com/zrcoder/ndor/internal/xgoerr"
 )
 
 func TestRun(t *testing.T) {
@@ -40,28 +38,32 @@ color "notExistColorName"`,
 	}
 }
 
-func TestParseXGoErr(t *testing.T) {
+func TestRunErrors(t *testing.T) {
 	tests := []struct {
 		name string
-		err  error
-		want *ndor.LineError
+		code string
+		want *xgoerr.LineError
 	}{
 		{
-			name: "./main.xgo:100:1: undefined: cc",
-			err:  errors.New("./main.xgo:100:1: undefined: cc"),
-			want: &ndor.LineError{Number: 100 - strings.Count(preCodes, "\n"), Msg: "undefined: cc"},
+			name: "undefined identifier",
+			code: "context 100, 100\ncc",
+			want: &xgoerr.LineError{Number: 2, Msg: "undefined: cc"},
 		},
 		{
-			name: "multiple errors",
-			err: errors.New(`main.xgo:126:2: undefined: abc
-			main.xgo:127:1: undefined: vv123`),
-			want: &ndor.LineError{Number: 126 - strings.Count(preCodes, "\n"), Msg: "undefined: abc"},
+			name: "syntax error",
+			code: "context 100, 100\ncolor (",
+			want: &xgoerr.LineError{Number: 2, Msg: "expected operand, found 'EOF'"},
+		},
+		{
+			name: "too many arguments",
+			code: "context 100, 100\ncircle 1, 2, 3, 4",
+			want: &xgoerr.LineError{Number: 2, Msg: "too many arguments in call to ndor.Circle"},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := parseXGoErr(tt.err); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("\nparseXGoErr() = %v, \nwant %v", got, tt.want)
+			if got := Run(tt.code); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Run() = %v, want %v", got, tt.want)
 			}
 		})
 	}

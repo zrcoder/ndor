@@ -52,6 +52,13 @@ func TestStepSign(t *testing.T) {
 	}
 }
 
+func TestRunErrorLine(t *testing.T) {
+	err := Run("step 5\ncc")
+	if err == nil || err.Error() != "Line 2: undefined: cc" {
+		t.Fatalf("got %v, want Line 2: undefined: cc", err)
+	}
+}
+
 func TestExamples(t *testing.T) {
 	for _, name := range turtleexamples.DefaultNames {
 		api.CmdQueue = nil

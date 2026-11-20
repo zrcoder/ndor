@@ -5,6 +5,7 @@ import (
 
 	api "github.com/zrcoder/ndor/api/turtle"
 	"github.com/zrcoder/ndor/internal/turtle/xgo"
+	"github.com/zrcoder/ndor/internal/xgoerr"
 )
 
 const (
@@ -34,7 +35,7 @@ func New() *Program {
 }
 
 // Compile runs xgo code and queues its drawing operations.
-func Compile(code string) (*Program, error) {
+func Compile(code string) (*Program, *xgoerr.LineError) {
 	p := New()
 	api.CmdQueue = nil
 	if err := xgo.Run(code); err != nil {

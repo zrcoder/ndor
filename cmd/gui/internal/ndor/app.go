@@ -3,6 +3,7 @@ package ndor
 import (
 	"io/fs"
 	"os"
+	"time"
 
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
@@ -14,10 +15,11 @@ import (
 )
 
 type App struct {
+	ctx           *ui.Context
+	pendingToast  string
 	resultImg     *ui.Bitmap
 	resultPNGData []byte
-	errorMsg      string
-	errorLine     int
+	paintUntil    time.Time
 	editor        *editor.State
 	helpBtnImg    *ui.Bitmap
 	runBtnImg     *ui.Bitmap
@@ -65,7 +67,12 @@ fill
 }
 
 func (a *App) View(c *ui.Context) {
-	// Handle shortcuts before the toast viewport so a run shows this frame.
+	a.ctx = c
+	if a.pendingToast != "" {
+		c.Toast(a.pendingToast)
+		a.pendingToast = ""
+	}
+	// Handle shortcuts before anything else so a run shows this frame.
 	if c.Shortcut(ui.Ctrl, ui.KeyH) {
 		a.help.Open()
 		c.Invalidate()
@@ -74,16 +81,12 @@ func (a *App) View(c *ui.Context) {
 		a.runCode(c)
 	}
 
-	if a.errorMsg != "" {
-		comp.ToastErrorAtLine(c, a.errorLine, a.errorMsg, func() {
-			a.errorMsg = ""
-			a.errorLine = 0
-		})
-	}
-
 	a.help.View(c)
 
-	painting := comp.PaintingViewport(c, a.paintImg, a.codeImg)
+	painting := comp.PaintingActive(c, a.paintUntil)
+	if painting {
+		c.After(time.Until(a.paintUntil))
+	}
 
 	ui.Row(c.Key("main")).Fill().Children(func() {
 		a.pictureArea(c, painting)
@@ -91,6 +94,10 @@ func (a *App) View(c *ui.Context) {
 	})
 
 	comp.FloatButtons(c, a.helpBtnImg, a.runBtnImg, a.help.Open, func() { a.runCode(c) })
+
+	if painting {
+		comp.Painting(c, a.paintImg, a.codeImg)
+	}
 }
 
 func (a *App) pictureArea(c *ui.Context, painting bool) {
@@ -120,11 +127,31 @@ func (a *App) saveImage(_ *ui.Context) {
 			DefaultPath: "ndor.png",
 			Filters:     []mygo.FileFilter{{Name: "PNG Image", Extensions: []string{"png"}}},
 		})
-		if err != nil || path == "" {
+		if err != nil {
+			a.notify("Save failed: " + err.Error())
 			return
 		}
-		os.WriteFile(path, data, 0o644)
+		if path == "" {
+			return
+		}
+		if err := os.WriteFile(path, data, 0o644); err != nil {
+			a.notify("Save failed: " + err.Error())
+			return
+		}
+		a.notify("Saved")
 	}()
+}
+
+// notify shows a toast from any goroutine. Toasts only register during a
+// frame, so the toast waits for the next View.
+func (a *App) notify(msg string) {
+	mygo.RunOnMain(func() {
+		if a.ctx == nil {
+			return
+		}
+		a.pendingToast = msg
+		a.ctx.Invalidate()
+	})
 }
 
 func (a *App) codeArea(c *ui.Context) {
@@ -143,30 +170,25 @@ func (a *App) runCode(c *ui.Context) {
 
 	pngData, lineErr := ndorlib.Gen(width, height, code)
 	if lineErr != nil {
-		a.errorMsg = lineErr.Msg
-		a.errorLine = lineErr.Number
 		a.resultImg = nil
 		a.resultPNGData = nil
+		c.Toast(lineErr.Error())
 		c.Invalidate()
 		return
 	}
 
-	a.errorMsg = ""
-	a.errorLine = 0
 	a.resultPNGData = pngData
 	bitmap, err := ui.DecodeBitmap(pngData)
 	if err != nil {
-		a.errorMsg = "Failed to decode image: " + err.Error()
-		a.errorLine = 0
 		a.resultImg = nil
 		a.resultPNGData = nil
+		c.Toast("Failed to decode image: " + err.Error())
 		c.Invalidate()
 		return
 	}
 
 	a.resultImg = bitmap
-
-	comp.ShowPainting(c)
+	a.paintUntil = time.Now().Add(comp.PaintingDuration)
 	c.Invalidate()
 }
 

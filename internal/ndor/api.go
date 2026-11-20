@@ -1,10 +1,6 @@
 package ndor
 
-type LineError struct {
-	Number int
-	Flag   string
-	Msg    string
-}
+import "github.com/zrcoder/ndor/internal/xgoerr"
 
 const (
 	invalidPars = "invalid parameters"
@@ -14,9 +10,9 @@ const (
 
 var (
 	GlobalCtx *Context
-	GlobalErr *LineError
+	GlobalErr *xgoerr.LineError
 
-	ErrEmptyInput = &LineError{
+	ErrEmptyInput = &xgoerr.LineError{
 		Number: -1,
 		Msg:    "empty input",
 	}
