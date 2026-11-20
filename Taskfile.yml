@@ -12,8 +12,10 @@ tasks:
       - rm -rf ndor/examples/*.html
       - rm -rf ../internal/goldmark/testdata/*.html
       - rm -rf ../internal/exported
+      - rm -rf ../internal/examples/ndor/*.png
       - rm -rf gui/build
       - rm -rf gui/.mygo
+      - rm -rf gui/*.png
   cli:
     deps: [gen]
     cmds:

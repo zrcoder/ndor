@@ -11,11 +11,10 @@ import (
 	ndorlib "github.com/zrcoder/ndor"
 	"github.com/zrcoder/ndor/cmd/gui/internal/assets"
 	"github.com/zrcoder/ndor/cmd/gui/internal/comp"
-	"github.com/zrcoder/ndor/internal/examples/ndor"
+	examples "github.com/zrcoder/ndor/internal/examples/ndor"
 )
 
 type App struct {
-	ctx           *ui.Context
 	pendingToast  string
 	resultImg     *ui.Bitmap
 	resultPNGData []byte
@@ -67,7 +66,6 @@ fill
 }
 
 func (a *App) View(c *ui.Context) {
-	a.ctx = c
 	if a.pendingToast != "" {
 		c.Toast(a.pendingToast)
 		a.pendingToast = ""
@@ -146,11 +144,10 @@ func (a *App) saveImage(_ *ui.Context) {
 // frame, so the toast waits for the next View.
 func (a *App) notify(msg string) {
 	mygo.RunOnMain(func() {
-		if a.ctx == nil {
-			return
-		}
 		a.pendingToast = msg
-		a.ctx.Invalidate()
+		if win := mygo.FocusedWindow(); win != nil {
+			win.Invalidate()
+		}
 	})
 }
 

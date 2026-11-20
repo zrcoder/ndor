@@ -48,8 +48,7 @@ func Run(code, prelude string) *LineError {
 // New returns err as a LineError, reading the line and message from the
 // ixgo error itself.
 func New(err error) *LineError {
-	var codeErr *gogen.CodeError
-	if errors.As(err, &codeErr) {
+	if codeErr, ok := errors.AsType[*gogen.CodeError](err); ok {
 		return &LineError{Number: codeErr.Fset.Position(codeErr.Pos).Line, Msg: firstLine(codeErr.Msg)}
 	}
 	var list scanner.ErrorList
