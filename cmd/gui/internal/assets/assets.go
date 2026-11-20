@@ -2,9 +2,13 @@
 package assets
 
 import (
+	"bytes"
+	"image"
+	"image/png"
 	"io/fs"
 
 	"github.com/egoist/mygo/ui"
+	"golang.org/x/image/draw"
 )
 
 func read(fsys fs.FS, name string) []byte {
@@ -29,9 +33,21 @@ func SVG(fsys fs.FS, name string) *ui.SVG {
 	return ui.MustParseSVG(read(fsys, "resources/icons/"+name))
 }
 
-// Sprite rasterizes an embedded SVG from the resources directory.
-func Sprite(fsys fs.FS, name string, size int) *ui.Bitmap {
-	return ui.NewBitmap(ui.MustParseSVG(read(fsys, "resources/"+name)).Image(size, size, nil))
+// SpriteSheet decodes a horizontal sprite sheet into per-frame bitmaps.
+func SpriteSheet(fsys fs.FS, name string, frames, size int) []*ui.Bitmap {
+	img, err := png.Decode(bytes.NewReader(read(fsys, "resources/"+name)))
+	if err != nil {
+		panic(err)
+	}
+	sheet := image.NewRGBA(image.Rect(0, 0, frames*size, size))
+	draw.CatmullRom.Scale(sheet, sheet.Bounds(), img, img.Bounds(), draw.Over, nil)
+	out := make([]*ui.Bitmap, frames)
+	for i := range out {
+		frame := image.NewRGBA(image.Rect(0, 0, size, size))
+		draw.Copy(frame, image.Point{}, sheet, image.Rect(i*size, 0, (i+1)*size, size), draw.Src, nil)
+		out[i] = ui.NewBitmap(frame)
+	}
+	return out
 }
 
 // DocLoader returns a wiki loader for a module: "ndor" or "turtle".

@@ -13,7 +13,10 @@ import (
 	turtlelib "github.com/zrcoder/ndor/internal/turtle"
 )
 
-const stepDelay = 80 * time.Millisecond
+const (
+	stepDelay      = 80 * time.Millisecond
+	gopherFrameDur = 100 * time.Millisecond
+)
 
 type App struct {
 	prog      *turtlelib.Program
@@ -21,7 +24,8 @@ type App struct {
 	help      *comp.Help
 	helpImg   *ui.Bitmap
 	runImg    *ui.Bitmap
-	gopher    *ui.Bitmap
+	gopher    []*ui.Bitmap // walk frames; frame 0 is the idle pose
+	animStart time.Time
 	stepTimer time.Time
 }
 
@@ -30,7 +34,7 @@ func New(fsys fs.FS) *App {
 	a := &App{
 		helpImg: assets.Bitmap(fsys, "teacher_labeled.png"),
 		runImg:  assets.Bitmap(fsys, "gopher_labeled.png"),
-		gopher:  assets.Sprite(fsys, "gopher_pen.svg", 50),
+		gopher:  assets.SpriteSheet(fsys, "turtle_pen.png", 4, 64),
 		prog:    turtlelib.New(),
 	}
 
@@ -68,6 +72,7 @@ func (a *App) runXGoCode(c *ui.Context) {
 	}
 
 	a.prog = prog
+	a.animStart = time.Now()
 	a.stepTimer = time.Now().Add(-stepDelay)
 	if !a.prog.Done() {
 		c.Invalidate()
@@ -106,7 +111,12 @@ func (a *App) View(c *ui.Context) {
 	ui.Row(c.Key("main")).Fill().Children(func() {
 		ui.Box(c).WidthPercent(50).Fill().Background(ui.RGB(255, 255, 255)).DrawOver(func(p *ui.Painter, r ui.Rect) {
 			a.tickStep(p)
-			a.prog.Draw(p, r, a.gopher)
+			// Idle shows frame 0; playback cycles walk frames by time.
+			frame := 0
+			if !a.prog.Done() && len(a.gopher) > 1 {
+				frame = int(p.Now().Sub(a.animStart)/gopherFrameDur) % len(a.gopher)
+			}
+			a.prog.Draw(p, r, a.gopher[frame])
 		})
 
 		ui.Column(c).Fill().Children(func() {

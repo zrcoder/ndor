@@ -67,7 +67,7 @@ func (p *Program) Draw(painter *ui.Painter, r ui.Rect, gopher *ui.Bitmap) {
 	drawGopher(painter, gopher, px, py, p.state.angle)
 }
 
-const gopherDrawSize = 30
+const gopherDrawSize = 55
 
 // drawGopher draws the gopher sprite at (x, y) rotated by angle.
 func drawGopher(p *ui.Painter, sprite *ui.Bitmap, x, y, angle float32) {
