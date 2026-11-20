@@ -1,10 +1,11 @@
-# ndor
+# Ndor
 
 [![Listed on Awesome MyGo](https://awesomemygo.dev/badge.svg)](https://awesomemygo.dev/apps/ndor)
 
-`ndor` is an app with which you can draw by codes, for kids and coders~
+`Ndor` is an app with which you can draw by codes, for kids and coders~
 
-![ndor](main.png)
+![ndor](ndor.png)
+![turtle](turtle.png)
 
 It contains two drawing modules, both driven by code in [XGo](https://xgo.dev):
 

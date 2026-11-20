@@ -15,10 +15,7 @@ func branch(size, ratio, angle float64, iterations int) {
         left angle
     }
 
-    left 180
-    step size
-    left 180
+    step -size
 }
 
-left 90
-branch 5, 0.7, 30, 5
+branch 12, 0.7, 30, 5

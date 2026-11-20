@@ -59,15 +59,15 @@ func (p *Program) Draw(painter *ui.Painter, r ui.Rect, gopher *ui.Bitmap) {
 	for _, s := range p.state.segments {
 		strokeSeg(s)
 	}
-	if p.state.cur != nil {
-		strokeSeg(*p.state.cur)
+	if len(p.state.cur) > 0 {
+		strokeSeg(seg{pts: p.state.cur, color: p.state.penColor, width: p.state.penWidth})
 	}
 
 	px, py := sx(pt{p.state.x, p.state.y}), sy(pt{p.state.x, p.state.y})
 	drawGopher(painter, gopher, px, py, p.state.angle)
 }
 
-const gopherDrawSize = 55
+const gopherDrawSize = 45
 
 // drawGopher draws the gopher sprite at (x, y) rotated by angle.
 func drawGopher(p *ui.Painter, sprite *ui.Bitmap, x, y, angle float32) {

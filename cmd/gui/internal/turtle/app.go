@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	stepDelay      = 80 * time.Millisecond
-	gopherFrameDur = 100 * time.Millisecond
+	stepDelay      = 50 * time.Millisecond
+	gopherFrameDur = 65 * time.Millisecond
 )
 
 type App struct {

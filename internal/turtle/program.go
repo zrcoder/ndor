@@ -11,6 +11,7 @@ import (
 const (
 	cell               = 10
 	stepPixelsPerFrame = 4
+	turnDegPerFrame    = 14
 )
 
 // op is one micro-operation replayed by the app.
@@ -53,7 +54,13 @@ func Compile(code string) (*Program, *xgoerr.LineError) {
 				p.ops = append(p.ops, op{kind: "step", val: step})
 			}
 		case "turn":
-			p.ops = append(p.ops, op{kind: "turn", val: float32(cmd.Val)})
+			// Split each turn into small rotations so the animation is smooth.
+			deg := float32(cmd.Val)
+			n := max(int(math.Ceil(math.Abs(float64(deg))/float64(turnDegPerFrame))), 1)
+			t := deg / float32(n)
+			for range n {
+				p.ops = append(p.ops, op{kind: "turn", val: t})
+			}
 		case "penUp":
 			p.ops = append(p.ops, op{kind: "penUp"})
 		case "penDown":

@@ -1,11 +1,8 @@
 func squar() {
-   step 5
-   right 90
-   step 5
-   right 90
-   step 5
-   right 90
-   step 5
+    for range 4 {
+        step 5
+        right 90
+    }
 }
 
 colors := ["red", "green", "blue"]
