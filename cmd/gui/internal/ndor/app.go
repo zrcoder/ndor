@@ -25,7 +25,7 @@ type App struct {
 	paintImg      *ui.Bitmap
 	codeImg       *ui.Bitmap
 	help          *comp.Help
-	toolbar       *comp.Toolbar
+	copyButton    *comp.CopyButton
 }
 
 func New(fsys fs.FS) *App {
@@ -54,14 +54,12 @@ fill
 		LoadDoc: assets.DocLoader(fsys, "ndor"),
 	})
 
-	a.toolbar = comp.NewToolbar(comp.ToolbarConfig{
+	a.copyButton = comp.NewCopyButton(comp.CopyButtonConfig{
 		CopyIcon:  assets.SVG(fsys, "copy.svg"),
 		CheckIcon: assets.SVG(fsys, "check.svg"),
-		SaveIcon:  assets.SVG(fsys, "save.svg"),
 		GetCode:   func() string { return a.editor.Buffer.String() },
-		OnCopy:    func(string) {},
-		OnSave:    func() { a.saveImage(nil) },
 	})
+
 	return a
 }
 
@@ -99,22 +97,19 @@ func (a *App) View(c *ui.Context) {
 }
 
 func (a *App) pictureArea(c *ui.Context, painting bool) {
-	ui.Column(c).WidthPercent(50).Fill().Children(func() {
-		if painting {
+	ui.Column(c).WidthPercent(50).Background(ui.RGB(255, 255, 255)).Fill().Children(func() {
+		if painting || a.resultImg == nil {
 			return
 		}
-		if a.resultImg == nil {
-			return
-		}
-		ui.Row(c).Fill().Height(40).Children(func() {
-			ui.Spacer(c)
-			a.toolbar.SaveButton(c)
+		ui.Image(c, a.resultImg).MaxWidthPercent(100).MaxHeightPercent(100).ContextMenu(func(m *ui.Menu) {
+			if m.Item("Save").Chosen() {
+				a.saveImage()
+			}
 		})
-		ui.Image(c, a.resultImg).MaxWidthPercent(100).MaxHeightPercent(100)
 	})
 }
 
-func (a *App) saveImage(_ *ui.Context) {
+func (a *App) saveImage() {
 	if a.resultPNGData == nil {
 		return
 	}
@@ -153,7 +148,10 @@ func (a *App) notify(msg string) {
 
 func (a *App) codeArea(c *ui.Context) {
 	ui.Column(c).Fill().Children(func() {
-		a.toolbar.View(c)
+		ui.Row(c).Fill().Height(36).Children(func() {
+			ui.Spacer(c)
+			a.copyButton.View(c)
+		})
 		editor.View(c, a.editor).Fill()
 	})
 }

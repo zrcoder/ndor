@@ -116,7 +116,7 @@ func (h *Help) showExamplesList(c *ui.Context) {
 	ui.Overlay(c, func() {
 		ui.Row(c).Top(0).Bottom(0).Left(0).Right(0).Absolute().OnClick(closePanel)
 
-		ui.Column(c).Top(40).Left(10).Width(180).Background(c.Theme().Surface).Radius(8).BorderWidth(1).BorderColor(c.Theme().Border).Absolute().Children(func() {
+		ui.Column(c).Top(52).Left(10).Width(180).Background(c.Theme().Surface).Radius(8).BorderWidth(1).BorderColor(c.Theme().Border).Absolute().Children(func() {
 			ui.Row(c).Fill().Height(36).BorderWidth(0, 0, 1, 0).BorderColor(c.Theme().Border).Children(func() {
 				ui.Text(c, "Examples").FontSize(14).FontWeight(700).Padding(8)
 				ui.Spacer(c)

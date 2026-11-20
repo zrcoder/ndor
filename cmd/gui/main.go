@@ -10,7 +10,7 @@ import (
 func main() {
 	log.SetFlags(log.Lshortfile)
 
-	mygo.Theme.SetSource(mygo.ThemeLight)
+	mygo.Theme.SetSource(mygo.ThemeDark)
 
 	mygo.App.SetMenu(mygo.NewMenu([]*mygo.MenuItem{
 		{Role: mygo.RoleAppMenu},
