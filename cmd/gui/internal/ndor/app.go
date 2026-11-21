@@ -159,7 +159,7 @@ func (a *App) codeArea(c *ui.Context) {
 }
 
 func (a *App) runCode(c *ui.Context) {
-	width, height := getPictureSize(c)
+	width, height := getPictureSize()
 	if width <= 0 || height <= 0 {
 		width, height = 800, 800
 	}
@@ -189,7 +189,7 @@ func (a *App) runCode(c *ui.Context) {
 	c.Invalidate()
 }
 
-func getPictureSize(c *ui.Context) (int, int) {
+func getPictureSize() (int, int) {
 	win := mygo.FocusedWindow()
 	if win != nil {
 		bounds := win.ContentBounds()

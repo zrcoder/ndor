@@ -113,15 +113,13 @@ func (a *App) View(c *ui.Context) {
 			a.tickStep(p)
 			// Idle shows frame 0; playback cycles walk frames by time.
 			frame := 0
-			if !a.prog.Done() && len(a.gopher) > 1 {
+			if !a.prog.Done() {
 				frame = int(p.Now().Sub(a.animStart)/gopherFrameDur) % len(a.gopher)
 			}
 			a.prog.Draw(p, r, a.gopher[frame])
 		})
 
-		ui.Column(c).Fill().Children(func() {
-			editor.View(c, a.editor).Fill()
-		})
+		editor.View(c, a.editor).Fill()
 	})
 
 	comp.FloatButtons(c, a.helpImg, a.runImg, a.help.Open, func() { a.runXGoCode(c) })

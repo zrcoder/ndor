@@ -39,12 +39,13 @@ func SpriteSheet(fsys fs.FS, name string, frames, size int) []*ui.Bitmap {
 	if err != nil {
 		panic(err)
 	}
-	sheet := image.NewRGBA(image.Rect(0, 0, frames*size, size))
-	draw.CatmullRom.Scale(sheet, sheet.Bounds(), img, img.Bounds(), draw.Over, nil)
+	b := img.Bounds()
+	fw := b.Dx() / frames
 	out := make([]*ui.Bitmap, frames)
 	for i := range out {
 		frame := image.NewRGBA(image.Rect(0, 0, size, size))
-		draw.Copy(frame, image.Point{}, sheet, image.Rect(i*size, 0, (i+1)*size, size), draw.Src, nil)
+		src := image.Rect(b.Min.X+i*fw, b.Min.Y, b.Min.X+(i+1)*fw, b.Max.Y)
+		draw.CatmullRom.Scale(frame, frame.Bounds(), img, src, draw.Over, nil)
 		out[i] = ui.NewBitmap(frame)
 	}
 	return out

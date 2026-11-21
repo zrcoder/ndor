@@ -63,8 +63,8 @@ func (p *Program) Draw(painter *ui.Painter, r ui.Rect, gopher *ui.Bitmap) {
 		strokeSeg(seg{pts: p.state.cur, color: p.state.penColor, width: p.state.penWidth})
 	}
 
-	px, py := sx(pt{p.state.x, p.state.y}), sy(pt{p.state.x, p.state.y})
-	drawGopher(painter, gopher, px, py, p.state.angle)
+	pos := pt{p.state.x, p.state.y}
+	drawGopher(painter, gopher, sx(pos), sy(pos), p.state.angle)
 }
 
 const gopherDrawSize = 45
