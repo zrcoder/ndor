@@ -4,8 +4,8 @@
 
 `Ndor` is an app with which you can draw by codes, for kids and coders~
 
-![ndor](ndor.png)
-![turtle](turtle.png)
+![ndor](ndor1.png)
+![turtle](turtle1.png)
 
 It contains two drawing modules, both driven by code in [XGo](https://xgo.dev):
 
