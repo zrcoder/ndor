@@ -26,6 +26,7 @@ type App struct {
 	codeImg       *ui.Bitmap
 	help          *comp.Help
 	copyButton    *comp.CopyButton
+	saveIcon      *ui.SVG
 }
 
 func New(fsys fs.FS) *App {
@@ -34,6 +35,7 @@ func New(fsys fs.FS) *App {
 		runBtnImg:  assets.Bitmap(fsys, "gopher_labeled.png"),
 		paintImg:   assets.Bitmap(fsys, "paint.png"),
 		codeImg:    assets.Bitmap(fsys, "code.png"),
+		saveIcon:   assets.SVG(fsys, "save.svg"),
 	}
 	code := `context 800, 800
 color "lightgreen"
@@ -97,15 +99,15 @@ func (a *App) View(c *ui.Context) {
 }
 
 func (a *App) pictureArea(c *ui.Context, painting bool) {
-	ui.Column(c).WidthPercent(50).Background(ui.RGB(255, 255, 255)).Fill().Children(func() {
+	ui.Themed(c, ui.LightTheme()).WidthPercent(50).Fill().Children(func() {
 		if painting || a.resultImg == nil {
 			return
 		}
-		ui.Image(c, a.resultImg).MaxWidthPercent(100).MaxHeightPercent(100).ContextMenu(func(m *ui.Menu) {
-			if m.Item("Save").Chosen() {
-				a.saveImage()
-			}
+		ui.Row(c).Fill().Height(40).Children(func() {
+			ui.Spacer(c)
+			comp.IconButton(c, comp.IconButtonOption{Icon: a.saveIcon, OnClick: a.saveImage})
 		})
+		ui.Image(c, a.resultImg).MaxWidthPercent(100).MaxHeightPercent(100)
 	})
 }
 
