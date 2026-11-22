@@ -5,10 +5,10 @@ func squar() {
     }
 }
 
-colors := ["red", "green", "blue"]
+colors := ["red", "orange", "green", "blue", "purple", "black"]
 
 for c <- colors {
    color c
    squar
-   right 30
+   right 60
 }

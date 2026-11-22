@@ -1,0 +1,29 @@
+func tri(size float64, depth int) {
+    if depth == 0 {
+        for range 3 {
+            step size
+            left 120
+        }
+    }
+    if depth > 0 {
+        tri size/2, depth-1
+        pen "up"
+        step size/2
+        pen "down"
+        tri size/2, depth-1
+        pen "up"
+        left 120
+        step size/2
+        right 120
+        pen "down"
+        tri size/2, depth-1
+        pen "up"
+        right 120
+        step size/2
+        left 120
+        pen "down"
+    }
+}
+
+color "seagreen"
+tri 16, 3

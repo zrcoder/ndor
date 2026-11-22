@@ -20,6 +20,10 @@ var (
 		"star",
 		"tree",
 		"colored squares",
+		"flower",
+		"snowflake",
+		"sierpinski",
+		"fibonacci",
 	}
 )
 

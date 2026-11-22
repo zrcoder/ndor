@@ -1,0 +1,20 @@
+func koch(size float64, depth int) {
+    if depth == 0 {
+        step size
+    }
+    if depth > 0 {
+        koch size/3, depth-1
+        left 60
+        koch size/3, depth-1
+        right 120
+        koch size/3, depth-1
+        left 60
+        koch size/3, depth-1
+    }
+}
+
+color "royalblue"
+for range 3 {
+    koch 27, 3
+    right 120
+}

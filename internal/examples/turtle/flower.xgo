@@ -1,0 +1,18 @@
+func petal() {
+    for range 15 {
+        step 0.8
+        left 6
+    }
+    left 90
+    for range 15 {
+        step 0.8
+        left 6
+    }
+    left 90
+}
+
+color "deeppink"
+for range 10 {
+    petal
+    right 36
+}

@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	stepDelay      = 50 * time.Millisecond
+	stepDelay      = 30 * time.Millisecond
 	gopherFrameDur = 65 * time.Millisecond
 )
 
