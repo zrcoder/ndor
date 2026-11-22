@@ -7,7 +7,6 @@ import (
 
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
-	"github.com/egoist/mygo/ui/editor"
 	ndorlib "github.com/zrcoder/ndor"
 	"github.com/zrcoder/ndor/cmd/gui/internal/assets"
 	"github.com/zrcoder/ndor/cmd/gui/internal/comp"
@@ -15,53 +14,34 @@ import (
 )
 
 type App struct {
+	ws            *comp.Workspace
 	pendingToast  string
 	resultImg     *ui.Bitmap
 	resultPNGData []byte
 	paintUntil    time.Time
-	editor        *editor.State
-	helpBtnImg    *ui.Bitmap
-	runBtnImg     *ui.Bitmap
 	paintImg      *ui.Bitmap
 	codeImg       *ui.Bitmap
-	help          *comp.Help
-	copyButton    *comp.CopyButton
 	saveIcon      *ui.SVG
 }
 
 func New(fsys fs.FS) *App {
 	a := &App{
-		helpBtnImg: assets.Bitmap(fsys, "teacher_labeled.png"),
-		runBtnImg:  assets.Bitmap(fsys, "gopher_labeled.png"),
-		paintImg:   assets.Bitmap(fsys, "paint.png"),
-		codeImg:    assets.Bitmap(fsys, "code.png"),
-		saveIcon:   assets.SVG(fsys, "save.svg"),
+		paintImg: assets.Bitmap(fsys, "paint.png"),
+		codeImg:  assets.Bitmap(fsys, "code.png"),
+		saveIcon: assets.SVG(fsys, "save.svg"),
 	}
-	code := `context 800, 800
+	a.ws = comp.NewWorkspace(fsys, comp.WorkspaceConfig{
+		Code: `context 800, 800
 color "lightgreen"
 circle 400, 400, 300
 fill
-`
-	a.editor = &editor.State{Buffer: editor.NewBuffer(code)}
-	a.editor.Buffer.SetLanguage(editor.LanguageNamed("c"))
-
-	a.help = comp.NewHelp(comp.HelpConfig{
-		DialogImg:    assets.Bitmap(fsys, "teacher.png"),
-		CloseIcon:    assets.SVG(fsys, "close.svg"),
+`,
 		ExampleNames: examples.DefaultNames,
 		Examples:     examples.Default,
-		OnPickExample: func(code string) {
-			a.editor.Buffer.Set(code)
-		},
-		LoadDoc: assets.DocLoader(fsys, "ndor"),
+		DocModule:    "ndor",
+		Canvas:       a.canvas,
+		OnRun:        a.runCode,
 	})
-
-	a.copyButton = comp.NewCopyButton(comp.CopyButtonConfig{
-		CopyIcon:  assets.SVG(fsys, "copy.svg"),
-		CheckIcon: assets.SVG(fsys, "check.svg"),
-		GetCode:   func() string { return a.editor.Buffer.String() },
-	})
-
 	return a
 }
 
@@ -70,35 +50,17 @@ func (a *App) View(c *ui.Context) {
 		c.Toast(a.pendingToast)
 		a.pendingToast = ""
 	}
-	// Handle shortcuts before anything else so a run shows this frame.
-	if c.Shortcut(ui.Ctrl, ui.KeyH) {
-		a.help.Open()
-		c.Invalidate()
-	}
-	if c.Shortcut(ui.Ctrl, ui.KeyR) {
-		a.runCode(c)
-	}
-
-	a.help.View(c)
-
-	painting := comp.PaintingActive(c, a.paintUntil)
-	if painting {
-		c.After(time.Until(a.paintUntil))
-	}
-
-	ui.Row(c.Key("main")).Fill().Children(func() {
-		a.pictureArea(c, painting)
-		a.codeArea(c)
-	})
-
-	comp.FloatButtons(c, a.helpBtnImg, a.runBtnImg, a.help.Open, func() { a.runCode(c) })
-
-	if painting {
+	a.ws.View(c)
+	if comp.PaintingActive(c, a.paintUntil) {
 		comp.Painting(c, a.paintImg, a.codeImg)
 	}
 }
 
-func (a *App) pictureArea(c *ui.Context, painting bool) {
+func (a *App) canvas(c *ui.Context) {
+	painting := comp.PaintingActive(c, a.paintUntil)
+	if painting {
+		c.After(time.Until(a.paintUntil))
+	}
 	ui.Themed(c, ui.LightTheme()).WidthPercent(50).Fill().Children(func() {
 		if painting || a.resultImg == nil {
 			return
@@ -148,22 +110,12 @@ func (a *App) notify(msg string) {
 	})
 }
 
-func (a *App) codeArea(c *ui.Context) {
-	ui.Column(c).Fill().Children(func() {
-		ui.Row(c).Fill().Height(36).Children(func() {
-			ui.Spacer(c)
-			a.copyButton.View(c)
-		})
-		editor.View(c, a.editor).Fill()
-	})
-}
-
 func (a *App) runCode(c *ui.Context) {
 	width, height := getPictureSize()
 	if width <= 0 || height <= 0 {
 		width, height = 800, 800
 	}
-	code := a.editor.Buffer.String()
+	code := a.ws.Editor.Buffer.String()
 
 	pngData, lineErr := ndorlib.Gen(width, height, code)
 	if lineErr != nil {

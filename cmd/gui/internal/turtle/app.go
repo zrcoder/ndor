@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/egoist/mygo/ui"
-	"github.com/egoist/mygo/ui/editor"
 
 	"github.com/zrcoder/ndor/cmd/gui/internal/assets"
 	"github.com/zrcoder/ndor/cmd/gui/internal/comp"
@@ -19,11 +18,8 @@ const (
 )
 
 type App struct {
+	ws        *comp.Workspace
 	prog      *turtlelib.Program
-	editor    *editor.State
-	help      *comp.Help
-	helpImg   *ui.Bitmap
-	runImg    *ui.Bitmap
 	gopher    []*ui.Bitmap // walk frames; frame 0 is the idle pose
 	animStart time.Time
 	stepTimer time.Time
@@ -32,38 +28,33 @@ type App struct {
 // New builds a turtle app.
 func New(fsys fs.FS) *App {
 	a := &App{
-		helpImg: assets.Bitmap(fsys, "teacher_labeled.png"),
-		runImg:  assets.Bitmap(fsys, "gopher_labeled.png"),
-		gopher:  assets.SpriteSheet(fsys, "turtle_pen.png", 4, 64),
-		prog:    turtlelib.New(),
+		gopher: assets.SpriteSheet(fsys, "turtle_pen.png", 4, 64),
+		prog:   turtlelib.New(),
 	}
-
-	code := `color "lightgreen"
+	a.ws = comp.NewWorkspace(fsys, comp.WorkspaceConfig{
+		Code: `color "lightgreen"
 width 3
 for range 4 {
     step 10
     right 90
 }
-`
-	a.editor = &editor.State{Buffer: editor.NewBuffer(code)}
-	a.editor.Buffer.SetLanguage(editor.LanguageNamed("c"))
-
-	a.help = comp.NewHelp(comp.HelpConfig{
-		DialogImg:    assets.Bitmap(fsys, "teacher.png"),
-		CloseIcon:    assets.SVG(fsys, "close.svg"),
+`,
 		ExampleNames: turtleexamples.DefaultNames,
 		Examples:     turtleexamples.Default,
-		OnPickExample: func(code string) {
-			a.editor.Buffer.Set(code)
-		},
-		LoadDoc: assets.DocLoader(fsys, "turtle"),
+		DocModule:    "turtle",
+		Canvas:       a.canvas,
+		OnRun:        a.runXGoCode,
 	})
 	return a
 }
 
+func (a *App) View(c *ui.Context) {
+	a.ws.View(c)
+}
+
 // runXGoCode compiles the editor's xgo code and starts playback.
 func (a *App) runXGoCode(c *ui.Context) {
-	prog, err := turtlelib.Compile(a.editor.Buffer.String())
+	prog, err := turtlelib.Compile(a.ws.Editor.Buffer.String())
 	if err != nil {
 		a.prog = turtlelib.New()
 		c.Toast(err.Error())
@@ -97,30 +88,14 @@ func (a *App) tickStep(p *ui.Painter) {
 	}
 }
 
-func (a *App) View(c *ui.Context) {
-	if c.Shortcut(ui.Ctrl, ui.KeyH) {
-		a.help.Open()
-		c.Invalidate()
-	}
-	if c.Shortcut(ui.Ctrl, ui.KeyR) {
-		a.runXGoCode(c)
-	}
-
-	a.help.View(c)
-
-	ui.Row(c.Key("main")).Fill().Children(func() {
-		ui.Box(c).WidthPercent(50).Fill().Background(ui.RGB(255, 255, 255)).DrawOver(func(p *ui.Painter, r ui.Rect) {
-			a.tickStep(p)
-			// Idle shows frame 0; playback cycles walk frames by time.
-			frame := 0
-			if !a.prog.Done() {
-				frame = int(p.Now().Sub(a.animStart)/gopherFrameDur) % len(a.gopher)
-			}
-			a.prog.Draw(p, r, a.gopher[frame])
-		})
-
-		editor.View(c, a.editor).Fill()
+func (a *App) canvas(c *ui.Context) {
+	ui.Box(c).WidthPercent(50).Fill().Background(ui.RGB(255, 255, 255)).DrawOver(func(p *ui.Painter, r ui.Rect) {
+		a.tickStep(p)
+		// Idle shows frame 0; playback cycles walk frames by time.
+		frame := 0
+		if !a.prog.Done() {
+			frame = int(p.Now().Sub(a.animStart)/gopherFrameDur) % len(a.gopher)
+		}
+		a.prog.Draw(p, r, a.gopher[frame])
 	})
-
-	comp.FloatButtons(c, a.helpImg, a.runImg, a.help.Open, func() { a.runXGoCode(c) })
 }
