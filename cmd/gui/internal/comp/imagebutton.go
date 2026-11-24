@@ -10,7 +10,8 @@ const (
 	imageButtonHeight = float32(72)
 )
 
-// ImageButton renders an image button sized for the floating corners.
+// ImageButton renders an image button sized for the floating corners. The
+// image eases larger while the pointer is over the button.
 func ImageButton(c *ui.Context, img *ui.Bitmap, onClick func()) {
 	btn := ui.ButtonBase(c).Width(imageButtonWidth).Height(imageButtonHeight).Background(ui.Color{})
 	if onClick != nil && btn.Clicked() {
@@ -21,11 +22,12 @@ func ImageButton(c *ui.Context, img *ui.Bitmap, onClick func()) {
 		if img == nil {
 			return
 		}
-		w, h := imageButtonWidth-21, imageButtonHeight-12
+		image := ui.Image(c, img).Width(imageButtonWidth-21).Height(imageButtonHeight-12).TransformOrigin(0.5, 1)
+		p := ui.Pose{}
 		if btn.Hovered() {
-			w *= 0.88
+			p.Scale = 1.2
 		}
-		ui.Image(c, img).Width(w).Height(h)
+		image.AnimatePose(p, ui.Snappy)
 	})
 }
 
