@@ -10,6 +10,7 @@ func TestShowDialogWithImage(t *testing.T) {
 	open := true
 	clickedBtn := -1
 	opt := DialogOption{
+		Title:   "Dialog",
 		Open:    &open,
 		Buttons: []string{"Left", "Right"},
 		OnClick: func(btnIndex int) {
@@ -37,6 +38,7 @@ func TestShowDialogWithImageDismissed(t *testing.T) {
 	outsideClicked := false
 
 	opt := DialogOption{
+		Title:   "Dialog",
 		Open:    &open,
 		Buttons: []string{"Button"},
 		OnClick: func(btnIndex int) {

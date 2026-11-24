@@ -5,6 +5,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/ELY-Open-Source/CrychicUI/feedback"
+	"github.com/ELY-Open-Source/CrychicUI/icon"
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 	ndorlib "github.com/zrcoder/ndor"
@@ -15,20 +17,18 @@ import (
 
 type App struct {
 	ws            *comp.Workspace
-	pendingToast  string
+	pendingToast  *ui.Toast
 	resultImg     *ui.Bitmap
 	resultPNGData []byte
 	paintUntil    time.Time
 	paintImg      *ui.Bitmap
 	codeImg       *ui.Bitmap
-	saveIcon      *ui.SVG
 }
 
 func New(fsys fs.FS) *App {
 	a := &App{
 		paintImg: assets.Bitmap(fsys, "paint.png"),
 		codeImg:  assets.Bitmap(fsys, "code.png"),
-		saveIcon: assets.SVG(fsys, "save.svg"),
 	}
 	a.ws = comp.NewWorkspace(fsys, comp.WorkspaceConfig{
 		Code: `context 800, 800
@@ -46,10 +46,12 @@ fill
 }
 
 func (a *App) View(c *ui.Context) {
-	if a.pendingToast != "" {
-		c.Toast(a.pendingToast)
-		a.pendingToast = ""
+	if a.pendingToast != nil {
+		c.AddToast(*a.pendingToast)
+		a.pendingToast = nil
 	}
+	feedback.Toaster(c, feedback.ToasterOptions{})
+
 	a.ws.View(c)
 	if comp.PaintingActive(c, a.paintUntil) {
 		comp.Painting(c, a.paintImg, a.codeImg)
@@ -67,7 +69,7 @@ func (a *App) canvas(c *ui.Context) {
 		}
 		ui.Row(c).Fill().Height(40).Children(func() {
 			ui.Spacer(c)
-			comp.IconButton(c, comp.IconButtonOption{Icon: a.saveIcon, OnClick: a.saveImage})
+			comp.IconButton(c, comp.IconButtonOption{Icon: icon.Must("download"), OnClick: a.saveImage})
 		})
 		ui.Image(c, a.resultImg).MaxWidthPercent(100).MaxHeightPercent(100)
 	})
@@ -77,6 +79,7 @@ func (a *App) saveImage() {
 	if a.resultPNGData == nil {
 		return
 	}
+
 	data := a.resultPNGData
 	go func() {
 		path, err := mygo.Dialog.Save(mygo.SaveDialogOptions{
@@ -85,25 +88,25 @@ func (a *App) saveImage() {
 			Filters:     []mygo.FileFilter{{Name: "PNG Image", Extensions: []string{"png"}}},
 		})
 		if err != nil {
-			a.notify("Save failed: " + err.Error())
+			a.notify(err)
 			return
 		}
 		if path == "" {
 			return
 		}
-		if err := os.WriteFile(path, data, 0o644); err != nil {
-			a.notify("Save failed: " + err.Error())
-			return
-		}
-		a.notify("Saved")
+		err = os.WriteFile(path, data, 0o644)
+		a.notify(err)
 	}()
 }
 
-// notify shows a toast from any goroutine. Toasts only register during a
-// frame, so the toast waits for the next View.
-func (a *App) notify(msg string) {
+// notify hands a toast to the next frame, the only place toasts can be added.
+func (a *App) notify(err error) {
 	mygo.RunOnMain(func() {
-		a.pendingToast = msg
+		if err != nil {
+			a.pendingToast = &ui.Toast{Title: "Save failed", Description: err.Error(), Type: "error"}
+		} else {
+			a.pendingToast = &ui.Toast{Title: "Saved", Type: "success"}
+		}
 		if win := mygo.FocusedWindow(); win != nil {
 			win.Invalidate()
 		}

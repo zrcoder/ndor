@@ -28,11 +28,6 @@ func Bitmap(fsys fs.FS, name string) *ui.Bitmap {
 	return b
 }
 
-// SVG parses an embedded icon from resources/icons.
-func SVG(fsys fs.FS, name string) *ui.SVG {
-	return ui.MustParseSVG(read(fsys, "resources/icons/"+name))
-}
-
 // SpriteSheet decodes a horizontal sprite sheet into per-frame bitmaps.
 func SpriteSheet(fsys fs.FS, name string, frames, size int) []*ui.Bitmap {
 	img, err := png.Decode(bytes.NewReader(read(fsys, "resources/"+name)))

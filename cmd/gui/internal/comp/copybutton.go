@@ -3,25 +3,20 @@ package comp
 import (
 	"time"
 
+	"github.com/ELY-Open-Source/CrychicUI/icon"
+	"github.com/ELY-Open-Source/CrychicUI/sound"
 	"github.com/egoist/mygo/ui"
 )
 
-// CopyButtonConfig holds the configuration for the CopyButton component.
-type CopyButtonConfig struct {
-	CopyIcon  *ui.SVG
-	CheckIcon *ui.SVG
-	GetCode   func() string
-}
-
 // CopyButton copies code to the clipboard and shows a check mark briefly.
 type CopyButton struct {
-	cfg  CopyButtonConfig
-	done time.Time
+	getContent func(*ui.Context) string
+	done       time.Time
 }
 
 // NewCopyButton creates a CopyButton.
-func NewCopyButton(cfg CopyButtonConfig) *CopyButton {
-	return &CopyButton{cfg: cfg}
+func NewCopyButton(getContent func(*ui.Context) string) *CopyButton {
+	return &CopyButton{getContent: getContent}
 }
 
 // View renders the copy button.
@@ -31,11 +26,12 @@ func (b *CopyButton) View(c *ui.Context) {
 		c.After(2*time.Second - c.Now().Sub(b.done))
 	}
 	IconButton(c, IconButtonOption{
-		Icon:       b.cfg.CopyIcon,
-		SecondIcon: b.cfg.CheckIcon,
+		Icon:       icon.Must("copy"),
+		SecondIcon: icon.Must("check"),
 		ShowSecond: copied,
 		OnClick: func() {
-			c.Services().WriteClipboard(b.cfg.GetCode())
+			sound.Play(sound.Tap)
+			c.Services().WriteClipboard(b.getContent(c))
 			b.done = c.Now()
 			c.Invalidate()
 		},

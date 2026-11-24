@@ -8,6 +8,7 @@ tool (
 )
 
 require (
+	github.com/ELY-Open-Source/CrychicUI v0.0.0-20261110123803-1c55e6a884bb
 	github.com/egoist/mygo v0.10.0
 	github.com/goplus/gogen v1.26.6
 	github.com/goplus/ixgo v1.2.7

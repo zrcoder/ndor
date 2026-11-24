@@ -1,6 +1,7 @@
 package comp
 
 import (
+	"github.com/ELY-Open-Source/CrychicUI/sound"
 	"github.com/egoist/mygo/ui"
 )
 
@@ -13,6 +14,7 @@ type IconButtonOption struct {
 
 func IconButton(c *ui.Context, opt IconButtonOption) {
 	btn := ui.ButtonBase(c).Margin(8).Padding(8).Radius(4).OnClick(func() {
+		sound.Play(sound.Tap)
 		opt.OnClick()
 	})
 	if btn.Hovered() {

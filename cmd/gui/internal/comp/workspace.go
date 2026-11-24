@@ -41,18 +41,13 @@ func NewWorkspace(fsys fs.FS, cfg WorkspaceConfig) *Workspace {
 
 	w.help = NewHelp(HelpConfig{
 		DialogImg:     assets.Bitmap(fsys, "teacher.png"),
-		CloseIcon:     assets.SVG(fsys, "close.svg"),
 		ExampleNames:  cfg.ExampleNames,
 		Examples:      cfg.Examples,
 		OnPickExample: w.Editor.Buffer.Set,
 		LoadDoc:       assets.DocLoader(fsys, cfg.DocModule),
 	})
 
-	w.copyBtn = NewCopyButton(CopyButtonConfig{
-		CopyIcon:  assets.SVG(fsys, "copy.svg"),
-		CheckIcon: assets.SVG(fsys, "check.svg"),
-		GetCode:   func() string { return w.Editor.Buffer.String() },
-	})
+	w.copyBtn = NewCopyButton(func(*ui.Context) string { return w.Editor.Buffer.String() })
 	return w
 }
 

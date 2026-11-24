@@ -1,10 +1,13 @@
 package comp
 
 import (
+	"github.com/ELY-Open-Source/CrychicUI/button"
+	"github.com/ELY-Open-Source/CrychicUI/overlay"
 	"github.com/egoist/mygo/ui"
 )
 
 type DialogOption struct {
+	Title   string
 	Open    *bool
 	Img     *ui.Bitmap
 	Buttons []string
@@ -17,46 +20,31 @@ func ShowDialogWithImage(c *ui.Context, opt DialogOption) {
 		return
 	}
 
-	if ui.Modal(c, opt.Open, func() {
-		ui.Column(c).Width(250).Radius(12).Background(c.Theme().Surface).Children(func() {
+	modal := overlay.Modal(c, opt.Title, opt.Open, overlay.ModalOptions{}, func() {
+		ui.Column(c).Fill().AlignItems(ui.Center).Children(func() {
 			if opt.Img != nil {
-				ui.Row(c).Fill().Children(func() {
-					ui.Spacer(c)
-					ui.Image(c, opt.Img).Width(80).Height(100)
-					ui.Spacer(c)
-				})
+				ui.Image(c, opt.Img).Width(80).Height(100).Margin(0, 18)
 			}
 
-			if len(opt.Buttons) > 0 {
-				ui.Row(c).Fill().Children(func() {
-					ui.Spacer(c)
-					for i, btnText := range opt.Buttons {
-						idx := i
-						bgColor := c.Theme().SurfaceHover
-						textColor := c.Theme().Text
-						if i == len(opt.Buttons)-1 {
-							bgColor = c.Theme().Accent
-							textColor = c.Theme().AccentText
-						}
-						ui.ButtonBase(c).Width(100).Height(36).Radius(6).Background(bgColor).OnClick(func() {
-							*opt.Open = false
-							if opt.OnClick != nil {
-								opt.OnClick(idx)
-							}
-						}).Children(func() {
-							ui.Text(c, btnText).FontSize(14).TextColor(textColor)
-						})
-						if i < len(opt.Buttons)-1 {
-							ui.Spacer(c).Width(8)
+			ui.Row(c).Children(func() {
+				for i, text := range opt.Buttons {
+					fn := func() {
+						*opt.Open = false
+						if opt.OnClick != nil {
+							opt.OnClick(i)
 						}
 					}
-					ui.Spacer(c)
-				})
-			}
+					if i == len(opt.Buttons)-1 {
+						button.Solid(c, text).Margin(0, 10).OnClick(fn)
+					} else {
+						button.Outline(c, text).Margin(0, 10).OnClick(fn)
+					}
+				}
+			})
 		})
-	}).Dismissed() {
-		if opt.OnClick != nil && len(opt.Buttons) > 0 {
-			opt.OnClick(0)
-		}
+	})
+
+	if modal.Changed() && opt.OnClick != nil {
+		opt.OnClick(0)
 	}
 }

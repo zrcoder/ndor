@@ -1,6 +1,10 @@
 package comp
 
 import (
+	"github.com/ELY-Open-Source/CrychicUI/icon"
+	"github.com/ELY-Open-Source/CrychicUI/layout"
+	"github.com/ELY-Open-Source/CrychicUI/navigation"
+	"github.com/ELY-Open-Source/CrychicUI/sound"
 	"github.com/egoist/mygo/ui"
 	"github.com/egoist/mygo/ui/markdown"
 )
@@ -8,7 +12,6 @@ import (
 // HelpConfig configures the Help component.
 type HelpConfig struct {
 	DialogImg     *ui.Bitmap
-	CloseIcon     *ui.SVG
 	ExampleNames  []string
 	Examples      map[string]string
 	OnPickExample func(code string)
@@ -40,6 +43,7 @@ func (h *Help) Open() {
 func (h *Help) View(c *ui.Context) {
 	if h.showDialog {
 		ShowDialogWithImage(c, DialogOption{
+			Title:   "Help",
 			Open:    &h.showDialog,
 			Img:     h.cfg.DialogImg,
 			Buttons: []string{"Examples", "Document"},
@@ -63,18 +67,24 @@ func (h *Help) View(c *ui.Context) {
 }
 
 func (h *Help) showDocument(c *ui.Context) {
-	content := ""
+	doc := ""
 	if h.cfg.LoadDoc != nil {
-		content = h.cfg.LoadDoc(h.isEnglish, h.docTab)
+		doc = h.cfg.LoadDoc(h.isEnglish, h.docTab)
+	}
+
+	closeFn := func() {
+		sound.Play(sound.Close)
+		h.showDoc = false
 	}
 
 	if ui.Modal(c, &h.showDoc, func() {
 		ui.Column(c).Width(800).Height(600).Radius(12).Background(c.Theme().Surface).Children(func() {
 			ui.Row(c).Fill().Height(40).Children(func() {
-				ui.Tabs(c, &h.docTab, "Home", "API", "Tutorials")
+				navigation.UnderlineTabs(c, "pages", []string{"Home", "API", "Tutorials"}, &h.docTab)
 				ui.Spacer(c)
 				btn := ui.ButtonBase(c).Width(60).Height(28).Radius(4).
 					OnClick(func() {
+						sound.Play(sound.Tap)
 						h.isEnglish = !h.isEnglish
 						c.Invalidate()
 					}).Children(func() {
@@ -88,21 +98,18 @@ func (h *Help) showDocument(c *ui.Context) {
 					btn.Background(c.Theme().SurfaceHover)
 				}
 				IconButton(c, IconButtonOption{
-					Icon: h.cfg.CloseIcon,
-					OnClick: func() {
-						h.showDoc = false
-						c.Invalidate()
-					},
+					Icon:    icon.Must("x"),
+					OnClick: closeFn,
 				})
 			})
-			ui.Scroll(c).Fill().Children(func() {
+			layout.ScrollArea(c, func() {
 				ui.Column(c).Width(760).Padding(10, 0, 0, 0).Children(func() {
-					markdown.View(c, content, nil)
+					markdown.View(c, doc, &markdown.Options{})
 				})
-			})
+			}).Fill()
 		})
 	}).Dismissed() {
-		h.showDoc = false
+		closeFn()
 	}
 }
 
@@ -120,13 +127,14 @@ func (h *Help) showExamplesList(c *ui.Context) {
 			ui.Row(c).Fill().Height(36).BorderWidth(0, 0, 1, 0).BorderColor(c.Theme().Border).Children(func() {
 				ui.Text(c, "Examples").FontSize(14).FontWeight(700).Padding(8)
 				ui.Spacer(c)
-				IconButton(c, IconButtonOption{Icon: h.cfg.CloseIcon, OnClick: closePanel})
+				IconButton(c, IconButtonOption{Icon: icon.Must("x"), OnClick: closePanel})
 				ui.Spacer(c).Width(4)
 			})
 
 			ui.List(c, &h.exampleList, len(names), func(i int) {
 				name := names[i]
 				ui.Row(c).Width(170).Height(28).BorderWidth(0, 0, 1, 0).BorderColor(c.Theme().Border).OnClick(func() {
+					sound.Play(sound.Select)
 					if h.cfg.OnPickExample != nil {
 						if code, ok := h.cfg.Examples[name]; ok {
 							h.cfg.OnPickExample(code)

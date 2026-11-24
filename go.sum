@@ -1,3 +1,5 @@
+github.com/ELY-Open-Source/CrychicUI v0.0.0-20261110123803-1c55e6a884bb h1:3Y2gd5aQomH78T6xhcAlHXrymH+wS9IPV5AZ0YqDUNU=
+github.com/ELY-Open-Source/CrychicUI v0.0.0-20261110123803-1c55e6a884bb/go.mod h1:1QGLYuBU27rGPHSdRh0+fdg8kGUe6aZj5ffDbFtbMzw=
 github.com/ProtonMail/go-crypto v1.4.1 h1:9RfcZHqEQUvP8RzecWEUafnZVtEvrBVL9BiF67IQOfM=
 github.com/ProtonMail/go-crypto v1.4.1/go.mod h1:e1OaTyu5SYVrO9gKOEhTc+5UcXtTUa+P3uLudwcgPqo=
 github.com/cloudflare/circl v1.6.2 h1:hL7VBpHHKzrV5WTfHCaBsgx/HGbBYlgrwvNXEVDYYsQ=

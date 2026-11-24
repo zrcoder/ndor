@@ -1,6 +1,9 @@
 package comp
 
-import "github.com/egoist/mygo/ui"
+import (
+	"github.com/ELY-Open-Source/CrychicUI/sound"
+	"github.com/egoist/mygo/ui"
+)
 
 const (
 	imageButtonWidth  = float32(64)
@@ -10,8 +13,9 @@ const (
 // ImageButton renders an image button sized for the floating corners.
 func ImageButton(c *ui.Context, img *ui.Bitmap, onClick func()) {
 	btn := ui.ButtonBase(c).Width(imageButtonWidth).Height(imageButtonHeight).Background(ui.Color{})
-	if onClick != nil {
-		btn.OnClick(onClick)
+	if onClick != nil && btn.Clicked() {
+		sound.Play(sound.Tap)
+		onClick()
 	}
 	btn.Children(func() {
 		if img == nil {
