@@ -3,6 +3,7 @@ package comp
 import (
 	"io/fs"
 
+	"github.com/ELY-Open-Source/CrychicUI/icon"
 	"github.com/egoist/mygo/ui"
 	"github.com/egoist/mygo/ui/editor"
 
@@ -21,12 +22,13 @@ type WorkspaceConfig struct {
 
 // Workspace lays out the canvas, code editor, help dialog and floating buttons.
 type Workspace struct {
-	Editor  *editor.State
-	cfg     WorkspaceConfig
-	help    *Help
-	copyBtn *CopyButton
-	helpImg *ui.Bitmap
-	runImg  *ui.Bitmap
+	Editor   *editor.State
+	cfg      WorkspaceConfig
+	help     *Help
+	settings *Settings
+	copyBtn  *CopyButton
+	helpImg  *ui.Bitmap
+	runImg   *ui.Bitmap
 }
 
 // NewWorkspace creates a workspace.
@@ -48,6 +50,7 @@ func NewWorkspace(fsys fs.FS, cfg WorkspaceConfig) *Workspace {
 	})
 
 	w.copyBtn = NewCopyButton(func(*ui.Context) string { return w.Editor.Buffer.String() })
+	w.settings = NewSettings()
 	return w
 }
 
@@ -62,6 +65,7 @@ func (w *Workspace) View(c *ui.Context) {
 	}
 
 	w.help.View(c)
+	w.settings.View(c)
 
 	ui.Row(c.Key("main")).Fill().Children(func() {
 		w.cfg.Canvas(c)
@@ -69,6 +73,7 @@ func (w *Workspace) View(c *ui.Context) {
 			ui.Row(c).Fill().Height(36).Children(func() {
 				ui.Spacer(c)
 				w.copyBtn.View(c)
+				IconButton(c, IconButtonOption{Icon: icon.Must("settings"), OnClick: w.settings.Open})
 			})
 			editor.View(c, w.Editor).Fill()
 		})
