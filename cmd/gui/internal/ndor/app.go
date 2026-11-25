@@ -7,6 +7,7 @@ import (
 
 	"github.com/ELY-Open-Source/CrychicUI/feedback"
 	"github.com/ELY-Open-Source/CrychicUI/icon"
+	"github.com/ELY-Open-Source/CrychicUI/sound"
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 	ndorlib "github.com/zrcoder/ndor"
@@ -21,6 +22,7 @@ type App struct {
 	resultImg     *ui.Bitmap
 	resultPNGData []byte
 	paintUntil    time.Time
+	painting      bool
 	paintImg      *ui.Bitmap
 	codeImg       *ui.Bitmap
 }
@@ -53,7 +55,12 @@ func (a *App) View(c *ui.Context) {
 	feedback.Toaster(c, feedback.ToasterOptions{})
 
 	a.ws.View(c)
-	if comp.PaintingActive(c, a.paintUntil) {
+	painting := comp.PaintingActive(c, a.paintUntil)
+	if a.painting && !painting {
+		sound.Play(sound.Success)
+	}
+	a.painting = painting
+	if painting {
 		comp.Painting(c, a.paintImg, a.codeImg)
 	}
 }
@@ -141,6 +148,7 @@ func (a *App) runCode(c *ui.Context) {
 
 	a.resultImg = bitmap
 	a.paintUntil = time.Now().Add(comp.PaintingDuration)
+	sound.Play(sound.Swipe)
 	c.Invalidate()
 }
 
