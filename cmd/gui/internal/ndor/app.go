@@ -13,6 +13,7 @@ import (
 	ndorlib "github.com/zrcoder/ndor"
 	"github.com/zrcoder/ndor/cmd/gui/internal/assets"
 	"github.com/zrcoder/ndor/cmd/gui/internal/comp"
+	"github.com/zrcoder/ndor/cmd/gui/internal/locales"
 	examples "github.com/zrcoder/ndor/internal/examples/ndor"
 )
 
@@ -88,11 +89,12 @@ func (a *App) saveImage() {
 	}
 
 	data := a.resultPNGData
+	m := locales.In(mygo.App.Locale())
 	go func() {
 		path, err := mygo.Dialog.Save(mygo.SaveDialogOptions{
-			Title:       "Save Image",
+			Title:       m.SaveImage(),
 			DefaultPath: "ndor.png",
-			Filters:     []mygo.FileFilter{{Name: "PNG Image", Extensions: []string{"png"}}},
+			Filters:     []mygo.FileFilter{{Name: m.PngImage(), Extensions: []string{"png"}}},
 		})
 		if err != nil {
 			a.notify(err)
@@ -109,10 +111,11 @@ func (a *App) saveImage() {
 // notify hands a toast to the next frame, the only place toasts can be added.
 func (a *App) notify(err error) {
 	mygo.RunOnMain(func() {
+		m := locales.In(mygo.App.Locale())
 		if err != nil {
-			a.pendingToast = &ui.Toast{Title: "Save failed", Description: err.Error(), Type: "error"}
+			a.pendingToast = &ui.Toast{Title: m.SaveFailed(), Description: err.Error(), Type: "error"}
 		} else {
-			a.pendingToast = &ui.Toast{Title: "Saved", Type: "success"}
+			a.pendingToast = &ui.Toast{Title: m.Saved(), Type: "success"}
 		}
 		if win := mygo.FocusedWindow(); win != nil {
 			win.Invalidate()
@@ -141,7 +144,7 @@ func (a *App) runCode(c *ui.Context) {
 	if err != nil {
 		a.resultImg = nil
 		a.resultPNGData = nil
-		c.Toast("Failed to decode image: " + err.Error())
+		c.Toast(locales.In(c.Locale()).DecodeFailed(err.Error()))
 		c.Invalidate()
 		return
 	}

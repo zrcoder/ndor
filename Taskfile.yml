@@ -3,6 +3,7 @@ tasks:
   gen:
     cmds:
       - go generate ./...
+      - (cd cmd/gui && go tool mygo generate)
   test:
     cmds:
       - go test ./...
@@ -16,6 +17,7 @@ tasks:
       - rm -rf gui/build
       - rm -rf gui/.mygo
       - rm -rf gui/*.png
+      - rm -f gui/internal/locales/catalog_gen.go
   cli:
     deps: [gen]
     cmds:

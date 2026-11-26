@@ -4,6 +4,8 @@ import (
 	"github.com/ELY-Open-Source/CrychicUI/button"
 	"github.com/ELY-Open-Source/CrychicUI/overlay"
 	"github.com/egoist/mygo/ui"
+
+	"github.com/zrcoder/ndor/cmd/gui/internal/locales"
 )
 
 type DialogOption struct {
@@ -20,7 +22,7 @@ func ShowDialogWithImage(c *ui.Context, opt DialogOption) {
 		return
 	}
 
-	modal := overlay.Modal(c, opt.Title, opt.Open, overlay.ModalOptions{}, func() {
+	modal := overlay.Modal(c, opt.Title, opt.Open, overlay.ModalOptions{Close: locales.In(c.Locale()).Close()}, func() {
 		ui.Column(c).Fill().AlignItems(ui.Center).Children(func() {
 			if opt.Img != nil {
 				ui.Image(c, opt.Img).Width(80).Height(100).Margin(0, 18)

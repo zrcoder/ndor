@@ -10,7 +10,7 @@ func TestHelpShowsAfterOpen(t *testing.T) {
 	h := NewHelp(HelpConfig{
 		ExampleNames: []string{"one"},
 		Examples:     map[string]string{"one": "code"},
-		LoadDoc:      func(bool, int) string { return "doc" },
+		LoadDoc:      func(string, int) string { return "doc" },
 	})
 
 	tt := ui.NewTester(func(c *ui.Context) { h.View(c) }, 400, 300)
@@ -31,7 +31,7 @@ func TestHelpExamplesOverlay(t *testing.T) {
 		ExampleNames:  []string{"one"},
 		Examples:      map[string]string{"one": "code"},
 		OnPickExample: func(code string) { picked = code },
-		LoadDoc:       func(bool, int) string { return "doc" },
+		LoadDoc:       func(string, int) string { return "doc" },
 	})
 	tt := ui.NewTester(func(c *ui.Context) { h.View(c) }, 400, 300)
 	h.Open()

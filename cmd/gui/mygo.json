@@ -2,5 +2,6 @@
   "name": "Ndor",
   "identifier": "edu.example.ndor",
   "version": "0.1.0",
-  "out": "build"
+  "out": "build",
+  "i18n": { "dir": "internal/locales", "source": "en" }
 }

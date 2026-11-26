@@ -6,6 +6,7 @@ import (
 	"image"
 	"image/png"
 	"io/fs"
+	"strings"
 
 	"github.com/egoist/mygo/ui"
 	"golang.org/x/image/draw"
@@ -46,17 +47,18 @@ func SpriteSheet(fsys fs.FS, name string, frames, size int) []*ui.Bitmap {
 	return out
 }
 
-// DocLoader returns a wiki loader for a module: "ndor" or "turtle".
-func DocLoader(fsys fs.FS, module string) func(isEnglish bool, tab int) string {
+// DocLoader returns a wiki loader for a module: Chinese reads its pages,
+// every other language en/.
+func DocLoader(fsys fs.FS, module string) func(locale string, tab int) string {
 	names := [...]string{"Home.md", "Api.md", "Tutorials.md"}
 	dir := "resources/wiki/" + module + "/"
 
-	return func(isEnglish bool, tab int) string {
+	return func(locale string, tab int) string {
 		if tab < 0 || tab >= len(names) {
 			return ""
 		}
 		lang := ""
-		if isEnglish {
+		if !strings.HasPrefix(locale, "zh") {
 			lang = "en/"
 		}
 		data, _ := fs.ReadFile(fsys, dir+lang+names[tab])

@@ -1,0 +1,22 @@
+{
+  "@@locale": "zh-Hans",
+  "settings": "设置",
+  "close": "关闭",
+  "sound": "音效",
+  "theme": "主题",
+  "language": "语言",
+  "system": "跟随系统",
+  "light": "浅色",
+  "dark": "深色",
+  "help": "帮助",
+  "examples": "示例",
+  "document": "文档",
+  "tab_home": "首页",
+  "tab_api": "API",
+  "tab_tutorials": "教程",
+  "save_image": "保存图片",
+  "png_image": "PNG 图片",
+  "save_failed": "保存失败",
+  "saved": "已保存",
+  "decode_failed": "图片解码失败：{err}"
+}

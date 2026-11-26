@@ -7,6 +7,8 @@ import (
 	"github.com/ELY-Open-Source/CrychicUI/sound"
 	"github.com/egoist/mygo/ui"
 	"github.com/egoist/mygo/ui/markdown"
+
+	"github.com/zrcoder/ndor/cmd/gui/internal/locales"
 )
 
 // HelpConfig configures the Help component.
@@ -15,7 +17,7 @@ type HelpConfig struct {
 	ExampleNames  []string
 	Examples      map[string]string
 	OnPickExample func(code string)
-	LoadDoc       func(isEnglish bool, tab int) string
+	LoadDoc       func(locale string, tab int) string
 }
 
 // Help owns the help dialog, docs viewer and examples overlay state.
@@ -25,7 +27,6 @@ type Help struct {
 	showDoc      bool
 	docTab       int
 	showExamples bool
-	isEnglish    bool
 	exampleList  ui.ListState
 }
 
@@ -41,12 +42,13 @@ func (h *Help) Open() {
 
 // View renders the help dialog and whatever it opens.
 func (h *Help) View(c *ui.Context) {
+	m := locales.In(c.Locale())
 	if h.showDialog {
 		ShowDialogWithImage(c, DialogOption{
-			Title:   "Help",
+			Title:   m.Help(),
 			Open:    &h.showDialog,
 			Img:     h.cfg.DialogImg,
-			Buttons: []string{"Examples", "Document"},
+			Buttons: []string{m.Examples(), m.Document()},
 			OnClick: func(btn int) {
 				if btn == 0 {
 					h.showExamples = true
@@ -58,18 +60,18 @@ func (h *Help) View(c *ui.Context) {
 	}
 
 	if h.showDoc {
-		h.showDocument(c)
+		h.showDocument(c, m)
 	}
 
 	if h.showExamples {
-		h.showExamplesList(c)
+		h.showExamplesList(c, m)
 	}
 }
 
-func (h *Help) showDocument(c *ui.Context) {
+func (h *Help) showDocument(c *ui.Context, m locales.Messages) {
 	doc := ""
 	if h.cfg.LoadDoc != nil {
-		doc = h.cfg.LoadDoc(h.isEnglish, h.docTab)
+		doc = h.cfg.LoadDoc(c.Locale(), h.docTab)
 	}
 
 	closeFn := func() {
@@ -80,23 +82,8 @@ func (h *Help) showDocument(c *ui.Context) {
 	if ui.Modal(c, &h.showDoc, func() {
 		ui.Column(c).Width(800).Height(600).Radius(12).Background(c.Theme().Surface).Children(func() {
 			ui.Row(c).Fill().Height(40).Children(func() {
-				navigation.UnderlineTabs(c, "pages", []string{"Home", "API", "Tutorials"}, &h.docTab)
+				navigation.UnderlineTabs(c, "pages", []string{m.TabHome(), m.TabApi(), m.TabTutorials()}, &h.docTab)
 				ui.Spacer(c)
-				btn := ui.ButtonBase(c).Width(60).Height(28).Radius(4).
-					OnClick(func() {
-						sound.Play(sound.Tap)
-						h.isEnglish = !h.isEnglish
-						c.Invalidate()
-					}).Children(func() {
-					if h.isEnglish {
-						ui.Text(c, "🌐 EN").FontSize(12)
-					} else {
-						ui.Text(c, "🌐 中文").FontSize(12)
-					}
-				})
-				if btn.Hovered() {
-					btn.Background(c.Theme().SurfaceHover)
-				}
 				IconButton(c, IconButtonOption{
 					Icon:    icon.Must("x"),
 					OnClick: closeFn,
@@ -113,7 +100,7 @@ func (h *Help) showDocument(c *ui.Context) {
 	}
 }
 
-func (h *Help) showExamplesList(c *ui.Context) {
+func (h *Help) showExamplesList(c *ui.Context, m locales.Messages) {
 	names := h.cfg.ExampleNames
 	closePanel := func() {
 		h.showExamples = false
@@ -125,7 +112,7 @@ func (h *Help) showExamplesList(c *ui.Context) {
 
 		ui.Column(c).Top(52).Left(10).Width(180).Background(c.Theme().Surface).Radius(8).BorderWidth(1).BorderColor(c.Theme().Border).Absolute().Children(func() {
 			ui.Row(c).Fill().Height(36).BorderWidth(0, 0, 1, 0).BorderColor(c.Theme().Border).Children(func() {
-				ui.Text(c, "Examples").FontSize(14).FontWeight(700).Padding(8)
+				ui.Text(c, m.Examples()).FontSize(14).FontWeight(700).Padding(8)
 				ui.Spacer(c)
 				IconButton(c, IconButtonOption{Icon: icon.Must("x"), OnClick: closePanel})
 				ui.Spacer(c).Width(4)
