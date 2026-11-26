@@ -15,3 +15,4 @@ internal/goldmark/testdata/*.html
 /gui
 .mygo
 .agents
+.trae
