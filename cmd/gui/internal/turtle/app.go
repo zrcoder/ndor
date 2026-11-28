@@ -71,10 +71,11 @@ func (a *App) runXGoCode(c *ui.Context) {
 	prog, err := turtlelib.Compile(a.ws.Editor.Buffer.String())
 	if err != nil {
 		a.prog = turtlelib.New()
-		c.Toast(err.Error())
+		a.ws.MakeError(err.Number, err.Msg)
 		c.Invalidate()
 		return
 	}
+	a.ws.ClearError()
 
 	a.prog = prog
 	if a.prog.Done() {

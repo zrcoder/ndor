@@ -56,6 +56,7 @@ func (a *App) View(c *ui.Context) {
 	feedback.Toaster(c, feedback.ToasterOptions{})
 
 	a.ws.View(c)
+
 	painting := comp.PaintingActive(c, a.paintUntil)
 	if a.painting && !painting {
 		sound.Play(sound.Success)
@@ -88,7 +89,6 @@ func (a *App) saveImage() {
 		return
 	}
 
-	data := a.resultPNGData
 	m := locales.In(mygo.App.Locale())
 	go func() {
 		path, err := mygo.Dialog.Save(mygo.SaveDialogOptions{
@@ -103,7 +103,7 @@ func (a *App) saveImage() {
 		if path == "" {
 			return
 		}
-		err = os.WriteFile(path, data, 0o644)
+		err = os.WriteFile(path, a.resultPNGData, 0o644)
 		a.notify(err)
 	}()
 }
@@ -134,10 +134,11 @@ func (a *App) runCode(c *ui.Context) {
 	if lineErr != nil {
 		a.resultImg = nil
 		a.resultPNGData = nil
-		c.Toast(lineErr.Error())
+		a.ws.MakeError(lineErr.Number, lineErr.Msg)
 		c.Invalidate()
 		return
 	}
+	a.ws.ClearError()
 
 	a.resultPNGData = pngData
 	bitmap, err := ui.DecodeBitmap(pngData)
