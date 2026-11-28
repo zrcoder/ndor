@@ -23,24 +23,18 @@ func (p *Program) Draw(painter *ui.Painter, r ui.Rect, gopher *ui.Bitmap) {
 		painter.StrokePath(&ln, 1, col)
 	}
 
-	drawGrid := func(vertical bool, n int) {
-		for k := -n; k <= n; k++ {
-			col := gridColor(k)
-			if vertical {
-				x := cx + float32(k)*cell
-				if x >= r.X && x <= r.X+r.W {
-					strokeGrid(x, r.Y, x, r.Y+r.H, col)
-				}
-				continue
-			}
-			y := cy + float32(k)*cell
-			if y >= r.Y && y <= r.Y+r.H {
-				strokeGrid(r.X, y, r.X+r.W, y, col)
-			}
+	for k := -int(cx / cell); k <= int(cx/cell); k++ {
+		x := cx + float32(k)*cell
+		if x >= r.X && x <= r.X+r.W {
+			strokeGrid(x, r.Y, x, r.Y+r.H, gridColor(k))
 		}
 	}
-	drawGrid(true, int(cx/cell))
-	drawGrid(false, int(cy/cell))
+	for k := -int(cy / cell); k <= int(cy/cell); k++ {
+		y := cy + float32(k)*cell
+		if y >= r.Y && y <= r.Y+r.H {
+			strokeGrid(r.X, y, r.X+r.W, y, gridColor(k))
+		}
+	}
 
 	sx := func(q pt) float32 { return cx + q.X }
 	sy := func(q pt) float32 { return cy - q.Y }

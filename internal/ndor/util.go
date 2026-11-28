@@ -20,13 +20,6 @@ func ParseColor(args ...any) (icolor.RGBA, *xgoerr.LineError) {
 	return rgba, newInvalidParsErr(colorFlag, invalidPars)
 }
 
-func KeepLastErr(err *xgoerr.LineError) {
-	if GlobalErr != nil {
-		return
-	}
-	GlobalErr = err
-}
-
 func newInvalidParsErr(flag, msg string) *xgoerr.LineError {
 	return &xgoerr.LineError{
 		Flag: flag,

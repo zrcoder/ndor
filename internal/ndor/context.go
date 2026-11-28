@@ -117,13 +117,13 @@ func (p path) d() string {
 		}
 		switch c.op {
 		case 0:
-			b.WriteString("M" + num(q[0][0]) + " " + num(q[0][1]))
+			fmt.Fprintf(&b, "M%s %s", num(q[0][0]), num(q[0][1]))
 		case 1:
-			b.WriteString("L" + num(q[0][0]) + " " + num(q[0][1]))
+			fmt.Fprintf(&b, "L%s %s", num(q[0][0]), num(q[0][1]))
 		case 2:
-			b.WriteString("Q" + num(q[0][0]) + " " + num(q[0][1]) + " " + num(q[1][0]) + " " + num(q[1][1]))
+			fmt.Fprintf(&b, "Q%s %s %s %s", num(q[0][0]), num(q[0][1]), num(q[1][0]), num(q[1][1]))
 		case 3:
-			b.WriteString("C" + num(q[0][0]) + " " + num(q[0][1]) + " " + num(q[1][0]) + " " + num(q[1][1]) + " " + num(q[2][0]) + " " + num(q[2][1]))
+			fmt.Fprintf(&b, "C%s %s %s %s %s %s", num(q[0][0]), num(q[0][1]), num(q[1][0]), num(q[1][1]), num(q[2][0]), num(q[2][1]))
 		case 4:
 			b.WriteString("Z")
 		}
@@ -148,7 +148,7 @@ func (o fillOp) draw(p *ui.Painter, tf renderXform) {
 }
 
 func (o fillOp) svg(b *strings.Builder) {
-	b.WriteString(`<path d="` + o.path.d() + `"`)
+	fmt.Fprintf(b, `<path d="%s"`, o.path.d())
 	svgPaint(b, "fill", o.color)
 	b.WriteString(`/>`)
 }
@@ -171,9 +171,9 @@ func (o strokeOp) draw(p *ui.Painter, tf renderXform) {
 }
 
 func (o strokeOp) svg(b *strings.Builder) {
-	b.WriteString(`<path d="` + o.path.d() + `" fill="none"`)
+	fmt.Fprintf(b, `<path d="%s" fill="none"`, o.path.d())
 	svgPaint(b, "stroke", o.color)
-	b.WriteString(` stroke-width="` + num(o.width) + `" stroke-linecap="round" stroke-linejoin="round"`)
+	fmt.Fprintf(b, ` stroke-width="%s" stroke-linecap="round" stroke-linejoin="round"`, num(o.width))
 	if len(o.dashes) > 0 {
 		b.WriteString(` stroke-dasharray="`)
 		for i, d := range o.dashes {
@@ -228,20 +228,21 @@ func (o textOp) draw(p *ui.Painter, tf renderXform) {
 }
 
 func (o textOp) svg(b *strings.Builder) {
-	lines := strings.Split(o.text, "\n")
 	layout := o.layout.Lines()
-	for i, line := range lines {
-		b.WriteString(`<text x="` + num(float32(o.x)))
+	i := 0
+	for line := range strings.SplitSeq(o.text, "\n") {
+		fmt.Fprintf(b, `<text x="%s"`, num(float32(o.x)))
 		y := o.y
 		if i < len(layout) {
 			y = o.y - float64(o.baseline) + float64(layout[i].Baseline)
 		}
-		b.WriteString(`" y="` + num(float32(y)) + `" font-family="` + textFontFamily + `" font-size="` + num(o.size) + `" xml:space="preserve"`)
+		fmt.Fprintf(b, `" y="%s" font-family="%s" font-size="%s" xml:space="preserve"`, num(float32(y)), textFontFamily, num(o.size))
 		svgPaint(b, "fill", o.color)
 		if o.angle != 0 {
-			b.WriteString(` transform="rotate(` + num(float32(o.angle*180/math.Pi)) + " " + num(float32(o.x)) + " " + num(float32(o.y)) + `)"`)
+			fmt.Fprintf(b, ` transform="rotate(%s %s %s)"`, num(float32(o.angle*180/math.Pi)), num(float32(o.x)), num(float32(o.y)))
 		}
-		b.WriteString(`>` + html.EscapeString(line) + `</text>`)
+		fmt.Fprintf(b, `>%s</text>`, html.EscapeString(line))
+		i++
 	}
 }
 
@@ -268,9 +269,9 @@ func (clearOp) draw(p *ui.Painter, tf renderXform) {}
 func (clearOp) svg(b *strings.Builder) {}
 
 func svgPaint(b *strings.Builder, name string, c ui.Color) {
-	b.WriteString(` ` + name + `="#` + fmt.Sprintf("%02x%02x%02x", c.R, c.G, c.B) + `"`)
+	fmt.Fprintf(b, ` %s="#%02x%02x%02x"`, name, c.R, c.G, c.B)
 	if c.A != 255 {
-		b.WriteString(` ` + name + `-opacity="` + num(float32(c.A)/255) + `"`)
+		fmt.Fprintf(b, ` %s-opacity="%s"`, name, num(float32(c.A)/255))
 	}
 }
 
@@ -322,14 +323,16 @@ func (d *Drawing) SVG() []byte {
 	var defs strings.Builder
 	for _, op := range d.ops {
 		if cl, ok := op.(clipOp); ok {
-			defs.WriteString(`<clipPath id="ndor-clip-` + strconv.Itoa(cl.id) + `"><path d="` + cl.path.d() + `"/></clipPath>`)
+			fmt.Fprintf(&defs, `<clipPath id="ndor-clip-%d"><path d="%s"/></clipPath>`, cl.id, cl.path.d())
 		}
 	}
 	if defs.Len() > 0 {
-		out.WriteString(`<defs>` + defs.String() + `</defs>`)
+		out.WriteString(`<defs>`)
+		out.WriteString(defs.String())
+		out.WriteString(`</defs>`)
 	}
 	if hasBG {
-		out.WriteString(`<rect x="` + num(b.X) + `" y="` + num(b.Y) + `" width="` + num(b.W) + `" height="` + num(b.H) + `"`)
+		fmt.Fprintf(&out, `<rect x="%s" y="%s" width="%s" height="%s"`, num(b.X), num(b.Y), num(b.W), num(b.H))
 		svgPaint(&out, "fill", bg)
 		out.WriteString(`/>`)
 	}
@@ -343,7 +346,7 @@ func writeSVG(b *strings.Builder, ops []drawOp, start int) {
 	draw = func(i int) {
 		for ; i < len(ops); i++ {
 			if cl, ok := ops[i].(clipOp); ok {
-				b.WriteString(`<g clip-path="url(#ndor-clip-` + strconv.Itoa(cl.id) + `)">`)
+				fmt.Fprintf(b, `<g clip-path="url(#ndor-clip-%d)">`, cl.id)
 				draw(i + 1)
 				b.WriteString(`</g>`)
 				return
@@ -595,9 +598,7 @@ func (c *Context) DrawEllipse(x, y, rx, ry float64) {
 }
 
 func (c *Context) DrawCircle(x, y, r float64) {
-	c.newSubPath()
-	c.DrawEllipticalArc(x, y, r, r, 0, 2*math.Pi)
-	c.closePath()
+	c.DrawEllipse(x, y, r, r)
 }
 
 func (c *Context) DrawRegularPolygon(n int, x, y, r, rotation float64) {

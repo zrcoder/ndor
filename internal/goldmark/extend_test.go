@@ -21,10 +21,5 @@ func Test(t *testing.T) {
 	err = md.Convert(data, out)
 	if err != nil {
 		t.Error(err)
-	} else {
-		err = os.WriteFile(filepath.Join("testdata", "test.html"), out.Bytes(), 0o640)
-		if err != nil {
-			t.Error(err)
-		}
 	}
 }

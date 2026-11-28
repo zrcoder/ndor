@@ -11,7 +11,9 @@ const (
 func Color(args ...any) {
 	rgba, err := ndor.ParseColor(args...)
 	if err != nil {
-		ndor.KeepLastErr(err)
+		if ndor.GlobalErr == nil {
+			ndor.GlobalErr = err
+		}
 		return
 	}
 	ndor.GlobalCtx.SetRGBA255(int(rgba.R), int(rgba.G), int(rgba.B), int(rgba.A))

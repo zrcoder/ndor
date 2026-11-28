@@ -69,10 +69,7 @@ func (h *Help) View(c *ui.Context) {
 }
 
 func (h *Help) showDocument(c *ui.Context, m locales.Messages) {
-	doc := ""
-	if h.cfg.LoadDoc != nil {
-		doc = h.cfg.LoadDoc(c.Locale(), h.docTab)
-	}
+	doc := h.cfg.LoadDoc(c.Locale(), h.docTab)
 
 	closeFn := func() {
 		sound.Play(sound.Close)

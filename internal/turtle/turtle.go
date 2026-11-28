@@ -52,15 +52,12 @@ func (t *state) penUp() {
 
 func (t *state) home() {
 	t.x, t.y, t.angle = 0, 0, 90
-	if t.down {
-		t.penUp()
-		t.penDown()
-	}
+	t.flushCur()
+	t.startCur()
 }
 
 func (t *state) clear() {
 	t.x, t.y, t.angle = 0, 0, 90
-	t.down = true
 	t.penColor = [3]uint8{20, 20, 20}
 	t.penWidth = defaultWidth
 	t.segments = nil
@@ -87,10 +84,8 @@ func (t *state) step(d float32) {
 	rad := t.angle * math.Pi / 180
 	nx := t.x + float32(math.Cos(float64(rad)))*d
 	ny := t.y + float32(math.Sin(float64(rad)))*d
+	t.startCur()
 	if t.down {
-		if t.cur == nil {
-			t.penDown()
-		}
 		t.cur = append(t.cur, pt{nx, ny})
 	}
 	t.x, t.y = nx, ny

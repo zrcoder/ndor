@@ -46,37 +46,20 @@ func Compile(code string) (*Program, *xgoerr.LineError) {
 	}
 
 	for _, cmd := range api.CmdQueue {
+		val, perFrame := float32(cmd.Val), float64(stepPixelsPerFrame)
 		switch cmd.Kind {
 		case "step":
-			// Split each step into small moves so the animation is smooth.
-			dist := float32(cmd.Val) * cell
-			n := max(int(math.Ceil(math.Abs(float64(dist))/float64(stepPixelsPerFrame))), 1)
-			n = min(n, maxSubOps)
-			step := dist / float32(n)
-			for range n {
-				p.ops = append(p.ops, op{kind: "step", val: step})
-			}
+			val *= cell
 		case "turn":
-			// Split each turn into small rotations so the animation is smooth.
-			deg := float32(cmd.Val)
-			n := max(int(math.Ceil(math.Abs(float64(deg))/float64(turnDegPerFrame))), 1)
-			n = min(n, maxSubOps)
-			t := deg / float32(n)
-			for range n {
-				p.ops = append(p.ops, op{kind: "turn", val: t})
-			}
-		case "penUp":
-			p.ops = append(p.ops, op{kind: "penUp"})
-		case "penDown":
-			p.ops = append(p.ops, op{kind: "penDown"})
-		case "setColor":
-			p.ops = append(p.ops, op{kind: "setColor", color: cmd.Color})
-		case "setWidth":
-			p.ops = append(p.ops, op{kind: "setWidth", val: float32(cmd.Val)})
-		case "clear":
-			p.ops = append(p.ops, op{kind: "clear"})
-		case "home":
-			p.ops = append(p.ops, op{kind: "home"})
+			perFrame = turnDegPerFrame
+		default:
+			p.ops = append(p.ops, op{kind: cmd.Kind, val: float32(cmd.Val), color: cmd.Color})
+			continue
+		}
+		n := max(int(math.Ceil(math.Abs(float64(val))/perFrame)), 1)
+		n = min(n, maxSubOps)
+		for range n {
+			p.ops = append(p.ops, op{kind: cmd.Kind, val: val / float32(n)})
 		}
 	}
 	return p, nil
