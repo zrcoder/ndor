@@ -20,7 +20,7 @@ const (
 type op struct {
 	kind  string
 	val   float32
-	color [3]uint8
+	color [4]uint8
 }
 
 // Program is a compiled turtle script that can be played back step by step.
@@ -86,7 +86,7 @@ func (p *Program) Advance() {
 	case "penDown":
 		p.state.penDown()
 	case "setColor":
-		p.state.setColor(o.color[0], o.color[1], o.color[2])
+		p.state.setColor(o.color)
 	case "setWidth":
 		p.state.setWidth(o.val)
 	case "clear":

@@ -4,15 +4,11 @@ This is a practical and fun app where you can draw by writing code.
 
 ## Usage
 
-We draw in a 2D coordinate system using `code`.
+We draw in a 2D coordinate system.
 
-`ndor` uses the [XGo](https://xgo.dev) programming language.
+`ndor` uses the [XGo](https://xgo.dev) programming language. Write code in the editor on the right, then click the run button at the bottom right (or press `Ctrl+R`). The help button at the bottom left (or `Ctrl+H`) opens the docs and examples.
 
-## Coordinate system
-
-As in `turtle`, the origin is at the center of the picture, `x` grows to the right and `y` grows upwards.
-
-The picture size needs no setting: it is sized to fit everything you draw.
+Commands such as `circle` and `rectangle` only add shapes to the current path; nothing is painted until you call `fill`, `stroke` or `clip`. `fill` and `stroke` clear the path afterwards unless you pass `preserve`.
 
 ## Hello World
 
@@ -20,13 +16,13 @@ The picture size needs no setting: it is sized to fit everything you draw.
 // Set current color to light green
 color "lightgreen"
 
-// Define a circle with center and radius
+// Add a circle with center and radius to the current path
 circle 0, 0, 300
 
-// Fill the circle with current color
+// Fill the current path with the current color
 fill
 ```
 
 > Lines starting with `"//"` or blocks wrapped in `"/*"` and `"*/"` are comments and are ignored.
 >
-> `x` coordinate goes left to right, `y` coordinate goes bottom to top, and angles are counter-clockwise.
+> `x` goes left to right, `y` goes bottom to top; angles are in degrees and positive means counter-clockwise.

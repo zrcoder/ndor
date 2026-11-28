@@ -115,6 +115,44 @@ color "black"
 text 0, 0, "Hello!"
 ```
 
-## Rendering
+## Clipping
 
-You can set line style (solid/dashed), line width, and color for all shapes. You can also rotate shapes by rotating the canvas with push/pop operations. TODO
+`clip` clips everything drawn afterwards to the current path, then clears the path. Multiple clips intersect. For example, two overlapping circles define the region, then a rectangle fills it:
+
+```c
+circle -150, 0, 300
+clip
+circle 150, 0, 300
+clip
+rectangle -500, -500, 1000, 1000
+color "black"
+fill
+```
+
+## Saving and restoring state
+
+You can set colors and line width for all shapes. Use `dash` for line style: no arguments restores a solid line, and the numbers are alternating on/off lengths, e.g. `dash 8, 4`.
+
+`push` saves the current drawing state on a stack and `pop` restores the most recent one. The saved state covers the coordinate system, colors, dashes and line width, but not the path being built or drawings already made. Calls can nest, and `pop` on an empty stack does nothing. Use it whenever you want to change settings temporarily and restore them afterwards: colors, line width, dashes, or a temporary rotation/scale/translation of the coordinate system.
+
+`rotate x, y, degree` rotates the coordinate system around `(x, y)`. The angle is in degrees, positive being counter-clockwise and negative clockwise. It affects only shapes and text drawn afterwards; anything already drawn stays put, and consecutive rotations accumulate. To give several shapes their own rotation without affecting each other, `push` before rotating and `pop` after drawing.
+
+The example below deliberately rotates only 5 times: six 60° steps make a full turn, so even a missing `pop` would leave the final orientation unchanged and the check would prove nothing.
+
+```c
+color "steelblue"
+linew 2
+
+for i <- :5 {
+    push
+    rotate 0, 0, float64(i)*60
+    rectangle 40, -10, 160, 20
+    stroke
+    pop
+}
+
+// the coordinate system is restored; a non-square rectangle makes any leftover rotation obvious
+color "orange"
+rectangle -8, -25, 16, 50
+fill
+```

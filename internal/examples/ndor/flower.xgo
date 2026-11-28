@@ -12,6 +12,7 @@ degree := 0.0
 color 0, 0, 0, 50
 
 for i <- :n {
+    // push/pop 让每次旋转都从原始坐标系开始，不叠加
     push
     rotate 0, 0, degree
     ellipse 0, 0, dx, dy

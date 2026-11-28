@@ -1,0 +1,19 @@
+// rotate: push, rotate, pop
+
+color "steelblue"
+linew 2
+
+// 每次都从同一状态出发，画一片旋转的叶片
+// 5 次 60° 不会凑成一整圈，便于看出 pop 是否真的恢复了状态
+for i <- :5 {
+    push
+    rotate 0, 0, float64(i)*60
+    rectangle 40, -10, 160, 20
+    stroke
+    pop
+}
+
+// pop 之后坐标系已恢复：非正方形的矩形方向明显，容易看出它没有跟着旋转
+color "orange"
+rectangle -8, -25, 16, 50
+fill

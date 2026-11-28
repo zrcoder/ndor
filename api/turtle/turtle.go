@@ -9,7 +9,7 @@ import "github.com/zrcoder/ndor/internal/parse"
 type cmd struct {
 	Kind  string // "step" | "turn" | "penUp" | "penDown" | "setColor" | "setWidth" | "clear" | "home"
 	Val   float64
-	Color [3]uint8
+	Color [4]uint8
 }
 
 // CmdQueue holds all commands produced by the user's code, in order.
@@ -30,13 +30,13 @@ func Left(d float64) { push("turn", d) }
 func Right(d float64) { push("turn", -d) }
 
 // PenColor sets the pen color. Accepts a color name string (e.g. "red", "#ff0000")
-// or 3-4 numeric args (r, g, b[, a]).
+// or 3-4 numeric args (r, g, b[, a]); alpha defaults to 255.
 func PenColor(args ...any) {
 	c, ok := parse.Color(args...)
 	if !ok {
 		return
 	}
-	CmdQueue = append(CmdQueue, cmd{Kind: "setColor", Color: [3]uint8{c.R, c.G, c.B}})
+	CmdQueue = append(CmdQueue, cmd{Kind: "setColor", Color: [4]uint8{c.R, c.G, c.B, c.A}})
 }
 
 // PenWidth sets the pen width.

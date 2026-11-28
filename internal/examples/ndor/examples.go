@@ -18,7 +18,7 @@ var (
 
 	DefaultNames = []string{
 		"hello world",
-		"beziel",
+		"bezier",
 		"clip",
 		"crisp",
 		"fan",
@@ -28,6 +28,7 @@ var (
 		"lines",
 		"open fill",
 		"rainbow",
+		"rotate",
 		"spiral",
 		"star",
 	}

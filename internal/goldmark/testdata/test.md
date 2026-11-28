@@ -1,6 +1,6 @@
 # ndor examples
 
-## beziel
+## bezier
 
 ```ndor
 type Point struct {
@@ -23,7 +23,7 @@ func connect(ps []Point) {
         return
     }
     from ps[0].x, ps[0].y
-    for _, p := range ps {
+    for _, p := range ps[1:] {
         to p.x, p.y
     }
     color "#FF2D00"
@@ -167,7 +167,7 @@ rectangle 130, -250, 120, 60
 rectangle -250, -250, 60, 120
 stroke
 
-dash // cacel dashes
+dash // cancel dashes
 from -130, 190
 to 190, 130
 to 130, -190
@@ -186,11 +186,11 @@ text -195, -265, "c"
 text -275, -130, "m-1-r"
 ```
 
-## hellow world
+## hello world
 
 ```ndor
-circle 0, 0, 300
 color "lightgreen"
+circle 0, 0, 300
 fill
 ```
 
@@ -244,9 +244,9 @@ for j <- :10 {
     for i <- :10 {
         x := (float64(i) - 4.5) * 100
         y := (float64(j) - 4.5) * 100
-        from := 360 * rand.float64
-        to := from + 180*rand.float64 + 180
-        arc x, y, 40, from, to
+        start := 360 * rand.float64
+        end := start + 180*rand.float64 + 180
+        arc x, y, 40, start, end
     }
 }
 
@@ -287,11 +287,30 @@ for c <- colors {
 }
 ```
 
+## rotate
+
+```ndor
+color "steelblue"
+linew 2
+
+for i <- :5 {
+    push
+    rotate 0, 0, float64(i)*60
+    rectangle 40, -10, 160, 20
+    stroke
+    pop
+}
+
+color "orange"
+rectangle -8, -25, 16, 50
+fill
+```
+
 ## spiral
 
 ```ndor
 const s = 1024
-const n = 2048
+const n = 512
 
 color "black"
 

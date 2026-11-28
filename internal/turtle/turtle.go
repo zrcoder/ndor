@@ -8,14 +8,14 @@ type pt struct{ X, Y float32 }
 // seg is a continuous stroke with its own color and width.
 type seg struct {
 	pts   []pt
-	color [3]uint8
+	color [4]uint8
 	width float32
 }
 
 type state struct {
 	x, y, angle float32 // degrees; 0 points right, default faces up (90)
 	down        bool
-	penColor    [3]uint8
+	penColor    [4]uint8
 	penWidth    float32
 	segments    []seg
 	cur         []pt // in-progress stroke points; style comes from penColor/penWidth
@@ -58,7 +58,7 @@ func (t *state) home() {
 
 func (t *state) clear() {
 	t.x, t.y, t.angle = 0, 0, 90
-	t.penColor = [3]uint8{20, 20, 20}
+	t.penColor = [4]uint8{20, 20, 20, 255}
 	t.penWidth = defaultWidth
 	t.segments = nil
 	t.cur = nil
@@ -66,9 +66,9 @@ func (t *state) clear() {
 }
 
 // setColor archives the current stroke (old color) before switching to the new one.
-func (t *state) setColor(r, g, b uint8) {
+func (t *state) setColor(c [4]uint8) {
 	t.flushCur()
-	t.penColor = [3]uint8{r, g, b}
+	t.penColor = c
 	t.startCur()
 }
 

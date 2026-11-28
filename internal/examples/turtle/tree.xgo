@@ -1,5 +1,6 @@
 func branch(size, ratio, angle float64, iterations int) {
     color "black"
+    // 枝长兼作线宽，越细的枝越细
     width size
     pen "down"
     step size

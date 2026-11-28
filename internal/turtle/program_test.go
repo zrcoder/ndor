@@ -5,6 +5,30 @@ import (
 	"testing"
 )
 
+func TestColorAlpha(t *testing.T) {
+	p, lineErr := Compile("color 255, 0, 0, 128\n")
+	if lineErr != nil {
+		t.Fatal(lineErr)
+	}
+	for !p.Done() {
+		p.Advance()
+	}
+	if want := [4]uint8{255, 0, 0, 128}; p.state.penColor != want {
+		t.Fatalf("pen color = %v, want %v", p.state.penColor, want)
+	}
+
+	p, lineErr = Compile("color \"red\"\n")
+	if lineErr != nil {
+		t.Fatal(lineErr)
+	}
+	for !p.Done() {
+		p.Advance()
+	}
+	if p.state.penColor[3] != 255 {
+		t.Fatalf("named color alpha = %d, want 255", p.state.penColor[3])
+	}
+}
+
 func TestCompileSubSteps(t *testing.T) {
 	p, lineErr := Compile("step 1000000\n")
 	if lineErr != nil {

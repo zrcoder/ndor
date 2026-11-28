@@ -4,9 +4,9 @@ for j <- :10 {
     for i <- :10 {
         x := (float64(i) - 4.5) * 100
         y := (float64(j) - 4.5) * 100
-        from := 360 * rand.float64
-        to := from + 180*rand.float64 + 180
-        arc x, y, 40, from, to
+        start := 360 * rand.float64
+        end := start + 180*rand.float64 + 180
+        arc x, y, 40, start, end
     }
 }
 

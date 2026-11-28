@@ -4,8 +4,7 @@ func tri(size float64, depth int) {
             step size
             left 120
         }
-    }
-    if depth > 0 {
+    } else {
         tri size/2, depth-1
         pen "up"
         step size/2

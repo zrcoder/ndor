@@ -48,7 +48,7 @@ func (p *Program) Draw(painter *ui.Painter, r ui.Rect, gopher *ui.Bitmap) {
 		for _, q := range s.pts[1:] {
 			ln.LineTo(sx(q), sy(q))
 		}
-		painter.StrokePath(&ln, s.width, ui.RGB(s.color[0], s.color[1], s.color[2]))
+		painter.StrokePath(&ln, s.width, ui.Color{R: s.color[0], G: s.color[1], B: s.color[2], A: s.color[3]})
 	}
 	for _, s := range p.state.segments {
 		strokeSeg(s)

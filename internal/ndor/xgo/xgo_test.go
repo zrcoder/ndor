@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"testing"
 
+	ndexamples "github.com/zrcoder/ndor/internal/examples/ndor"
 	"github.com/zrcoder/ndor/internal/ndor"
 	"github.com/zrcoder/ndor/internal/xgoerr"
 )
@@ -62,5 +63,21 @@ func TestRunErrors(t *testing.T) {
 				t.Errorf("Run() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestExamples(t *testing.T) {
+	for _, name := range ndexamples.DefaultNames {
+		ndor.Init()
+		if err := Run(ndexamples.Default[name]); err != nil {
+			t.Errorf("%s: %v", name, err)
+			continue
+		}
+		if ndor.GlobalErr != nil {
+			t.Errorf("%s: %v", name, ndor.GlobalErr)
+		}
+		if b := ndor.GlobalCtx.Bounds(); b.W <= 0 || b.H <= 0 {
+			t.Errorf("%s: empty drawing", name)
+		}
 	}
 }

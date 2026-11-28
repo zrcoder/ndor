@@ -13,7 +13,7 @@ for range 4 {
 
 ## Star
 
-Move forward and turn right 144 degrees, five times.
+Move forward and turn right 144 degrees, five times; the turtle ends exactly back at the start.
 
 ```c
 color "orange"
@@ -25,16 +25,17 @@ for range 5 {
 
 ## Backward
 
-Pass a negative number to `step`; with the pen down it draws in reverse.
+Pass a negative number to `step`; with the pen down it draws in reverse. Turn first to make the effect visible:
 
 ```c
 step 8
+right 90
 step -8
 ```
 
 ## Colored squares
 
-Change colors in a loop to draw a ring of rotated squares.
+Change colors in a loop to draw three connected squares, each turned 30° from the previous one (a chain, not a ring around a point).
 
 ```c
 func squar() {
