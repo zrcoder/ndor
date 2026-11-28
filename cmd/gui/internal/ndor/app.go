@@ -19,13 +19,13 @@ import (
 
 type App struct {
 	ws            *comp.Workspace
-	pendingToast  *ui.Toast
 	resultImg     *ui.Bitmap
 	resultPNGData []byte
 	paintUntil    time.Time
 	painting      bool
 	paintImg      *ui.Bitmap
 	codeImg       *ui.Bitmap
+	notice        comp.Notice
 }
 
 func New(fsys fs.FS) *App {
@@ -49,12 +49,6 @@ fill
 }
 
 func (a *App) View(c *ui.Context) {
-	if a.pendingToast != nil {
-		c.AddToast(*a.pendingToast)
-		a.pendingToast = nil
-	}
-	feedback.Toaster(c, feedback.ToasterOptions{})
-
 	a.ws.View(c)
 
 	painting := comp.PaintingActive(c, a.paintUntil)
@@ -65,6 +59,7 @@ func (a *App) View(c *ui.Context) {
 	if painting {
 		comp.Painting(c, a.paintImg, a.codeImg)
 	}
+	a.notice.View(c)
 }
 
 func (a *App) canvas(c *ui.Context) {
@@ -108,17 +103,14 @@ func (a *App) saveImage() {
 	}()
 }
 
-// notify hands a toast to the next frame, the only place toasts can be added.
+// notify shows the save result, from the goroutine that saved the file.
 func (a *App) notify(err error) {
 	mygo.RunOnMain(func() {
 		m := locales.In(mygo.App.Locale())
 		if err != nil {
-			a.pendingToast = &ui.Toast{Title: m.SaveFailed(), Description: err.Error(), Type: "error"}
+			a.notice.Show(feedback.ToneDanger, m.SaveFailed(), err.Error(), 3*time.Second)
 		} else {
-			a.pendingToast = &ui.Toast{Title: m.Saved(), Type: "success"}
-		}
-		if win := mygo.FocusedWindow(); win != nil {
-			win.Invalidate()
+			a.notice.Show(feedback.ToneSuccess, m.Saved(), "", 2*time.Second)
 		}
 	})
 }
@@ -145,8 +137,7 @@ func (a *App) runCode(c *ui.Context) {
 	if err != nil {
 		a.resultImg = nil
 		a.resultPNGData = nil
-		c.Toast(locales.In(c.Locale()).DecodeFailed(err.Error()))
-		c.Invalidate()
+		a.notice.Show(feedback.ToneDanger, locales.In(c.Locale()).DecodeFailed(err.Error()), "", 3*time.Second)
 		return
 	}
 
