@@ -1,40 +1,43 @@
 // crisp
 
 const (
-    width = 1000
-    height = 1000
+    half  = 500
     minor = 10
     major = 100
 )
 
+const (
+    first = -half + minor
+    top   = -half + major
+)
+
 func row(y int) {
     f := float64(y)
-    from 0, f
-    to width, f
+    from -half, f
+    to half, f
 }
 
 func col(x int) {
     f := float64(x)
-    from f, 0
-    to f, height
+    from f, -half
+    to f, half
 }
 
-context width, height
 linew 1
 
-for x <- minor:width:minor {
+for x <- first:half:minor {
     col x
 }
-for y <- minor:height:minor {
+for y <- first:half:minor {
     row y
 }
 color 0, 0, 0, 55
 stroke
 
-for x <- major:width:major {
+for x <- top:half:major {
     col x
 }
-for y <- major:width:major {
+for y <- top:half:major {
     row y
 }
 

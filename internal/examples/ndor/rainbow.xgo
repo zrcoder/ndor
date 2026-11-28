@@ -1,6 +1,5 @@
 // rainbow
 
-context 1024, 512
 color "white"
 clear
 
@@ -15,13 +14,11 @@ colors := [
     "white",
 ]
 
-const x, y = 512, 512
-const from, to = 0, -180
 r := 400.0
 
 for c <- colors {
     color c
-    arc x, y, r, from, to
+    arc 0, 0, r, 0, 180
     fill
     r -= 50
 }

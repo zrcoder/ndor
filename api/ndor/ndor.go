@@ -8,10 +8,6 @@ const (
 	Preserve = "preserve"
 )
 
-func Context(w, h int) {
-	ndor.GlobalCtx = ndor.NewContext(w, h)
-}
-
 func Color(args ...any) {
 	rgba, err := ndor.ParseColor(args...)
 	if err != nil {

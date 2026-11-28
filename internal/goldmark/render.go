@@ -33,7 +33,7 @@ func (r *HTMLRenderer) Render(w util.BufWriter, src []byte, node ast.Node, enter
 		return ast.WalkContinue, nil
 	}
 
-	data, lineErr := ndor.Run(0, 0, b.String())
+	data, lineErr := ndor.Run(b.String())
 	if lineErr != nil {
 		_, err := w.WriteString(lineErr.Msg)
 		return ast.WalkContinue, err

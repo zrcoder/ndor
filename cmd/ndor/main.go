@@ -44,7 +44,7 @@ func main() {
 }
 
 func genPng(data []byte) ([]byte, error) {
-	src, lerr := ndor.Gen(0, 0, string(data))
+	src, lerr := ndor.Gen(string(data))
 	if lerr != nil {
 		return nil, fmt.Errorf("line %d: %s", lerr.Number, lerr.Msg)
 	}

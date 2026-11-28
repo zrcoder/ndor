@@ -34,9 +34,8 @@ func New(fsys fs.FS) *App {
 		codeImg:  assets.Bitmap(fsys, "code.png"),
 	}
 	a.ws = comp.NewWorkspace(fsys, comp.WorkspaceConfig{
-		Code: `context 800, 800
-color "lightgreen"
-circle 400, 400, 300
+		Code: `color "lightgreen"
+circle 0, 0, 300
 fill
 `,
 		ExampleNames: examples.DefaultNames,
@@ -75,7 +74,10 @@ func (a *App) canvas(c *ui.Context) {
 			ui.Spacer(c)
 			comp.IconButton(c, comp.IconButtonOption{Icon: icon.Must("download"), OnClick: a.saveImage})
 		})
-		ui.Image(c, a.resultImg).MaxWidthPercent(100).MaxHeightPercent(100)
+		ui.Box(c).Grow(1).FillWidth().DrawOver(func(p *ui.Painter, r ui.Rect) {
+			r.X, r.W = r.X+10, max(r.W-20, 0)
+			p.Image(a.resultImg, r, ui.ScaleDown)
+		})
 	})
 }
 
@@ -116,13 +118,9 @@ func (a *App) notify(err error) {
 }
 
 func (a *App) runCode(c *ui.Context) {
-	width, height := getPictureSize()
-	if width <= 0 || height <= 0 {
-		width, height = 800, 800
-	}
 	code := a.ws.Editor.Buffer.String()
 
-	pngData, lineErr := ndorlib.Gen(width, height, code)
+	pngData, lineErr := ndorlib.Gen(code)
 	if lineErr != nil {
 		a.resultImg = nil
 		a.resultPNGData = nil
@@ -145,13 +143,4 @@ func (a *App) runCode(c *ui.Context) {
 	a.paintUntil = time.Now().Add(comp.PaintingDuration)
 	sound.Play(sound.Swipe)
 	c.Invalidate()
-}
-
-func getPictureSize() (int, int) {
-	win := mygo.FocusedWindow()
-	if win != nil {
-		bounds := win.ContentBounds()
-		return bounds.Width / 2, bounds.Height - 40 - 72
-	}
-	return 800, 600
 }

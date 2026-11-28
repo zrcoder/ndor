@@ -2,20 +2,18 @@
 
 const width, height = 1024, 1024
 
-context width, height
-
 color "snow"
 clear
 
 for i <- :100 {
-    x1 := rand.float64 * width
-    y1 := rand.float64 * height
-    x2 := rand.float64 * width
-    y2 := rand.float64 * height
+    x1 := (rand.float64 - 0.5) * width
+    y1 := (rand.float64 - 0.5) * height
+    x2 := (rand.float64 - 0.5) * width
+    y2 := (rand.float64 - 0.5) * height
     r := 255 * rand.float64
     g := 255 * rand.float64
     b := 255 * rand.float64
-    a := 255*(rand.float64*0.5 + 0.5)
+    a := 255 * (rand.float64*0.5 + 0.5)
     w := rand.float64*4 + 1
     color r, g, b, a
     linew w

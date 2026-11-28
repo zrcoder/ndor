@@ -29,7 +29,6 @@ func init() {
 			"Clear":     reflect.ValueOf(q.Clear),
 			"Clip":      reflect.ValueOf(q.Clip),
 			"Color":     reflect.ValueOf(q.Color),
-			"Context":   reflect.ValueOf(q.Context),
 			"Dash":      reflect.ValueOf(q.Dash),
 			"Earc":      reflect.ValueOf(q.Earc),
 			"Ellipse":   reflect.ValueOf(q.Ellipse),

@@ -18,7 +18,7 @@ var (
 	}
 )
 
-func Init(width, height int) {
+func Init() {
 	GlobalErr = nil
-	GlobalCtx = NewContext(width, height)
+	GlobalCtx = NewContext()
 }

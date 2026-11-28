@@ -3,8 +3,8 @@
 You can't really draw a point, but you can draw a tiny circle instead:
 
 ```c
-color black
-circle 50, 50, 2
+color "black"
+circle 0, 0, 2
 fill
 ```
 
@@ -13,7 +13,7 @@ fill
 Strictly speaking, we draw line segments. Just specify start and end coordinates:
 
 ```c
-from 10, 15
+from -20, -15
 to 35, 50
 stroke
 ```
@@ -23,16 +23,16 @@ stroke
 You can draw quadratic or cubic bezier curves. Specify start point, control point(s), and end point. For example:
 
 ```c
-from 10, 15
-bezier 10, 50, 35, 50
+from 0, 0
+bezier 0, 35, 25, 35
 stroke
 ```
 
 Add one more control point for a cubic bezier:
 
 ```c
-from 10, 15
-bezier 10, 40, 10, 60, 35, 50
+from 0, 0
+bezier 0, 25, 0, 45, 25, 35
 stroke
 ```
 
@@ -41,32 +41,32 @@ stroke
 Similar to circles, specify center, horizontal radius, and vertical radius:
 
 ```c
-ellipse 50, 50, 10, 20
+ellipse 0, 0, 10, 20
 fill
 ```
 
 ## Rectangles
 
-Specify top-left corner and width/height:
+Specify bottom-left corner and width/height:
 
 ```c
-rectangle 5, 5, 90, 40
+rectangle 0, 0, 90, 40
 stroke
 ```
 
 You can also draw rounded rectangles by adding a corner radius parameter:
 
 ```c
-rectangle 5, 5, 90, 40, 10
+rectangle 0, 0, 90, 40, 10
 stroke
 ```
 
 ## Arcs
 
-Another way to draw curves is to draw an arc. First specify the circle parameters (center and radius), then the start and end angles (positive = clockwise).
+Another way to draw curves is to draw an arc. First specify the circle parameters (center and radius), then the start and end angles (positive = counter-clockwise).
 
 ```c
-arc 50, 50, 40, 45, 180
+arc 0, 0, 40, 45, 180
 stroke
 ```
 
@@ -75,7 +75,7 @@ stroke
 You can also draw arcs on ellipses. Similar to arcs, specify ellipse parameters first, then angles:
 
 ```c
-earc 50, 50, 40, 15, 0, 150
+earc 0, 0, 40, 15, 0, 150
 stroke
 ```
 
@@ -90,17 +90,17 @@ Draw a circle, divide it into n equal parts, connect the division points to form
 So we just need to specify the number of sides and the circumcircle parameters:
 
 ```c
-polygon 5, 50, 50, 40
+polygon 5, 0, 0, 40
 stroke
 ```
 
 This draws a regular pentagon.
 
-> You can also add a rotation angle. Positive = clockwise, negative = counter-clockwise.
-> The polygon above is flat on the bottom. Let's rotate it:
+> You can also add a rotation angle. Positive = counter-clockwise, negative = clockwise.
+> The polygon above is flat on top. Let's rotate it:
 
 ```c
-polygon 5, 50, 50, 40, 20
+polygon 5, 0, 0, 40, 20
 stroke
 ```
 
@@ -108,11 +108,11 @@ stroke
 
 You can draw simple text like coordinates. Only supports letters, numbers and common symbols - no Chinese characters.
 
-Specify the top-left position and text content:
+Specify the start (left end of the baseline) and text content:
 
 ```c
 color "black"
-text 100, 100, "Hello!"
+text 0, 0, "Hello!"
 ```
 
 ## Rendering

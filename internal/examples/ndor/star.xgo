@@ -9,16 +9,15 @@ func genPoints(n int, x, y, r float64) []point {
     for i, _ <- result {
         angle := float64(i)*2*math.Pi/float64(n) - math.Pi/2
         result[i] = point{
-            x: x + r*math.cos(angle),
-            y: y + r*math.sin(angle),
+            x: x + r*math.Cos(angle),
+            y: y - r*math.Sin(angle),
         }
     }
     return result
 }
 
-context 1024, 1024
 n := 5
-points := genPoints(n, 512, 512, 400)
+points := genPoints(n, 0, 0, 400)
 for i <- :n + 1 {
     index := (i * 2) % n
     p := points[index]

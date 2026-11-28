@@ -1,6 +1,7 @@
 package ndor
 
 import (
+	"fmt"
 	"image"
 	"math"
 
@@ -80,11 +81,16 @@ type textOp struct {
 	angle float64
 }
 
-func (o textOp) draw(p *ui.Painter) {
+func (o textOp) size() float32 {
 	size := float32(13 * o.scale)
 	if size < 1 {
 		size = 13
 	}
+	return size
+}
+
+func (o textOp) draw(p *ui.Painter) {
+	size := o.size()
 	x, y := float32(o.x), float32(o.y)
 	top := y - size*0.8
 	if o.angle != 0 {
@@ -96,6 +102,27 @@ func (o textOp) draw(p *ui.Painter) {
 	p.Text(x, top, o.text, size, o.color)
 }
 
+// bounds estimates the box the text covers, rotation included.
+func (o textOp) bounds() ui.Rect {
+	size := float64(o.size())
+	w := 0.0
+	for _, r := range o.text {
+		if r < 0x2E80 {
+			w += size * 0.55
+		} else {
+			w += size
+		}
+	}
+	parts := [4][2]float64{{0, -size}, {w, -size}, {w, size * 0.35}, {0, size * 0.35}}
+	cos, sin := math.Cos(o.angle), math.Sin(o.angle)
+	x0, y0, x1, y1 := math.Inf(1), math.Inf(1), math.Inf(-1), math.Inf(-1)
+	for _, q := range parts {
+		x, y := o.x+q[0]*cos-q[1]*sin, o.y+q[0]*sin+q[1]*cos
+		x0, y0, x1, y1 = min(x0, x), min(y0, y), max(x1, x), max(y1, y)
+	}
+	return ui.Rect{X: float32(x0), Y: float32(y0), W: float32(x1 - x0), H: float32(y1 - y0)}
+}
+
 type clearOp struct {
 	color ui.Color
 }
@@ -104,8 +131,6 @@ func (o clearOp) draw(p *ui.Painter) {}
 
 // Context records the ndor API and renders it with mygo's painter.
 type Context struct {
-	width, height int
-
 	matrix      matrix
 	fillColor   ui.Color
 	strokeColor ui.Color
@@ -121,15 +146,54 @@ type Context struct {
 	curX       float64
 	curY       float64
 
+	pathBox box // bounds of the path being built
+	clipBox box // bounds of the active clip, if any
+	ink     box // bounds of everything drawn
+
 	ops []drawOp
 }
 
-// NewContext returns a context that draws on a width×height image.
-func NewContext(width, height int) *Context {
+// box tracks the four edges of a region.
+type box struct {
+	x0, y0, x1, y1 float32
+	ok             bool
+}
+
+func (b *box) add(x, y float32) {
+	if !b.ok {
+		b.x0, b.y0, b.x1, b.y1, b.ok = x, y, x, y, true
+		return
+	}
+	b.x0, b.y0, b.x1, b.y1 = min(b.x0, x), min(b.y0, y), max(b.x1, x), max(b.y1, y)
+}
+
+func (b *box) addRect(r ui.Rect) {
+	b.add(r.X, r.Y)
+	b.add(r.X+r.W, r.Y+r.H)
+}
+
+// addCurve widens b to the bezier through the x,y pairs, sampled because
+// its control points may lie outside the curve.
+func (b *box) addCurve(pts ...float64) {
+	const n = 32
+	for i := range n + 1 {
+		t := float64(i) / n
+		u := 1 - t
+		q := append([]float64(nil), pts...)
+		for len(q) > 2 {
+			for j := range len(q) - 2 {
+				q[j] = u*q[j] + t*q[j+2]
+			}
+			q = q[:len(q)-2]
+		}
+		b.add(float32(q[0]), float32(q[1]))
+	}
+}
+
+// NewContext returns a context whose origin is the picture center, +Y up.
+func NewContext() *Context {
 	return &Context{
-		width:       width,
-		height:      height,
-		matrix:      matrix{XX: 1, YY: 1},
+		matrix:      matrix{XX: 1, YY: -1},
 		fillColor:   ui.RGB(255, 255, 255),
 		strokeColor: ui.RGB(0, 0, 0),
 		textColor:   ui.Transparent,
@@ -150,8 +214,8 @@ func (c *Context) newSubPath() {
 func (c *Context) MoveTo(x, y float64) {
 	x, y = c.matrix.transformPoint(x, y)
 	c.path.MoveTo(float32(x), float32(y))
-	c.startX, c.startY = x, y
-	c.curX, c.curY = x, y
+	c.startX, c.startY, c.curX, c.curY = x, y, x, y
+	c.pathBox.add(float32(x), float32(y))
 	c.hasCurrent = true
 }
 
@@ -163,6 +227,7 @@ func (c *Context) LineTo(x, y float64) {
 	x, y = c.matrix.transformPoint(x, y)
 	c.path.LineTo(float32(x), float32(y))
 	c.curX, c.curY = x, y
+	c.pathBox.add(float32(x), float32(y))
 }
 
 func (c *Context) QuadraticTo(x1, y1, x2, y2 float64) {
@@ -172,6 +237,7 @@ func (c *Context) QuadraticTo(x1, y1, x2, y2 float64) {
 	x1, y1 = c.matrix.transformPoint(x1, y1)
 	x2, y2 = c.matrix.transformPoint(x2, y2)
 	c.path.QuadTo(float32(x1), float32(y1), float32(x2), float32(y2))
+	c.pathBox.addCurve(c.curX, c.curY, x1, y1, x2, y2)
 	c.curX, c.curY = x2, y2
 }
 
@@ -183,6 +249,7 @@ func (c *Context) CubicTo(x1, y1, x2, y2, x3, y3 float64) {
 	x2, y2 = c.matrix.transformPoint(x2, y2)
 	x3, y3 = c.matrix.transformPoint(x3, y3)
 	c.path.CubeTo(float32(x1), float32(y1), float32(x2), float32(y2), float32(x3), float32(y3))
+	c.pathBox.addCurve(c.curX, c.curY, x1, y1, x2, y2, x3, y3)
 	c.curX, c.curY = x3, y3
 }
 
@@ -196,6 +263,7 @@ func (c *Context) closePath() {
 
 func (c *Context) clearPath() {
 	c.path = ui.Path{}
+	c.pathBox = box{}
 	c.hasCurrent = false
 }
 
@@ -292,7 +360,27 @@ func (c *Context) DrawString(s string, x, y float64) {
 	tx, ty := c.matrix.transformPoint(x, y)
 	angle := math.Atan2(c.matrix.YX, c.matrix.XX)
 	scale := math.Hypot(c.matrix.XX, c.matrix.YX)
-	c.ops = append(c.ops, textOp{text: s, x: tx, y: ty, color: c.textColor, scale: scale, angle: angle})
+	op := textOp{text: s, x: tx, y: ty, color: c.textColor, scale: scale, angle: angle}
+	c.ops = append(c.ops, op)
+	c.ink.addRect(op.bounds())
+}
+
+// pathRect returns the path's box widened by pad, cut to the active clip.
+func (c *Context) pathRect(pad float32) (ui.Rect, bool) {
+	b := c.pathBox
+	if !b.ok {
+		return ui.Rect{}, false
+	}
+	r := ui.Rect{X: b.x0 - pad, Y: b.y0 - pad, W: b.x1 - b.x0 + 2*pad, H: b.y1 - b.y0 + 2*pad}
+	if c.clipBox.ok {
+		x0, y0 := max(r.X, c.clipBox.x0), max(r.Y, c.clipBox.y0)
+		x1, y1 := min(r.X+r.W, c.clipBox.x1), min(r.Y+r.H, c.clipBox.y1)
+		if x1 <= x0 || y1 <= y0 {
+			return ui.Rect{}, false
+		}
+		r = ui.Rect{X: x0, Y: y0, W: x1 - x0, H: y1 - y0}
+	}
+	return r, true
 }
 
 func (c *Context) Fill() {
@@ -301,6 +389,9 @@ func (c *Context) Fill() {
 }
 
 func (c *Context) FillPreserve() {
+	if r, ok := c.pathRect(0); ok {
+		c.ink.addRect(r)
+	}
 	c.ops = append(c.ops, fillOp{path: c.path, color: c.fillColor})
 }
 
@@ -314,6 +405,9 @@ func (c *Context) StrokePreserve() {
 	for i, v := range c.dashes {
 		dashes[i] = float32(v)
 	}
+	if r, ok := c.pathRect(float32(c.lineWidth / 2)); ok {
+		c.ink.addRect(r)
+	}
 	c.ops = append(c.ops, strokeOp{
 		path:   c.path,
 		color:  c.strokeColor,
@@ -324,11 +418,20 @@ func (c *Context) StrokePreserve() {
 
 func (c *Context) Clip() {
 	c.ops = append(c.ops, clipOp{path: c.path})
+	if c.pathBox.ok {
+		if c.clipBox.ok {
+			c.clipBox.x0, c.clipBox.y0 = max(c.clipBox.x0, c.pathBox.x0), max(c.clipBox.y0, c.pathBox.y0)
+			c.clipBox.x1, c.clipBox.y1 = min(c.clipBox.x1, c.pathBox.x1), min(c.clipBox.y1, c.pathBox.y1)
+		} else {
+			c.clipBox = c.pathBox
+		}
+	}
 	c.clearPath()
 }
 
 func (c *Context) Clear() {
 	c.ops = append(c.ops, clearOp{color: c.textColor})
+	c.ink = box{}
 }
 
 func (c *Context) Push() {
@@ -371,22 +474,28 @@ func (c *Context) RotateAbout(angle, x, y float64) {
 	c.Translate(-x, -y)
 }
 
-// Image renders the recorded drawing with mygo's painter and returns it.
-func (c *Context) Image() image.Image {
-	if c.width <= 0 || c.height <= 0 {
-		return image.NewRGBA(image.Rect(0, 0, max(c.width, 0), max(c.height, 0)))
+// Image renders the recorded drawing at the exact size of its content.
+// It refuses drawings over maxSide a side, where the canvas would take GBs.
+func (c *Context) Image() (image.Image, error) {
+	const maxSide = 8000
+	w := int(math.Ceil(float64(c.ink.x1 - c.ink.x0)))
+	h := int(math.Ceil(float64(c.ink.y1 - c.ink.y0)))
+	if w > maxSide || h > maxSide {
+		return nil, fmt.Errorf("drawing too large: %dx%d, at most %d a side", w, h, maxSide)
 	}
+
 	ops, clips, bg, hasBG := c.renderPlan()
-	width, height := c.width, c.height
-	return ui.Render(func(ctx *ui.Context) {
+	tf := ui.Translation(-c.ink.x0, -c.ink.y0)
+	img := ui.Render(func(ctx *ui.Context) {
 		ctx.Root().Background(ui.Transparent)
 		ui.Column(ctx).Fill().Draw(func(p *ui.Painter, r ui.Rect) {
-			if hasBG && bg.A != 0 {
-				p.Fill(ui.Rect{W: float32(width), H: float32(height)}, bg, 0)
+			if hasBG {
+				p.Fill(ui.Rect{W: float32(w), H: float32(h)}, bg, 0)
 			}
-			replay(p, ops, clips)
+			p.Transform(tf, 0, 0, func() { replay(p, ops, clips) })
 		})
-	}, width, height, 1)
+	}, max(w, 1), max(h, 1), 1)
+	return img, nil
 }
 
 // renderPlan drops ops before the last Clear and keeps its active clips.

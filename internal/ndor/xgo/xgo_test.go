@@ -5,30 +5,26 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/zrcoder/ndor/internal/ndor"
 	"github.com/zrcoder/ndor/internal/xgoerr"
 )
 
 func TestRun(t *testing.T) {
 	codes := []string{
-		`context 100, 100
-color "black"`,
-		`context 100, 100
-color`,
-		`context 100, 100
-Color`,
-		`Context 800, 800
-Color "lightgreen"
-Circle 400, 400, 300
+		`color "black"`,
+		`color`,
+		`Color`,
+		`Color "lightgreen"
+Circle 0, 0, 300
 Fill`,
-		`context 800, 800
-color "lightgreen"
-circle 400, 400, 300
+		`color "lightgreen"
+circle 0, 0, 300
 fill`,
-		`context 1000, 1000
-color "notExistColorName"`,
+		`color "notExistColorName"`,
 	}
 	for i, code := range codes {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			ndor.Init()
 			err := Run(code)
 			if err != nil {
 				t.Error("code:\n", code)
@@ -46,17 +42,17 @@ func TestRunErrors(t *testing.T) {
 	}{
 		{
 			name: "undefined identifier",
-			code: "context 100, 100\ncc",
+			code: "color \"black\"\ncc",
 			want: &xgoerr.LineError{Number: 2, Msg: "undefined: cc"},
 		},
 		{
 			name: "syntax error",
-			code: "context 100, 100\ncolor (",
+			code: "color \"black\"\ncolor (",
 			want: &xgoerr.LineError{Number: 2, Msg: "expected operand, found 'EOF'"},
 		},
 		{
 			name: "too many arguments",
-			code: "context 100, 100\ncircle 1, 2, 3, 4",
+			code: "color \"black\"\ncircle 1, 2, 3, 4",
 			want: &xgoerr.LineError{Number: 2, Msg: "too many arguments in call to ndor.Circle"},
 		},
 	}

@@ -1,6 +1,5 @@
-// hellow world
+// hello world
 
-context 800, 800
-circle 400, 400, 300
 color "lightgreen"
+circle 0, 0, 300
 fill

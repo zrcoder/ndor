@@ -8,17 +8,20 @@ We draw in a 2D coordinate system using `code`.
 
 `ndor` uses the [XGo](https://xgo.dev) programming language.
 
+## Coordinate system
+
+As in `turtle`, the origin is at the center of the picture, `x` grows to the right and `y` grows upwards.
+
+The picture size needs no setting: it is sized to fit everything you draw.
+
 ## Hello World
 
 ```c
-// 800×800 canvas, can be omitted, defaults to the size of the picture frame
-context 800, 800
-
 // Set current color to light green
 color "lightgreen"
 
 // Define a circle with center and radius
-circle 400, 400, 300
+circle 0, 0, 300
 
 // Fill the circle with current color
 fill
@@ -26,4 +29,4 @@ fill
 
 > Lines starting with `"//"` or blocks wrapped in `"/*"` and `"*/"` are comments and are ignored.
 >
-> `x` coordinate goes left to right, `y` coordinate goes top to bottom
+> `x` coordinate goes left to right, `y` coordinate goes bottom to top, and angles are counter-clockwise.

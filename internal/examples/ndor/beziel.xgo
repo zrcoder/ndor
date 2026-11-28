@@ -43,11 +43,8 @@ func bezierPoints(ps []Point) {
     stroke
 }
 
-const s = 1200
-context s, s
 color "white"
 clear
-translate s/2, s/2
 scale 40, 40
 
 ps := []Point{{-10, 0}, {-5, -10}, {0, 0}, {5, 10}, {10, 0}}
