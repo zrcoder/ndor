@@ -19,8 +19,8 @@ import (
 
 type App struct {
 	ws            *comp.Workspace
-	resultImg     *ui.Bitmap
-	resultPNGData []byte
+	result        *ndorlib.Drawing
+	resultSVGData []byte
 	paintUntil    time.Time
 	painting      bool
 	paintImg      *ui.Bitmap
@@ -67,7 +67,7 @@ func (a *App) canvas(c *ui.Context) {
 		c.After(time.Until(a.paintUntil))
 	}
 	ui.Themed(c, ui.LightTheme()).WidthPercent(50).Fill().Children(func() {
-		if painting || a.resultImg == nil {
+		if painting || a.result == nil {
 			return
 		}
 		ui.Row(c).Fill().Height(40).Children(func() {
@@ -76,13 +76,13 @@ func (a *App) canvas(c *ui.Context) {
 		})
 		ui.Box(c).Grow(1).FillWidth().DrawOver(func(p *ui.Painter, r ui.Rect) {
 			r.X, r.W = r.X+10, max(r.W-20, 0)
-			p.Image(a.resultImg, r, ui.ScaleDown)
+			a.result.Render(p, r)
 		})
 	})
 }
 
 func (a *App) saveImage() {
-	if a.resultPNGData == nil {
+	if a.resultSVGData == nil {
 		return
 	}
 
@@ -90,8 +90,8 @@ func (a *App) saveImage() {
 	go func() {
 		path, err := mygo.Dialog.Save(mygo.SaveDialogOptions{
 			Title:       m.SaveImage(),
-			DefaultPath: "ndor.png",
-			Filters:     []mygo.FileFilter{{Name: m.PngImage(), Extensions: []string{"png"}}},
+			DefaultPath: "ndor.svg",
+			Filters:     []mygo.FileFilter{{Name: m.SvgImage(), Extensions: []string{"svg"}}},
 		})
 		if err != nil {
 			a.notify(err)
@@ -100,7 +100,7 @@ func (a *App) saveImage() {
 		if path == "" {
 			return
 		}
-		err = os.WriteFile(path, a.resultPNGData, 0o644)
+		err = os.WriteFile(path, a.resultSVGData, 0o644)
 		a.notify(err)
 	}()
 }
@@ -120,26 +120,18 @@ func (a *App) notify(err error) {
 func (a *App) runCode(c *ui.Context) {
 	code := a.ws.Editor.Buffer.String()
 
-	pngData, lineErr := ndorlib.Gen(code)
+	d, lineErr := ndorlib.Compile(code)
 	if lineErr != nil {
-		a.resultImg = nil
-		a.resultPNGData = nil
+		a.result = nil
+		a.resultSVGData = nil
 		a.ws.MakeError(lineErr.Number, lineErr.Msg)
 		c.Invalidate()
 		return
 	}
 	a.ws.ClearError()
 
-	a.resultPNGData = pngData
-	bitmap, err := ui.DecodeBitmap(pngData)
-	if err != nil {
-		a.resultImg = nil
-		a.resultPNGData = nil
-		a.notice.Show(feedback.ToneDanger, locales.In(c.Locale()).DecodeFailed(err.Error()), "", 3*time.Second)
-		return
-	}
-
-	a.resultImg = bitmap
+	a.result = d
+	a.resultSVGData = d.SVG()
 	a.paintUntil = time.Now().Add(comp.PaintingDuration)
 	sound.Play(sound.Swipe)
 	c.Invalidate()

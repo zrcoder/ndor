@@ -1,9 +1,7 @@
 package ndor
 
 import (
-	"bytes"
 	"encoding/base64"
-	"image/png"
 	"strings"
 
 	"github.com/zrcoder/ndor/internal/ndor"
@@ -11,17 +9,12 @@ import (
 	"github.com/zrcoder/ndor/internal/xgoerr"
 )
 
-// Run executes the code and returns the image as a PNG data URI.
-func Run(code string) (string, *xgoerr.LineError) {
-	src, lineErr := Gen(code)
-	if lineErr != nil {
-		return "", lineErr
-	}
-	return "data:image/png;base64," + base64.StdEncoding.EncodeToString(src), nil
-}
+// Drawing is a recorded ndor drawing, drawn with mygo's painter or exported
+// as SVG.
+type Drawing = ndor.Drawing
 
-// Gen executes the code and returns the raw PNG bytes.
-func Gen(code string) ([]byte, *xgoerr.LineError) {
+// Compile executes the code and returns its recorded drawing.
+func Compile(code string) (*Drawing, *xgoerr.LineError) {
 	if strings.TrimSpace(code) == "" {
 		return nil, ndor.ErrEmptyInput
 	}
@@ -33,13 +26,14 @@ func Gen(code string) ([]byte, *xgoerr.LineError) {
 		ndor.GlobalErr.Number = xgoerr.FindLine(code, ndor.GlobalErr.Flag)
 		return nil, ndor.GlobalErr
 	}
-	img, err := ndor.GlobalCtx.Image()
-	if err != nil {
-		return nil, &xgoerr.LineError{Number: -1, Msg: err.Error()}
+	return ndor.GlobalCtx.Drawing, nil
+}
+
+// Run executes the code and returns the SVG as a data URI.
+func Run(code string) (string, *xgoerr.LineError) {
+	d, lineErr := Compile(code)
+	if lineErr != nil {
+		return "", lineErr
 	}
-	buf := new(bytes.Buffer)
-	if err := png.Encode(buf, img); err != nil {
-		return nil, &xgoerr.LineError{Number: -1, Msg: err.Error()}
-	}
-	return buf.Bytes(), nil
+	return "data:image/svg+xml;base64," + base64.StdEncoding.EncodeToString(d.SVG()), nil
 }

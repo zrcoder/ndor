@@ -12,6 +12,8 @@ const (
 	cell               = 10
 	stepPixelsPerFrame = 4
 	turnDegPerFrame    = 14
+	// maxSubOps bounds compile-time allocation for huge step/turn values.
+	maxSubOps = 1000
 )
 
 // op is one micro-operation replayed by the app.
@@ -48,7 +50,8 @@ func Compile(code string) (*Program, *xgoerr.LineError) {
 		case "step":
 			// Split each step into small moves so the animation is smooth.
 			dist := float32(cmd.Val) * cell
-			n := max(int(math.Ceil(float64(dist)/float64(stepPixelsPerFrame))), 1)
+			n := max(int(math.Ceil(math.Abs(float64(dist))/float64(stepPixelsPerFrame))), 1)
+			n = min(n, maxSubOps)
 			step := dist / float32(n)
 			for range n {
 				p.ops = append(p.ops, op{kind: "step", val: step})
@@ -57,6 +60,7 @@ func Compile(code string) (*Program, *xgoerr.LineError) {
 			// Split each turn into small rotations so the animation is smooth.
 			deg := float32(cmd.Val)
 			n := max(int(math.Ceil(math.Abs(float64(deg))/float64(turnDegPerFrame))), 1)
+			n = min(n, maxSubOps)
 			t := deg / float32(n)
 			for range n {
 				p.ops = append(p.ops, op{kind: "turn", val: t})

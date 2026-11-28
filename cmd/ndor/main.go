@@ -31,8 +31,8 @@ func main() {
 		err = md.Convert(data, buf)
 		data = buf.Bytes()
 	} else {
-		outFile = getOutfile(inFile, ".png")
-		data, err = genPng(data)
+		outFile = getOutfile(inFile, ".svg")
+		data, err = genSVG(data)
 	}
 	if err != nil {
 		log.Fatal(err)
@@ -43,12 +43,12 @@ func main() {
 	}
 }
 
-func genPng(data []byte) ([]byte, error) {
-	src, lerr := ndor.Gen(string(data))
+func genSVG(data []byte) ([]byte, error) {
+	d, lerr := ndor.Compile(string(data))
 	if lerr != nil {
 		return nil, fmt.Errorf("line %d: %s", lerr.Number, lerr.Msg)
 	}
-	return src, nil
+	return d.SVG(), nil
 }
 
 func getOutfile(inFile, ext string) string {

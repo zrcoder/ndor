@@ -184,14 +184,14 @@ func (msgs Messages) SaveImage() string {
 	return Catalog.Format(msgs.locale, "save_image", nil)
 }
 
-// PngImage says "PNG Image"
+// SvgImage says "SVG Image"
 // in the language the app shows.
-func PngImage() string { return In(i18n.Locale()).PngImage() }
+func SvgImage() string { return In(i18n.Locale()).SvgImage() }
 
-// PngImage says "PNG Image"
+// SvgImage says "SVG Image"
 // in the language of msgs.
-func (msgs Messages) PngImage() string {
-	return Catalog.Format(msgs.locale, "png_image", nil)
+func (msgs Messages) SvgImage() string {
+	return Catalog.Format(msgs.locale, "svg_image", nil)
 }
 
 // SaveFailed says "Save failed"
@@ -212,18 +212,4 @@ func Saved() string { return In(i18n.Locale()).Saved() }
 // in the language of msgs.
 func (msgs Messages) Saved() string {
 	return Catalog.Format(msgs.locale, "saved", nil)
-}
-
-// DecodeFailed says "Failed to decode image: {err}"
-// in the language the app shows.
-//
-// Shown when the rendered image cannot be decoded.
-func DecodeFailed(err string) string { return In(i18n.Locale()).DecodeFailed(err) }
-
-// DecodeFailed says "Failed to decode image: {err}"
-// in the language of msgs.
-//
-// Shown when the rendered image cannot be decoded.
-func (msgs Messages) DecodeFailed(err string) string {
-	return Catalog.Format(msgs.locale, "decode_failed", map[string]any{"err": err})
 }

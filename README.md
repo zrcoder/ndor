@@ -18,7 +18,7 @@ A native GUI version built with [mygo](https://github.com/egoist/mygo), with one
 
 ## cli
 
-The CLI generates images for the **ndor** module.
+The CLI generates SVG drawings for the **ndor** module.
 
 Install with Go:
 
@@ -32,7 +32,7 @@ Run:
 ndor {source file}
 ```
 
-> The argument is the code source file(xxx.xgo or xxx.md), the cli will generate a image as xxx.png or a html as xxx.html.
+> The argument is the code source file(xxx.xgo or xxx.md), the cli will generate an SVG as xxx.svg or an HTML as xxx.html.
 
 ## develop
 

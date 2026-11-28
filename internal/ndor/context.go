@@ -2,8 +2,10 @@ package ndor
 
 import (
 	"fmt"
-	"image"
+	"html"
 	"math"
+	"strconv"
+	"strings"
 
 	"github.com/egoist/mygo/ui"
 )
@@ -43,94 +45,348 @@ type state struct {
 	lineWidth   float64
 }
 
-// drawOp is one recorded command, replayed in order by Image.
+const textFontFamily = "system-ui, sans-serif"
+
+// pathCmd is one SVG path command, kept as data so a drawing can be replayed
+// with mygo's painter and exported as SVG.
+type pathCmd struct {
+	op  byte // 0 move, 1 line, 2 quad, 3 cubic, 4 close
+	pts [3][2]float32
+}
+
+type path struct {
+	cmds []pathCmd
+}
+
+func (p *path) MoveTo(x, y float32) {
+	p.cmds = append(p.cmds, pathCmd{op: 0, pts: [3][2]float32{{x, y}}})
+}
+
+func (p *path) LineTo(x, y float32) {
+	p.cmds = append(p.cmds, pathCmd{op: 1, pts: [3][2]float32{{x, y}}})
+}
+
+func (p *path) QuadTo(cx, cy, x, y float32) {
+	p.cmds = append(p.cmds, pathCmd{op: 2, pts: [3][2]float32{{cx, cy}, {x, y}}})
+}
+
+func (p *path) CubeTo(c1x, c1y, c2x, c2y, x, y float32) {
+	p.cmds = append(p.cmds, pathCmd{op: 3, pts: [3][2]float32{{c1x, c1y}, {c2x, c2y}, {x, y}}})
+}
+
+func (p *path) Close() {
+	p.cmds = append(p.cmds, pathCmd{op: 4})
+}
+
+// renderXform scales paths before painting so large drawings do not tile and show seams.
+type renderXform struct {
+	dx, dy, scale float32
+}
+
+func (tf renderXform) x(x float32) float32 { return tf.dx + x*tf.scale }
+func (tf renderXform) y(y float32) float32 { return tf.dy + y*tf.scale }
+
+func (p path) ui(tf renderXform) ui.Path {
+	var out ui.Path
+	for _, c := range p.cmds {
+		q := c.pts
+		switch c.op {
+		case 0:
+			out.MoveTo(tf.x(q[0][0]), tf.y(q[0][1]))
+		case 1:
+			out.LineTo(tf.x(q[0][0]), tf.y(q[0][1]))
+		case 2:
+			out.QuadTo(tf.x(q[0][0]), tf.y(q[0][1]), tf.x(q[1][0]), tf.y(q[1][1]))
+		case 3:
+			out.CubeTo(tf.x(q[0][0]), tf.y(q[0][1]), tf.x(q[1][0]), tf.y(q[1][1]), tf.x(q[2][0]), tf.y(q[2][1]))
+		case 4:
+			out.Close()
+		}
+	}
+	return out
+}
+
+func num(v float32) string { return strconv.FormatFloat(float64(v), 'g', -1, 32) }
+
+func (p path) d() string {
+	var b strings.Builder
+	for i, c := range p.cmds {
+		q := c.pts
+		if i > 0 {
+			b.WriteByte(' ')
+		}
+		switch c.op {
+		case 0:
+			b.WriteString("M" + num(q[0][0]) + " " + num(q[0][1]))
+		case 1:
+			b.WriteString("L" + num(q[0][0]) + " " + num(q[0][1]))
+		case 2:
+			b.WriteString("Q" + num(q[0][0]) + " " + num(q[0][1]) + " " + num(q[1][0]) + " " + num(q[1][1]))
+		case 3:
+			b.WriteString("C" + num(q[0][0]) + " " + num(q[0][1]) + " " + num(q[1][0]) + " " + num(q[1][1]) + " " + num(q[2][0]) + " " + num(q[2][1]))
+		case 4:
+			b.WriteString("Z")
+		}
+	}
+	return b.String()
+}
+
+// drawOp is one recorded command, replayed by Render and written by SVG.
 type drawOp interface {
-	draw(p *ui.Painter)
+	draw(p *ui.Painter, tf renderXform)
+	svg(b *strings.Builder)
 }
 
 type fillOp struct {
-	path  ui.Path
+	path  path
 	color ui.Color
 }
 
-func (o fillOp) draw(p *ui.Painter) { p.FillPath(&o.path, o.color) }
+func (o fillOp) draw(p *ui.Painter, tf renderXform) {
+	path := o.path.ui(tf)
+	p.FillPath(&path, o.color)
+}
+
+func (o fillOp) svg(b *strings.Builder) {
+	b.WriteString(`<path d="` + o.path.d() + `"`)
+	svgPaint(b, "fill", o.color)
+	b.WriteString(`/>`)
+}
 
 type strokeOp struct {
-	path   ui.Path
+	path   path
 	color  ui.Color
 	width  float32
 	dashes []float32
 }
 
-func (o strokeOp) draw(p *ui.Painter) {
-	o.path.Dash(0, o.dashes...)
-	p.StrokePath(&o.path, o.width, o.color)
+func (o strokeOp) draw(p *ui.Painter, tf renderXform) {
+	path := o.path.ui(tf)
+	dashes := make([]float32, len(o.dashes))
+	for i, d := range o.dashes {
+		dashes[i] = d * tf.scale
+	}
+	path.Dash(0, dashes...)
+	p.StrokePath(&path, o.width*tf.scale, o.color)
+}
+
+func (o strokeOp) svg(b *strings.Builder) {
+	b.WriteString(`<path d="` + o.path.d() + `" fill="none"`)
+	svgPaint(b, "stroke", o.color)
+	b.WriteString(` stroke-width="` + num(o.width) + `" stroke-linecap="round" stroke-linejoin="round"`)
+	if len(o.dashes) > 0 {
+		b.WriteString(` stroke-dasharray="`)
+		for i, d := range o.dashes {
+			if i > 0 {
+				b.WriteByte(' ')
+			}
+			b.WriteString(num(d))
+			// SVG repeats an odd-length dash list, as mygo does.
+			if i == len(o.dashes)-1 && len(o.dashes)%2 == 1 {
+				b.WriteByte(' ')
+				b.WriteString(num(d))
+			}
+		}
+		b.WriteByte('"')
+	}
+	b.WriteString(`/>`)
 }
 
 type clipOp struct {
-	path ui.Path
+	path path
+	id   int
 }
 
-func (o clipOp) draw(p *ui.Painter) {}
+func (clipOp) draw(p *ui.Painter, tf renderXform) {}
+
+func (clipOp) svg(b *strings.Builder) {}
 
 type textOp struct {
-	text  string
-	x, y  float64
-	color ui.Color
-	scale float64
-	angle float64
+	text     string
+	x, y     float64
+	color    ui.Color
+	size     float32
+	angle    float64
+	layout   *ui.TextLayout
+	baseline float32
 }
 
-func (o textOp) size() float32 {
-	size := float32(13 * o.scale)
-	if size < 1 {
-		size = 13
+func (o textOp) draw(p *ui.Painter, tf renderXform) {
+	draw := func() {
+		p.TextLayout(o.layout, float32(o.x), float32(o.y)-o.baseline, o.color)
 	}
-	return size
-}
-
-func (o textOp) draw(p *ui.Painter) {
-	size := o.size()
-	x, y := float32(o.x), float32(o.y)
-	top := y - size*0.8
-	if o.angle != 0 {
-		p.Transform(ui.Rotation(float32(o.angle*180/math.Pi)), x, y, func() {
-			p.Text(x, top, o.text, size, o.color)
-		})
-		return
-	}
-	p.Text(x, top, o.text, size, o.color)
-}
-
-// bounds estimates the box the text covers, rotation included.
-func (o textOp) bounds() ui.Rect {
-	size := float64(o.size())
-	w := 0.0
-	for _, r := range o.text {
-		if r < 0x2E80 {
-			w += size * 0.55
-		} else {
-			w += size
+	transform := func() {
+		if o.angle != 0 {
+			p.Transform(ui.Rotation(float32(o.angle*180/math.Pi)), float32(o.x), float32(o.y), draw)
+			return
 		}
+		draw()
 	}
-	parts := [4][2]float64{{0, -size}, {w, -size}, {w, size * 0.35}, {0, size * 0.35}}
+	p.Transform(ui.Translation(tf.dx, tf.dy), 0, 0, func() {
+		p.Transform(ui.Scaling(tf.scale, tf.scale), 0, 0, transform)
+	})
+}
+
+func (o textOp) svg(b *strings.Builder) {
+	lines := strings.Split(o.text, "\n")
+	layout := o.layout.Lines()
+	for i, line := range lines {
+		b.WriteString(`<text x="` + num(float32(o.x)))
+		y := o.y
+		if i < len(layout) {
+			y = o.y - float64(o.baseline) + float64(layout[i].Baseline)
+		}
+		b.WriteString(`" y="` + num(float32(y)) + `" font-family="` + textFontFamily + `" font-size="` + num(o.size) + `" xml:space="preserve"`)
+		svgPaint(b, "fill", o.color)
+		if o.angle != 0 {
+			b.WriteString(` transform="rotate(` + num(float32(o.angle*180/math.Pi)) + " " + num(float32(o.x)) + " " + num(float32(o.y)) + `)"`)
+		}
+		b.WriteString(`>` + html.EscapeString(line) + `</text>`)
+	}
+}
+
+// bounds is the real ink box of the shaped text, rotation included.
+func (o textOp) bounds() box {
+	w, h := o.layout.Size()
+	top := -float64(o.baseline)
+	parts := [4][2]float64{{0, top}, {float64(w), top}, {float64(w), top + float64(h)}, {0, top + float64(h)}}
 	cos, sin := math.Cos(o.angle), math.Sin(o.angle)
 	x0, y0, x1, y1 := math.Inf(1), math.Inf(1), math.Inf(-1), math.Inf(-1)
 	for _, q := range parts {
 		x, y := o.x+q[0]*cos-q[1]*sin, o.y+q[0]*sin+q[1]*cos
 		x0, y0, x1, y1 = min(x0, x), min(y0, y), max(x1, x), max(y1, y)
 	}
-	return ui.Rect{X: float32(x0), Y: float32(y0), W: float32(x1 - x0), H: float32(y1 - y0)}
+	return box{x0: float32(x0), y0: float32(y0), x1: float32(x1), y1: float32(y1), ok: true}
 }
 
 type clearOp struct {
 	color ui.Color
 }
 
-func (o clearOp) draw(p *ui.Painter) {}
+func (clearOp) draw(p *ui.Painter, tf renderXform) {}
 
-// Context records the ndor API and renders it with mygo's painter.
+func (clearOp) svg(b *strings.Builder) {}
+
+func svgPaint(b *strings.Builder, name string, c ui.Color) {
+	b.WriteString(` ` + name + `="#` + fmt.Sprintf("%02x%02x%02x", c.R, c.G, c.B) + `"`)
+	if c.A != 255 {
+		b.WriteString(` ` + name + `-opacity="` + num(float32(c.A)/255) + `"`)
+	}
+}
+
+// Drawing is a recorded ndor drawing. It holds commands, not a full-size
+// bitmap, and can be scaled into any painter rect or exported as SVG.
+type Drawing struct {
+	ops []drawOp
+	ink box
+}
+
+// Bounds returns the content box in drawing coordinates.
+func (d *Drawing) Bounds() ui.Rect {
+	if !d.ink.ok {
+		return ui.Rect{}
+	}
+	return ui.Rect{X: d.ink.x0, Y: d.ink.y0, W: d.ink.x1 - d.ink.x0, H: d.ink.y1 - d.ink.y0}
+}
+
+// Render draws the content scaled to fit r, without enlarging it.
+func (d *Drawing) Render(p *ui.Painter, r ui.Rect) {
+	b := d.Bounds()
+	if b.W <= 0 || b.H <= 0 || r.W <= 0 || r.H <= 0 {
+		return
+	}
+	scale := min(r.W/b.W, r.H/b.H, 1)
+	tf := renderXform{
+		dx:    r.X + (r.W-b.W*scale)/2 - b.X*scale,
+		dy:    r.Y + (r.H-b.H*scale)/2 - b.Y*scale,
+		scale: scale,
+	}
+	start, bg, hasBG := d.renderPlan()
+	p.Clip(r, 0, func() {
+		if hasBG {
+			p.Fill(ui.Rect{X: tf.x(b.X), Y: tf.y(b.Y), W: b.W * scale, H: b.H * scale}, bg, 0)
+		}
+		replay(p, d.ops, start, tf)
+	})
+}
+
+// SVG returns a standalone SVG document with vector paths and live text.
+func (d *Drawing) SVG() []byte {
+	b := d.Bounds()
+	if b.W <= 0 || b.H <= 0 {
+		b = ui.Rect{W: 1, H: 1}
+	}
+	var out strings.Builder
+	fmt.Fprintf(&out, `<svg xmlns="http://www.w3.org/2000/svg" width="%s" height="%s" viewBox="%s %s %s %s">`, num(b.W), num(b.H), num(b.X), num(b.Y), num(b.W), num(b.H))
+	start, bg, hasBG := d.renderPlan()
+	var defs strings.Builder
+	for _, op := range d.ops {
+		if cl, ok := op.(clipOp); ok {
+			defs.WriteString(`<clipPath id="ndor-clip-` + strconv.Itoa(cl.id) + `"><path d="` + cl.path.d() + `"/></clipPath>`)
+		}
+	}
+	if defs.Len() > 0 {
+		out.WriteString(`<defs>` + defs.String() + `</defs>`)
+	}
+	if hasBG {
+		out.WriteString(`<rect x="` + num(b.X) + `" y="` + num(b.Y) + `" width="` + num(b.W) + `" height="` + num(b.H) + `"`)
+		svgPaint(&out, "fill", bg)
+		out.WriteString(`/>`)
+	}
+	writeSVG(&out, d.ops, start)
+	out.WriteString(`</svg>`)
+	return []byte(out.String())
+}
+
+func writeSVG(b *strings.Builder, ops []drawOp, start int) {
+	var draw func(int)
+	draw = func(i int) {
+		for ; i < len(ops); i++ {
+			if cl, ok := ops[i].(clipOp); ok {
+				b.WriteString(`<g clip-path="url(#ndor-clip-` + strconv.Itoa(cl.id) + `)">`)
+				draw(i + 1)
+				b.WriteString(`</g>`)
+				return
+			}
+			if i >= start {
+				ops[i].svg(b)
+			}
+		}
+	}
+	draw(0)
+}
+
+// renderPlan finds the last Clear, whose color becomes the background.
+func (d *Drawing) renderPlan() (start int, bg ui.Color, hasBG bool) {
+	for i, op := range d.ops {
+		if cl, ok := op.(clearOp); ok {
+			start, bg, hasBG = i+1, cl.color, true
+		}
+	}
+	return
+}
+
+// replay draws ops in order, applying each clip to everything after it.
+func replay(p *ui.Painter, ops []drawOp, start int, tf renderXform) {
+	var draw func(int)
+	draw = func(i int) {
+		for ; i < len(ops); i++ {
+			if cl, ok := ops[i].(clipOp); ok {
+				path := cl.path.ui(tf)
+				p.ClipPath(&path, func() { draw(i + 1) })
+				return
+			}
+			if i >= start {
+				ops[i].draw(p, tf)
+			}
+		}
+	}
+	draw(0)
+}
+
+// Context records the ndor API into a Drawing.
 type Context struct {
+	*Drawing
 	matrix      matrix
 	fillColor   ui.Color
 	strokeColor ui.Color
@@ -139,7 +395,7 @@ type Context struct {
 	lineWidth   float64
 	stack       []state
 
-	path       ui.Path
+	path       path
 	hasCurrent bool
 	startX     float64
 	startY     float64
@@ -148,9 +404,6 @@ type Context struct {
 
 	pathBox box // bounds of the path being built
 	clipBox box // bounds of the active clip, if any
-	ink     box // bounds of everything drawn
-
-	ops []drawOp
 }
 
 // box tracks the four edges of a region.
@@ -190,9 +443,22 @@ func (b *box) addCurve(pts ...float64) {
 	}
 }
 
+func intersectBox(a, b box) box {
+	if !a.ok || !b.ok {
+		return box{}
+	}
+	x0, y0 := max(a.x0, b.x0), max(a.y0, b.y0)
+	x1, y1 := min(a.x1, b.x1), min(a.y1, b.y1)
+	if x1 <= x0 || y1 <= y0 {
+		return box{}
+	}
+	return box{x0: x0, y0: y0, x1: x1, y1: y1, ok: true}
+}
+
 // NewContext returns a context whose origin is the picture center, +Y up.
 func NewContext() *Context {
 	return &Context{
+		Drawing:     &Drawing{},
 		matrix:      matrix{XX: 1, YY: -1},
 		fillColor:   ui.RGB(255, 255, 255),
 		strokeColor: ui.RGB(0, 0, 0),
@@ -262,7 +528,7 @@ func (c *Context) closePath() {
 }
 
 func (c *Context) clearPath() {
-	c.path = ui.Path{}
+	c.path = path{}
 	c.pathBox = box{}
 	c.hasCurrent = false
 }
@@ -360,9 +626,27 @@ func (c *Context) DrawString(s string, x, y float64) {
 	tx, ty := c.matrix.transformPoint(x, y)
 	angle := math.Atan2(c.matrix.YX, c.matrix.XX)
 	scale := math.Hypot(c.matrix.XX, c.matrix.YX)
-	op := textOp{text: s, x: tx, y: ty, color: c.textColor, scale: scale, angle: angle}
+	size := float32(13 * scale)
+	if size < 1 {
+		size = 13
+	}
+	layout := ui.ShapeText(s, ui.Font{Family: textFontFamily, Size: size}, 0)
+	lines := layout.Lines()
+	baseline := float32(0)
+	if len(lines) > 0 {
+		baseline = lines[0].Baseline
+	}
+	op := textOp{text: s, x: tx, y: ty, color: c.textColor, size: size, angle: angle, layout: layout, baseline: baseline}
 	c.ops = append(c.ops, op)
-	c.ink.addRect(op.bounds())
+	// Text is painted under the active clip; its ink must be clipped too,
+	// or an offscreen label enlarges the content box for no drawn pixels.
+	r := op.bounds()
+	if c.clipBox.ok {
+		r = intersectBox(r, c.clipBox)
+	}
+	if r.ok {
+		c.ink.addRect(ui.Rect{X: r.x0, Y: r.y0, W: r.x1 - r.x0, H: r.y1 - r.y0})
+	}
 }
 
 // pathRect returns the path's box widened by pad, cut to the active clip.
@@ -417,7 +701,7 @@ func (c *Context) StrokePreserve() {
 }
 
 func (c *Context) Clip() {
-	c.ops = append(c.ops, clipOp{path: c.path})
+	c.ops = append(c.ops, clipOp{path: c.path, id: len(c.ops)})
 	if c.pathBox.ok {
 		if c.clipBox.ok {
 			c.clipBox.x0, c.clipBox.y0 = max(c.clipBox.x0, c.pathBox.x0), max(c.clipBox.y0, c.pathBox.y0)
@@ -472,69 +756,4 @@ func (c *Context) RotateAbout(angle, x, y float64) {
 	cos, sin := math.Cos(angle), math.Sin(angle)
 	c.matrix = matrix{XX: cos, YX: sin, XY: -sin, YY: cos}.multiply(c.matrix)
 	c.Translate(-x, -y)
-}
-
-// Image renders the recorded drawing at the exact size of its content.
-// It refuses drawings over maxSide a side, where the canvas would take GBs.
-func (c *Context) Image() (image.Image, error) {
-	const maxSide = 8000
-	w := int(math.Ceil(float64(c.ink.x1 - c.ink.x0)))
-	h := int(math.Ceil(float64(c.ink.y1 - c.ink.y0)))
-	if w > maxSide || h > maxSide {
-		return nil, fmt.Errorf("drawing too large: %dx%d, at most %d a side", w, h, maxSide)
-	}
-
-	ops, clips, bg, hasBG := c.renderPlan()
-	tf := ui.Translation(-c.ink.x0, -c.ink.y0)
-	img := ui.Render(func(ctx *ui.Context) {
-		ctx.Root().Background(ui.Transparent)
-		ui.Column(ctx).Fill().Draw(func(p *ui.Painter, r ui.Rect) {
-			if hasBG {
-				p.Fill(ui.Rect{W: float32(w), H: float32(h)}, bg, 0)
-			}
-			p.Transform(tf, 0, 0, func() { replay(p, ops, clips) })
-		})
-	}, max(w, 1), max(h, 1), 1)
-	return img, nil
-}
-
-// renderPlan drops ops before the last Clear and keeps its active clips.
-func (c *Context) renderPlan() (ops []drawOp, clips []ui.Path, bg ui.Color, hasBG bool) {
-	start := 0
-	for i, op := range c.ops {
-		if cl, ok := op.(clearOp); ok {
-			start, bg, hasBG = i+1, cl.color, true
-		}
-	}
-	for _, op := range c.ops[:start] {
-		if cl, ok := op.(clipOp); ok {
-			clips = append(clips, cl.path)
-		}
-	}
-	return c.ops[start:], clips, bg, hasBG
-}
-
-// replay draws ops in order, applying each clip to everything after it.
-func replay(p *ui.Painter, ops []drawOp, clips []ui.Path) {
-	var draw func(int)
-	draw = func(i int) {
-		for ; i < len(ops); i++ {
-			if cl, ok := ops[i].(clipOp); ok {
-				path := cl.path
-				p.ClipPath(&path, func() { draw(i + 1) })
-				return
-			}
-			ops[i].draw(p)
-		}
-	}
-	var wrap func(k int)
-	wrap = func(k int) {
-		if k >= len(clips) {
-			draw(0)
-			return
-		}
-		path := clips[k]
-		p.ClipPath(&path, func() { wrap(k + 1) })
-	}
-	wrap(0)
 }

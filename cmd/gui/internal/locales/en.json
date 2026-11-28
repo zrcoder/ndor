@@ -15,12 +15,7 @@
   "tab_api": "API",
   "tab_tutorials": "Tutorials",
   "save_image": "Save Image",
-  "png_image": "PNG Image",
+  "svg_image": "SVG Image",
   "save_failed": "Save failed",
-  "saved": "Saved",
-  "decode_failed": "Failed to decode image: {err}",
-  "@decode_failed": {
-    "description": "Shown when the rendered image cannot be decoded.",
-    "placeholders": { "err": { "type": "String" } }
-  }
+  "saved": "Saved"
 }

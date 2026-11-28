@@ -15,8 +15,7 @@
   "tab_api": "API",
   "tab_tutorials": "教程",
   "save_image": "保存图片",
-  "png_image": "PNG 图片",
+  "svg_image": "SVG 图片",
   "save_failed": "保存失败",
-  "saved": "已保存",
-  "decode_failed": "图片解码失败：{err}"
+  "saved": "已保存"
 }
